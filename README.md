@@ -4,7 +4,9 @@ Wireframe hệ thống phân hàng thông minh sử dụng đèn LED định v�
 
 ## Demo
 
-Mở file `ptl_wireframes_all.html` trực tiếp trên trình duyệt — không cần cài đặt hay server.
+**https://rockship-team.github.io/pick-to-light/**
+
+Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 
 ## Màn hình
 
