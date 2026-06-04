@@ -8,14 +8,26 @@ Wireframe hệ thống phân hàng thông minh sử dụng đèn LED định v�
 
 Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 
+## Vai trò & phân quyền
+
+Đăng nhập chọn 1 trong 3 vai trò — sidebar và quyền thao tác tự thay đổi theo vai trò:
+
+| Vai trò | Nhiệm vụ | Màn hình thấy được |
+|---|---|---|
+| 📊 **Tổng Quản Lý** | Giám sát & ra quyết định | Dashboard, LOT/Batch *(xem)*, Gán tự động *(xem)*, Báo cáo |
+| 🏭 **Quản Lý Vận Hành** | Vận hành phân hàng hằng ngày | Dashboard, LOT/Batch, Nhận API, Gán tự động *(thao tác)*, Bổ sung hàng, Layout *(xem)*, Báo cáo |
+| 🔧 **IT / Kỹ Thuật** | Cài đặt & bảo trì hệ thống | Dashboard, Tạo Layout kho *(chỉnh sửa)*, Light Module Test, Cấu hình thiết bị |
+
 ## Màn hình
 
 | Màn hình | Mô tả |
 |---|---|
-| Đăng nhập | Xác thực theo vai trò: Quản Lý Vận Hành, IT, Tổng Quản Lý |
+| Đăng nhập | Chọn vai trò → mô tả nhiệm vụ → vào Dashboard |
+| Dashboard | Trang chủ theo vai trò: KPI, việc cần làm, truy cập nhanh |
 | Quản lý LOT / Batch | Theo dõi tiến độ các đợt phân hàng trong ngày |
 | Nhận dữ liệu API | Kết nối 2 đầu API: hàng tiếp nhận và kế hoạch phân phối |
-| Kết quả gán tự động | Xem và điều chỉnh phân bổ hàng theo từng cửa hàng |
+| Kết quả gán tự động | Mapping tồn kho × kế hoạch — đủ/thiếu/dư, xác nhận/từ chối/tính lại |
+| Báo cáo & thống kê | Sản lượng, độ chính xác, hiệu suất theo khu vực & nhân sự |
 | Tạo Layout kho | Cấu hình khu vực, kệ, tầng — kéo thả gán địa chỉ đèn |
 | Bổ sung hàng | Replenishment — đèn sáng hướng dẫn vị trí cần bổ sung |
 | Light Module Test | Kiểm tra hoạt động từng đèn trước khi vận hành |
