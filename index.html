@@ -439,7 +439,7 @@ tr:last-child td { border-bottom: none; }
               <button class="btn btn-ghost btn-sm">📊 Báo cáo</button>
             </td>
           </tr>
-          <tr>
+          <tr id="lot-row-BATCH-002">
             <td class="text-mono">BATCH-20260518-002</td>
             <td>18/05/2026 09:15</td>
             <td><span class="badge badge-blue">LOT-006</span> <span style="color:var(--text-muted);font-size:11px">+2 LOT</span></td>
@@ -451,10 +451,10 @@ tr:last-child td { border-bottom: none; }
                 <span class="text-mono text-sm">73%</span>
               </div>
             </td>
-            <td><span class="badge badge-yellow">Đang xử lý</span></td>
-            <td style="text-align:right">
+            <td id="lot-status-BATCH-002"><span class="badge badge-yellow">Đang xử lý</span></td>
+            <td style="text-align:right" id="lot-actions-BATCH-002">
               <button class="btn btn-ghost btn-sm">👁 Xem</button>
-              <button class="btn btn-primary btn-sm">▶ Tiếp tục</button>
+              <button class="btn btn-primary btn-sm" onclick="showScreen('autoassign')">🤖 Gán tự động</button>
             </td>
           </tr>
           <tr>
@@ -731,9 +731,9 @@ tr:last-child td { border-bottom: none; }
         <div class="page-desc">Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — Mapping API 1 (hàng tiếp nhận) × API 2 (kế hoạch phân phối)</div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-secondary">🔄 Tính lại</button>
-        <button class="btn btn-danger">✗ Từ chối</button>
-        <button class="btn btn-success" id="btn-confirm-assign">✓ Xác nhận & Bắt đầu</button>
+        <button class="btn btn-secondary" onclick="openRecalcModal()">🔄 Tính lại</button>
+        <button class="btn btn-danger" onclick="openRejectModal()">✗ Từ chối</button>
+        <button class="btn btn-success" id="btn-confirm-assign" onclick="openConfirmModal()">✓ Xác nhận & Bắt đầu</button>
       </div>
     </div>
   </div>
@@ -1301,6 +1301,100 @@ tr:last-child td { border-bottom: none; }
 
 </div><!-- /main -->
 
+<!-- Loading overlay -->
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(13,17,23,.75);z-index:400;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite"></div>
+  <div id="loading-msg" style="font-size:13px;color:var(--text-muted)">Đang xử lý...</div>
+</div>
+@keyframes spin { to { transform: rotate(360deg); } }
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+<!-- Modal: Tính lại -->
+<div id="modal-recalc" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeRecalcModal()">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Xác nhận tính lại</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeRecalcModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">
+        <div style="font-size:28px;line-height:1">🔄</div>
+        <div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:6px">Tính lại kết quả phân phối?</div>
+          <div style="font-size:13px;color:var(--text-muted)">Hệ thống sẽ chạy lại thuật toán từ dữ liệu API gốc. Mọi chỉnh sửa thủ công trong bảng sẽ bị xóa.</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-muted)">
+        📌 Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> &nbsp;·&nbsp; 100 SKU
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRecalcModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="doRecalc()">🔄 Xác nhận tính lại</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Từ chối -->
+<div id="modal-reject" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeRejectModal()">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--red)">✗ Từ chối kết quả</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeRejectModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Vui lòng chọn lý do từ chối để hệ thống ghi nhận và cải thiện:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px" id="reject-reasons">
+        <label class="reject-opt" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px">
+          <input type="radio" name="reject-reason" value="sku_wrong" style="accent-color:var(--red)"> Mã SKU không đúng
+        </label>
+        <label class="reject-opt" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px">
+          <input type="radio" name="reject-reason" value="qty_wrong" style="accent-color:var(--red)"> Số lượng phân phối sai
+        </label>
+        <label class="reject-opt" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px">
+          <input type="radio" name="reject-reason" value="data_error" style="accent-color:var(--red)"> Dữ liệu API lỗi / không đồng bộ
+        </label>
+        <label class="reject-opt" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px">
+          <input type="radio" name="reject-reason" value="other" style="accent-color:var(--red)"> Lý do khác
+        </label>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="label">Ghi chú thêm (tuỳ chọn)</label>
+        <textarea class="input" id="reject-note" rows="2" placeholder="Mô tả vấn đề cụ thể..." style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeRejectModal()">Hủy</button>
+      <button class="btn btn-danger" onclick="doReject()">✗ Xác nhận từ chối</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Xác nhận & Bắt đầu -->
+<div id="modal-confirm-assign" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeConfirmModal()">
+  <div class="modal" style="width:500px">
+    <div class="modal-header">
+      <div class="modal-title">✓ Xác nhận & Bắt đầu phân hàng</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeConfirmModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- tóm tắt -->
+      <div id="confirm-summary" style="margin-bottom:14px"></div>
+      <!-- cảnh báo SKU thiếu -->
+      <div id="confirm-short-warn" style="display:none;background:var(--red-dim);border:1px solid rgba(248,81,73,.25);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">⚠ Có SKU thiếu hàng</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Các SKU sau sẽ được bỏ qua trong lần phân hàng này:</div>
+        <div id="confirm-short-list" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted)">Sau khi xác nhận, hệ thống sẽ gửi lệnh bật đèn và chuyển Batch sang trạng thái <strong style="color:var(--yellow)">Đang thực hiện</strong>.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeConfirmModal()">Quay lại</button>
+      <button class="btn btn-success" onclick="doConfirmAssign()">✓ Bắt đầu phân hàng</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: thêm khu vực -->
 <div id="modal-add-zone" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeAddZoneModal()">
   <div class="modal">
@@ -1400,6 +1494,7 @@ function showScreen(id) {
   if (nav) nav.classList.add('active');
   document.getElementById('topbar-screen-name').textContent = '🖥 ' + (screens[id] || id);
   if (id === 'autoassign') renderAssignScreen();
+  if (id === 'lot') refreshLotStatuses();
   if (id === 'layout') {
     if (!isITRole()) { showToast('Chỉ Quản Lý Vận Hành mới có thể truy cập Tạo Layout kho', 'warn'); return; }
     renderLayoutScreen();
@@ -2167,6 +2262,165 @@ function toggleSurplusDetail() {
   _surplusOpen = !_surplusOpen;
   document.getElementById('surplus-detail').style.display = _surplusOpen ? '' : 'none';
   document.getElementById('surplus-toggle-label').textContent = _surplusOpen ? '▼ Thu gọn' : '▶ Xem chi tiết';
+}
+
+// ── LOADING OVERLAY ──
+function showLoading(msg) {
+  document.getElementById('loading-msg').textContent = msg || 'Đang xử lý...';
+  document.getElementById('loading-overlay').style.display = 'flex';
+}
+function hideLoading() {
+  document.getElementById('loading-overlay').style.display = 'none';
+}
+
+// ── FLOW 1: TÍNH LẠI ──
+function openRecalcModal() {
+  document.getElementById('modal-recalc').style.display = 'flex';
+}
+function closeRecalcModal() {
+  document.getElementById('modal-recalc').style.display = 'none';
+}
+function doRecalc() {
+  closeRecalcModal();
+  showLoading('Đang tính lại kết quả phân phối...');
+  setTimeout(() => {
+    hideLoading();
+    _assignFilter = 'all';
+    _assignSearch = '';
+    ['all','ok','short','surplus'].forEach(k => {
+      const el = document.getElementById('filter-' + k);
+      if (el) el.className = 'btn btn-sm ' + (k === 'all' ? 'btn-primary' : 'btn-secondary');
+    });
+    const inp = document.querySelector('#screen-autoassign input[type=text]');
+    if (inp) inp.value = '';
+    renderAssignScreen();
+    showToast('✓ Đã tính lại xong — kết quả được cập nhật', 'success');
+  }, 1400);
+}
+
+// ── FLOW 2: TỪ CHỐI ──
+function openRejectModal() {
+  // reset form
+  document.querySelectorAll('input[name="reject-reason"]').forEach(r => r.checked = false);
+  document.getElementById('reject-note').value = '';
+  // style lại các option khi chọn
+  document.querySelectorAll('#reject-reasons label').forEach(lbl => {
+    lbl.style.borderColor = 'var(--border)';
+    lbl.style.background  = 'transparent';
+    lbl.querySelector('input').addEventListener('change', function() {
+      document.querySelectorAll('#reject-reasons label').forEach(l => {
+        l.style.borderColor = 'var(--border)';
+        l.style.background  = 'transparent';
+      });
+      lbl.style.borderColor = 'var(--red)';
+      lbl.style.background  = 'var(--red-dim)';
+    });
+  });
+  document.getElementById('modal-reject').style.display = 'flex';
+}
+function closeRejectModal() {
+  document.getElementById('modal-reject').style.display = 'none';
+}
+function doReject() {
+  const chosen = document.querySelector('input[name="reject-reason"]:checked');
+  if (!chosen) { showToast('Vui lòng chọn lý do từ chối', 'warn'); return; }
+  closeRejectModal();
+  showLoading('Đang ghi nhận từ chối...');
+  setTimeout(() => {
+    hideLoading();
+    // cập nhật badge trên bảng LOT (row BATCH-20260518-002 → Đã từ chối)
+    _batchStatuses['BATCH-20260518-002'] = 'rejected';
+    showToast('Đã từ chối — vui lòng nhận lại dữ liệu từ API', 'error');
+    setTimeout(() => showScreen('import'), 900);
+  }, 1000);
+}
+
+// ── FLOW 3: XÁC NHẬN & BẮT ĐẦU ──
+function openConfirmModal() {
+  const data      = ASSIGN_DATA;
+  const nOk       = data.filter(d => d.status === 'ok').length;
+  const nShort    = data.filter(d => d.status === 'short').length;
+  const nSurplus  = data.filter(d => d.status === 'surplus').length;
+  const totalPlan = data.reduce((s, d) => s + d.plan, 0);
+
+  document.getElementById('confirm-summary').innerHTML = `
+    <div class="stat-grid stat-grid-4" style="margin-bottom:0">
+      <div class="stat-card" style="padding:10px 12px">
+        <div class="stat-label">Tổng SKU</div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--accent)">${data.length}</div>
+      </div>
+      <div class="stat-card" style="padding:10px 12px">
+        <div class="stat-label">Sẽ phân hàng</div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--green)">${nOk + nSurplus}</div>
+      </div>
+      <div class="stat-card" style="padding:10px 12px">
+        <div class="stat-label">Bỏ qua (thiếu)</div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--red)">${nShort}</div>
+      </div>
+      <div class="stat-card" style="padding:10px 12px">
+        <div class="stat-label">Tổng đơn vị</div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600">${totalPlan.toLocaleString()}</div>
+      </div>
+    </div>`;
+
+  const warnEl   = document.getElementById('confirm-short-warn');
+  const listEl   = document.getElementById('confirm-short-list');
+  if (nShort > 0) {
+    warnEl.style.display = '';
+    const shortItems = data.filter(d => d.status === 'short');
+    listEl.innerHTML = shortItems.map(d =>
+      `<span style="background:var(--surface);border:1px solid rgba(248,81,73,.3);border-radius:20px;padding:2px 8px;font-size:11px;font-family:var(--font-mono);color:var(--red)">${d.sku} <span style="color:var(--text-muted)">thiếu ${Math.abs(d.diff)}</span></span>`
+    ).join('');
+  } else {
+    warnEl.style.display = 'none';
+  }
+  document.getElementById('modal-confirm-assign').style.display = 'flex';
+}
+function closeConfirmModal() {
+  document.getElementById('modal-confirm-assign').style.display = 'none';
+}
+function doConfirmAssign() {
+  closeConfirmModal();
+  showLoading('Đang gửi lệnh bật đèn...');
+  setTimeout(() => {
+    document.getElementById('loading-msg').textContent = 'Đèn đang sáng — chuyển màn hình...';
+    setTimeout(() => {
+      hideLoading();
+      _batchStatuses['BATCH-20260518-002'] = 'running';
+      showToast('✓ Đã bắt đầu — đèn đang sáng tại khu vực A & B', 'success');
+      setTimeout(() => showScreen('lot'), 800);
+    }, 900);
+  }, 1200);
+}
+
+// ── BATCH STATUS (cho LOT screen highlight) ──
+const _batchStatuses = {};
+
+function refreshLotStatuses() {
+  const st = _batchStatuses['BATCH-20260518-002'];
+  if (!st) return;
+  const row       = document.getElementById('lot-row-BATCH-002');
+  const statusEl  = document.getElementById('lot-status-BATCH-002');
+  const actionsEl = document.getElementById('lot-actions-BATCH-002');
+  if (!row || !statusEl) return;
+
+  if (st === 'running') {
+    row.style.outline = '2px solid var(--green)';
+    row.style.outlineOffset = '-2px';
+    row.style.background = 'rgba(63,185,80,.05)';
+    statusEl.innerHTML = `<span class="badge badge-yellow" style="animation:tpulse .8s ease infinite alternate">● Đang phân hàng</span>`;
+    actionsEl.innerHTML = `
+      <button class="btn btn-ghost btn-sm">👁 Xem</button>
+      <button class="btn btn-success btn-sm" style="animation:tpulse 1s ease infinite alternate">💡 Đèn đang sáng</button>`;
+  } else if (st === 'rejected') {
+    row.style.outline = '2px solid var(--red)';
+    row.style.outlineOffset = '-2px';
+    row.style.background = 'rgba(248,81,73,.04)';
+    statusEl.innerHTML = `<span class="badge badge-red">✗ Đã từ chối</span>`;
+    actionsEl.innerHTML = `
+      <button class="btn btn-ghost btn-sm">👁 Xem</button>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('import')">📥 Nhận lại data</button>`;
+  }
 }
 
 // ── IMPORT TAB ──
