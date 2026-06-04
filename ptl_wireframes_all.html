@@ -727,94 +727,70 @@ tr:last-child td { border-bottom: none; }
   <div class="page-header">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="page-title">Xác nhận kết quả gán tự động</div>
-        <div class="page-desc">Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — Hệ thống đã phân chia số lượng theo thuật toán</div>
+        <div class="page-title">Kết quả gán tự động</div>
+        <div class="page-desc">Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — Mapping API 1 (hàng tiếp nhận) × API 2 (kế hoạch phân phối)</div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-secondary">🔄 Tính lại</button>
         <button class="btn btn-danger">✗ Từ chối</button>
-        <button class="btn btn-success">✓ Xác nhận & Bắt đầu</button>
+        <button class="btn btn-success" id="btn-confirm-assign">✓ Xác nhận & Bắt đầu</button>
       </div>
     </div>
   </div>
 
-  <div class="stat-grid stat-grid-4" style="margin-bottom:16px">
-    <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">6</div></div>
-    <div class="stat-card"><div class="stat-label">Tổng hàng phân</div><div class="stat-value">348</div></div>
-    <div class="stat-card"><div class="stat-label">Địa điểm nhận</div><div class="stat-value" style="color:var(--purple)">12</div></div>
-    <div class="stat-card"><div class="stat-label">Cần điều chỉnh</div><div class="stat-value" style="color:var(--yellow)">2</div><div class="stat-sub">SL lẻ cần xác nhận</div></div>
+  <!-- Stats -->
+  <div class="stat-grid stat-grid-4" style="margin-bottom:16px" id="assign-stats"></div>
+
+  <!-- Surplus note panel -->
+  <div id="assign-surplus-panel" style="margin-bottom:16px;display:none">
+    <div style="background:var(--yellow-dim);border:1px solid rgba(210,153,34,.35);border-radius:var(--radius);padding:12px 16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--yellow)">
+          ⚠ Hàng dư — cần lưu kho hoặc điều phối lại
+        </div>
+        <button class="btn btn-ghost btn-sm" style="color:var(--yellow);font-size:11px" onclick="toggleSurplusDetail()">
+          <span id="surplus-toggle-label">▼ Thu gọn</span>
+        </button>
+      </div>
+      <div id="surplus-detail">
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="surplus-chips"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="tooltip-note">
-    💡 Bạn có thể chỉnh sửa trực tiếp số lượng trong bảng. Tổng sẽ tự động cập nhật.
+  <!-- Filter bar -->
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--text-muted)">Lọc:</span>
+    <button class="btn btn-sm btn-primary" id="filter-all"   onclick="filterAssign('all')">Tất cả</button>
+    <button class="btn btn-sm btn-secondary" id="filter-ok"  onclick="filterAssign('ok')">✓ Đủ hàng</button>
+    <button class="btn btn-sm btn-secondary" id="filter-short" onclick="filterAssign('short')">✗ Thiếu hàng</button>
+    <button class="btn btn-sm btn-secondary" id="filter-surplus" onclick="filterAssign('surplus')">⚠ Dư hàng</button>
+    <div style="margin-left:auto">
+      <input class="input" placeholder="🔍 Tìm SKU..." style="width:200px" oninput="searchAssign(this.value)">
+    </div>
   </div>
 
-  <div class="card">
-    <div class="table-wrap">
-      <table class="assign-table">
-        <thead>
+  <!-- Table -->
+  <div class="card" style="padding:0">
+    <div class="table-wrap" style="max-height:calc(100vh - 340px);overflow-y:auto">
+      <table id="assign-table">
+        <thead style="position:sticky;top:0;background:var(--surface);z-index:10">
           <tr>
-            <th>SKU / Địa điểm</th>
-            <th>Tổng hàng</th>
-            <th>Đã phân</th>
-            <th>Cửa hàng A</th>
-            <th>Cửa hàng B</th>
-            <th>Cửa hàng C</th>
-            <th>Cửa hàng D</th>
-            <th>Cửa hàng E</th>
-            <th>Chênh lệch</th>
+            <th style="min-width:110px">SKU</th>
+            <th style="min-width:180px">Tên hàng</th>
+            <th>LOT</th>
+            <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
+            <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
+            <th style="text-align:right">CH-A</th>
+            <th style="text-align:right">CH-B</th>
+            <th style="text-align:right">CH-C</th>
+            <th style="text-align:right">CH-D</th>
+            <th style="text-align:right">CH-E</th>
+            <th style="text-align:right">Chênh lệch</th>
+            <th>Trạng thái</th>
           </tr>
         </thead>
-        <tbody>
-          <tr class="sku-row"><td colspan="9">📦 SKU-100 · Áo thun trắng size M</td></tr>
-          <tr>
-            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-001</td>
-            <td class="assign-total">120</td>
-            <td class="assign-total" style="color:var(--green)">120</td>
-            <td><input class="input assign-input" value="30"></td>
-            <td><input class="input assign-input" value="25"></td>
-            <td><input class="input assign-input" value="28"></td>
-            <td><input class="input assign-input" value="20"></td>
-            <td><input class="input assign-input" value="17"></td>
-            <td class="assign-diff diff-ok">0</td>
-          </tr>
-          <tr class="sku-row"><td colspan="9">📦 SKU-101 · Quần jean xanh size 30</td></tr>
-          <tr>
-            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-002</td>
-            <td class="assign-total">87</td>
-            <td class="assign-total" style="color:var(--yellow)">85</td>
-            <td><input class="input assign-input" value="20"></td>
-            <td><input class="input assign-input" value="18"></td>
-            <td><input class="input assign-input" value="22"></td>
-            <td><input class="input assign-input" value="15"></td>
-            <td><input class="input assign-input" value="10"></td>
-            <td class="assign-diff diff-warn">-2</td>
-          </tr>
-          <tr class="sku-row"><td colspan="9">📦 SKU-102 · Giày thể thao size 42</td></tr>
-          <tr>
-            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-003</td>
-            <td class="assign-total">54</td>
-            <td class="assign-total" style="color:var(--red)">56</td>
-            <td><input class="input assign-input" value="12"></td>
-            <td><input class="input assign-input" value="11"></td>
-            <td><input class="input assign-input" value="13"></td>
-            <td><input class="input assign-input" value="10"></td>
-            <td><input class="input assign-input" value="10"></td>
-            <td class="assign-diff diff-err">+2</td>
-          </tr>
-          <tr class="sku-row"><td colspan="9">📦 SKU-103 · Túi xách da nâu</td></tr>
-          <tr>
-            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-004</td>
-            <td class="assign-total">87</td>
-            <td class="assign-total" style="color:var(--green)">87</td>
-            <td><input class="input assign-input" value="18"></td>
-            <td><input class="input assign-input" value="17"></td>
-            <td><input class="input assign-input" value="20"></td>
-            <td><input class="input assign-input" value="16"></td>
-            <td><input class="input assign-input" value="16"></td>
-            <td class="assign-diff diff-ok">0</td>
-          </tr>
-        </tbody>
+        <tbody id="assign-tbody"></tbody>
       </table>
     </div>
   </div>
@@ -1423,6 +1399,7 @@ function showScreen(id) {
   const nav = document.getElementById('nav-' + id);
   if (nav) nav.classList.add('active');
   document.getElementById('topbar-screen-name').textContent = '🖥 ' + (screens[id] || id);
+  if (id === 'autoassign') renderAssignScreen();
   if (id === 'layout') {
     if (!isITRole()) { showToast('Chỉ Quản Lý Vận Hành mới có thể truy cập Tạo Layout kho', 'warn'); return; }
     renderLayoutScreen();
@@ -2012,6 +1989,169 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+// ── AUTO ASSIGN MOCK DATA & RENDER ──
+const PRODUCT_NAMES = [
+  'Áo thun trắng','Áo thun đen','Áo polo xanh','Áo sơ mi trắng','Áo khoác gió',
+  'Quần jean xanh','Quần tây đen','Quần short kaki','Quần jogger xám','Quần legging đen',
+  'Giày thể thao','Giày da đen','Giày sandal nâu','Dép tông','Giày vải trắng',
+  'Túi xách da','Ba lô laptop','Túi tote canvas','Ví da nam','Ví clutch nữ',
+  'Mũ snapback','Mũ bucket','Nón lưỡi trai','Khăn quàng len','Thắt lưng da',
+  'Tất thể thao','Tất lưới','Đồng hồ thể thao','Kính râm UV','Vòng tay bạc',
+  'Áo len cổ lọ','Áo hoodie','Áo croptop','Áo blazer','Áo cardigan',
+  'Váy maxi','Váy mini','Chân váy xếp ly','Đầm dạ hội','Jumpsuit',
+  'Quần cullote','Quần lửng','Shorts thun','Bộ pyjama','Đồ ngủ lụa',
+  'Bra thể thao','Áo lót cotton','Quần lót boxer','Tất không gót','Set đồ lót',
+  'Dây nịt thun','Khóa thắt lưng','Phụ kiện tóc','Kẹp tóc bướm','Bờm tóc',
+  'Áo gile đan','Quần bermuda','Áo peplum','Áo off-shoulder','Áo bodysuit',
+  'Áo bomber','Áo windbreaker','Áo flannel','Áo denim','Áo terry',
+  'Giày cao gót','Giày mules','Giày oxford','Giày slip-on','Boot cổ ngắn',
+  'Túi đeo chéo','Túi mini bucket','Túi belt bag','Túi hobo','Túi flap',
+  'Khăn bandana','Khăn scarf lụa','Khăn len mỏng','Nón bê rê','Mũ rộng vành',
+  'Áo thun polo nữ','Áo thun raglan','Áo thun tie-dye','Áo thun oversize','Áo thun crop',
+  'Quần palazzo','Quần wide leg','Quần suit','Quần chino','Quần cargo',
+  'Áo khoác denim','Áo khoác lông','Áo khoác da','Áo khoác puffer','Áo vest'
+];
+const SIZES  = ['XS','S','M','L','XL','XXL','28','30','32','34','36','38','40','42','44'];
+const LOTS   = ['LOT-001','LOT-002','LOT-003','LOT-004','LOT-005'];
+
+function seededRand(seed) {
+  let s = seed;
+  return function() { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+}
+
+function buildAssignData() {
+  const rng = seededRand(42);
+  return Array.from({length: 100}, (_, i) => {
+    const idx   = i % PRODUCT_NAMES.length;
+    const size  = SIZES[i % SIZES.length];
+    const stock = Math.floor(rng() * 180) + 20;          // 20–199
+    const plan  = Math.floor(rng() * 180) + 20;           // 20–199
+
+    // phân bổ plan cho 5 cửa hàng
+    const stores = [0,0,0,0,0];
+    let rem = plan;
+    for (let j = 0; j < 4; j++) {
+      stores[j] = Math.floor(rng() * (rem * 0.4)) + 1;
+      rem -= stores[j];
+    }
+    stores[4] = Math.max(0, rem);
+
+    const diff = stock - plan;
+    const status = diff === 0 ? 'ok' : diff > 0 ? 'surplus' : 'short';
+
+    return {
+      sku:    `SKU-${String(i + 100).padStart(3,'0')}`,
+      name:   `${PRODUCT_NAMES[idx]} ${size}`,
+      lot:    LOTS[i % LOTS.length],
+      stock,
+      plan,
+      stores,
+      diff,
+      status
+    };
+  });
+}
+
+const ASSIGN_DATA = buildAssignData();
+let _assignFilter = 'all';
+let _assignSearch = '';
+let _surplusOpen  = true;
+
+function renderAssignScreen() {
+  const data = ASSIGN_DATA;
+  const nOk      = data.filter(d => d.status === 'ok').length;
+  const nShort   = data.filter(d => d.status === 'short').length;
+  const nSurplus = data.filter(d => d.status === 'surplus').length;
+  const totalStock= data.reduce((s,d) => s + d.stock, 0);
+
+  // stats
+  document.getElementById('assign-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">${data.length}</div><div class="stat-sub">100 mã hàng</div></div>
+    <div class="stat-card"><div class="stat-label">Đủ hàng</div><div class="stat-value" style="color:var(--green)">${nOk}</div><div class="stat-sub">Tồn kho = kế hoạch ±0</div></div>
+    <div class="stat-card"><div class="stat-label">Thiếu hàng</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">Cần bổ sung trước khi phân</div></div>
+    <div class="stat-card"><div class="stat-label">Dư hàng</div><div class="stat-value" style="color:var(--yellow)">${nSurplus}</div><div class="stat-sub">Cần lưu kho hoặc điều phối</div></div>
+  `;
+
+  // surplus panel
+  const surplus = data.filter(d => d.status === 'surplus');
+  const sp = document.getElementById('assign-surplus-panel');
+  sp.style.display = surplus.length ? '' : 'none';
+  document.getElementById('surplus-chips').innerHTML = surplus.map(d =>
+    `<div style="background:var(--surface);border:1px solid rgba(210,153,34,.4);border-radius:20px;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:6px">
+      <span class="text-mono" style="color:var(--yellow)">${d.sku}</span>
+      <span style="color:var(--text-muted)">${d.name}</span>
+      <span style="font-family:var(--font-mono);font-weight:600;color:var(--yellow)">+${d.diff}</span>
+    </div>`
+  ).join('');
+
+  renderAssignTable();
+}
+
+function renderAssignTable() {
+  let rows = ASSIGN_DATA;
+  if (_assignFilter !== 'all') rows = rows.filter(d => d.status === _assignFilter);
+  if (_assignSearch) {
+    const q = _assignSearch.toLowerCase();
+    rows = rows.filter(d => d.sku.toLowerCase().includes(q) || d.name.toLowerCase().includes(q));
+  }
+
+  const tbody = document.getElementById('assign-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-muted)">Không có kết quả</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(d => {
+    const diffStr  = d.diff === 0 ? '0' : d.diff > 0 ? `+${d.diff}` : `${d.diff}`;
+    const diffCls  = d.diff === 0 ? 'diff-ok' : d.diff > 0 ? 'diff-warn' : 'diff-err';
+
+    let statusBadge, rowBg = '';
+    if (d.status === 'ok') {
+      statusBadge = `<span class="badge badge-green">✓ Đủ</span>`;
+      rowBg = 'background:rgba(63,185,80,.04)';
+    } else if (d.status === 'short') {
+      statusBadge = `<span class="badge badge-red">✗ Thiếu ${Math.abs(d.diff)}</span>`;
+      rowBg = 'background:rgba(248,81,73,.04)';
+    } else {
+      statusBadge = `<span class="badge badge-yellow">⚠ Dư ${d.diff}</span>`;
+      rowBg = 'background:rgba(210,153,34,.04)';
+    }
+
+    const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
+
+    return `<tr style="${rowBg}">
+      <td class="text-mono" style="font-size:12px">${d.sku}</td>
+      <td style="font-size:13px">${d.name}</td>
+      <td class="text-mono text-sm" style="color:var(--text-muted)">${d.lot}</td>
+      <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
+      <td class="text-mono" style="text-align:right">${d.plan}</td>
+      ${d.stores.map(s => `<td class="text-mono" style="text-align:right;font-size:12px">${s}</td>`).join('')}
+      <td class="assign-diff ${diffCls}" style="text-align:right">${diffStr}</td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterAssign(f) {
+  _assignFilter = f;
+  ['all','ok','short','surplus'].forEach(k => {
+    const el = document.getElementById('filter-' + k);
+    if (el) { el.className = 'btn btn-sm ' + (k === f ? 'btn-primary' : 'btn-secondary'); }
+  });
+  renderAssignTable();
+}
+
+function searchAssign(q) {
+  _assignSearch = q;
+  renderAssignTable();
+}
+
+function toggleSurplusDetail() {
+  _surplusOpen = !_surplusOpen;
+  document.getElementById('surplus-detail').style.display = _surplusOpen ? '' : 'none';
+  document.getElementById('surplus-toggle-label').textContent = _surplusOpen ? '▼ Thu gọn' : '▶ Xem chi tiết';
+}
 
 // ── IMPORT TAB ──
 function switchImportTab(tab) {
