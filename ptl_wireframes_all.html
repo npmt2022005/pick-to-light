@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Put-to-Light — Wireframes</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2330;
+  --surface3: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-muted: #7d8590;
+  --text-subtle: #484f58;
+  --accent: #58a6ff;
+  --accent-dim: rgba(88,166,255,.15);
+  --green: #3fb950;
+  --green-dim: rgba(63,185,80,.15);
+  --yellow: #d29922;
+  --yellow-dim: rgba(210,153,34,.15);
+  --red: #f85149;
+  --red-dim: rgba(248,81,73,.15);
+  --purple: #bc8cff;
+  --purple-dim: rgba(188,140,255,.15);
+  --light-on: #ffd60a;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-ui: 'IBM Plex Sans Thai', sans-serif;
+  --radius: 6px;
+  --sidebar-w: 220px;
+  --topbar-h: 52px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h);
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; z-index: 200;
+}
+.logo { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: 2px; }
+.topbar-center { font-size: 11px; color: var(--text-muted); background: var(--surface2); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); font-weight: 600; }
+.user-info { text-align: right; }
+.user-name { font-size: 12px; font-weight: 500; }
+.user-role { font-size: 10px; color: var(--text-muted); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed; top: var(--topbar-h); left: 0; bottom: 0; width: var(--sidebar-w);
+  background: var(--surface); border-right: 1px solid var(--border);
+  overflow-y: auto; z-index: 100; padding: 12px 0;
+}
+.sidebar-section { padding: 8px 16px 4px; font-size: 10px; font-weight: 600; color: var(--text-subtle); letter-spacing: 1px; text-transform: uppercase; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px; cursor: pointer; font-size: 13px; color: var(--text-muted);
+  border-left: 2px solid transparent; transition: all .15s;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); border-left-color: var(--accent); }
+.nav-icon { font-size: 14px; width: 18px; text-align: center; }
+.nav-badge { margin-left: auto; font-family: var(--font-mono); font-size: 10px; background: var(--red-dim); color: var(--red); padding: 1px 5px; border-radius: 10px; }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); padding: 24px; min-height: calc(100vh - var(--topbar-h)); }
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── COMMON COMPONENTS ── */
+.page-header { margin-bottom: 20px; }
+.page-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.page-desc { font-size: 13px; color: var(--text-muted); }
+.page-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+.card-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+.btn { padding: 7px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all .15s; font-family: var(--font-ui); }
+.btn-primary { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.btn-primary:hover { opacity: .85; }
+.btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { background: var(--surface2); }
+.btn-danger { background: transparent; color: var(--red); border-color: var(--red-dim); }
+.btn-danger:hover { background: var(--red-dim); }
+.btn-success { background: var(--green); color: #0d1117; }
+.btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+.btn-ghost:hover { color: var(--text); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-icon { padding: 6px 8px; }
+
+.badge { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.badge-blue { background: var(--accent-dim); color: var(--accent); }
+.badge-purple { background: var(--purple-dim); color: var(--purple); }
+.badge-gray { background: var(--surface2); color: var(--text-muted); }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tr:hover td { background: var(--surface2); }
+tr:last-child td { border-bottom: none; }
+
+.input { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; color: var(--text); font-size: 13px; font-family: var(--font-ui); width: 100%; outline: none; transition: border-color .15s; }
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--text-subtle); }
+.select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237d8590'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+.label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 5px; display: block; }
+
+.stat-grid { display: grid; gap: 12px; }
+.stat-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.stat-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.stat-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+.stat-value { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
+.stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.row { display: flex; gap: 12px; align-items: flex-start; }
+.col { flex: 1; }
+.flex-center { display: flex; align-items: center; gap: 8px; }
+.ml-auto { margin-left: auto; }
+.text-muted { color: var(--text-muted); }
+.text-mono { font-family: var(--font-mono); }
+.text-sm { font-size: 12px; }
+
+/* ── SCREEN 1: LOGIN ── */
+.login-wrap { min-height: calc(100vh - var(--topbar-h)); display: flex; align-items: center; justify-content: center; }
+.login-card { width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 32px; }
+.login-logo { text-align: center; margin-bottom: 24px; }
+.login-logo-text { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: 3px; }
+.login-logo-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.form-group { margin-bottom: 14px; }
+.login-footer { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
+.role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.role-opt { padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); text-align: center; cursor: pointer; font-size: 12px; transition: all .15s; }
+.role-opt.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+.role-opt .role-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+
+/* ── SCREEN 2: LOT/BATCH ── */
+.filter-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-bar .input { width: 200px; }
+.progress-bar { height: 5px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .3s; }
+.progress-fill.green { background: var(--green); }
+.progress-fill.yellow { background: var(--yellow); }
+
+/* ── SCREEN 3: API IMPORT ── */
+.import-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px; text-align: center; cursor: pointer; transition: all .2s; }
+.import-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+.import-icon { font-size: 36px; margin-bottom: 10px; }
+.import-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.import-desc { font-size: 12px; color: var(--text-muted); }
+.validation-row td:first-child { border-left: 3px solid transparent; }
+.validation-row.ok td:first-child { border-left-color: var(--green); }
+.validation-row.error td:first-child { border-left-color: var(--red); }
+.validation-row.warn td:first-child { border-left-color: var(--yellow); }
+
+/* ── SCREEN 4: AUTO ASSIGN ── */
+.assign-table th, .assign-table td { padding: 8px 10px; }
+.assign-input { width: 60px; text-align: center; padding: 4px 6px; }
+.assign-total { font-family: var(--font-mono); font-weight: 600; }
+.assign-diff { font-family: var(--font-mono); font-size: 12px; }
+.diff-ok { color: var(--green); }
+.diff-warn { color: var(--yellow); }
+.diff-err { color: var(--red); }
+.sku-row { background: var(--surface2); }
+.sku-row td { font-weight: 600; font-size: 12px; color: var(--accent); padding: 6px 10px; }
+
+/* ── SCREEN 5: LAYOUT ── */
+.layout-builder { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+.layout-sidebar { display: flex; flex-direction: column; gap: 12px; }
+.shelf-visual { display: flex; flex-direction: column; gap: 4px; }
+.shelf-row { display: flex; gap: 4px; align-items: center; }
+.shelf-label { font-size: 10px; color: var(--text-muted); width: 30px; text-align: right; font-family: var(--font-mono); }
+.shelf-cell { width: 44px; height: 34px; border: 1px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-family: var(--font-mono); color: var(--text-muted); cursor: pointer; transition: all .15s; background: var(--surface2); }
+.shelf-cell:hover { border-color: var(--accent); background: var(--accent-dim); }
+.shelf-cell.has-light { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+.shelf-cell.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+.khu-vuc-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+.khu-vuc-header { padding: 10px 14px; background: var(--surface2); display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; border-bottom: 1px solid var(--border); }
+.khu-vuc-content { padding: 12px 14px; }
+.area-dot { width: 8px; height: 8px; border-radius: 50%; }
+.shelf-cell[draggable="true"] { cursor: grab; }
+.shelf-cell.dragging { opacity: .3; cursor: grabbing; }
+.shelf-cell.drag-over { border-color: var(--accent) !important; background: var(--accent-dim) !important; transform: scale(1.08); z-index: 1; position: relative; }
+
+/* ── LAYOUT OVERVIEW ── */
+.view-toggle { display: flex; gap: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 3px; width: fit-content; margin-bottom: 16px; }
+.view-btn { padding: 5px 16px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--text-muted); transition: all .15s; font-family: var(--font-ui); }
+.view-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+.zone-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.zone-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.zone-card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-dim); }
+.zone-card-header { padding: 10px 12px; background: var(--surface2); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+.zone-card-map { padding: 12px; }
+.mini-shelf-block { margin-bottom: 8px; }
+.mini-shelf-block:last-child { margin-bottom: 0; }
+.mini-row { display: flex; gap: 2px; align-items: center; margin-bottom: 2px; }
+.mini-label { font-size: 9px; color: var(--text-subtle); width: 16px; text-align: right; font-family: var(--font-mono); flex-shrink: 0; }
+.mini-cell { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.mini-cell.mc-on  { background: var(--green); opacity: .85; }
+.mini-cell.mc-off { background: var(--surface3); border: 1px solid var(--border); }
+.mini-cell.mc-ok  { background: var(--green); }
+.mini-cell.mc-err { background: var(--red); }
+.zone-card-stats { padding: 8px 12px; border-top: 1px solid var(--border); }
+/* Test mode cells */
+.shelf-cell.t-ok      { border-color: var(--green) !important; background: var(--green-dim) !important; color: var(--green) !important; }
+.shelf-cell.t-error   { border-color: var(--red)   !important; background: var(--red-dim)   !important; color: var(--red)   !important; }
+.shelf-cell.t-pending { border-color: var(--yellow) !important; background: var(--yellow-dim)!important; color: var(--yellow)!important; animation: tpulse .7s ease infinite alternate; }
+@keyframes tpulse { from { opacity:.5 } to { opacity:1 } }
+
+/* ── SCREEN 6: REPLENISHMENT ── */
+.replen-input-bar { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
+.replen-input-bar .form-group { margin-bottom: 0; flex: 1; }
+.light-status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.light-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: flex; align-items: center; gap: 10px; }
+.light-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.light-dot.on { background: var(--light-on); box-shadow: 0 0 8px rgba(255,214,10,.5); }
+.light-dot.off { background: var(--surface3); }
+.light-dot.done { background: var(--green); }
+.light-item-info { flex: 1; min-width: 0; }
+.light-item-code { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.light-item-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.light-item-loc { font-size: 11px; color: var(--text-muted); }
+
+/* ── SCREEN 7: LIGHT MODULE TEST ── */
+.test-controls { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+.test-timer { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--accent); }
+.module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; margin-bottom: 16px; }
+.module-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 8px 6px; text-align: center; }
+.module-cell .addr { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.module-cell .light-indicator { width: 20px; height: 20px; border-radius: 4px; margin: 5px auto; background: var(--surface3); }
+.module-cell.testing .light-indicator { background: var(--light-on); box-shadow: 0 0 6px rgba(255,214,10,.4); }
+.module-cell.error { border-color: var(--red); }
+.module-cell.error .light-indicator { background: var(--red); }
+.module-cell.ok .light-indicator { background: var(--green); }
+.test-block-select { display: flex; gap: 8px; flex-wrap: wrap; }
+.block-chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 1px solid var(--border); cursor: pointer; transition: all .15s; }
+.block-chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.error-list { display: flex; flex-direction: column; gap: 6px; }
+.error-row { background: var(--red-dim); border: 1px solid rgba(248,81,73,.2); border-radius: var(--radius); padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.error-row .err-addr { font-family: var(--font-mono); font-weight: 600; color: var(--red); }
+
+/* ── SCREEN 8: SETTINGS ── */
+.settings-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.settings-tab { padding: 9px 18px; font-size: 13px; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+.settings-tab:hover { color: var(--text); }
+.settings-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.settings-section { display: none; }
+.settings-section.active { display: block; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 300; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 480px; max-width: 95vw; }
+.modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 15px; font-weight: 600; }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+.empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+.empty-text { font-size: 14px; }
+
+.tooltip-note { background: var(--yellow-dim); border: 1px solid rgba(210,153,34,.3); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--yellow); margin-bottom: 12px; display: flex; gap: 8px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">PUT·TO·LIGHT</div>
+  <div class="topbar-center" id="topbar-screen-name">🖥 Wireframe Preview</div>
+  <div class="topbar-right">
+    <div class="user-info">
+      <div class="user-name">Nguyễn Văn A</div>
+      <div class="user-role">Quản Lý</div>
+    </div>
+    <div class="avatar">NV</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-section">Tổng quan</div>
+  <div class="nav-item" onclick="showScreen('login')" id="nav-login">
+    <span class="nav-icon">🔐</span> Đăng nhập
+  </div>
+
+  <div class="sidebar-section">Vận hành</div>
+  <div class="nav-item" onclick="showScreen('lot')" id="nav-lot">
+    <span class="nav-icon">📋</span> Quản lý LOT / Batch
+  </div>
+  <div class="nav-item" onclick="showScreen('import')" id="nav-import">
+    <span class="nav-icon">📥</span> Nhận dữ liệu API
+  </div>
+  <div class="nav-item" onclick="showScreen('autoassign')" id="nav-autoassign">
+    <span class="nav-icon">🤖</span> Kết quả gán tự động
+  </div>
+  <div class="nav-item" onclick="showScreen('replenishment')" id="nav-replenishment">
+    <span class="nav-icon">🔄</span> Bổ sung hàng
+  </div>
+
+  <div class="sidebar-section">Cài đặt hệ thống</div>
+  <div class="nav-item" onclick="showScreen('layout')" id="nav-layout">
+    <span class="nav-icon">🏗</span> Tạo Layout kho
+  </div>
+  <div class="nav-item" onclick="showScreen('lighttest')" id="nav-lighttest">
+    <span class="nav-icon">💡</span> Light Module Test
+  </div>
+  <div class="nav-item" onclick="showScreen('settings')" id="nav-settings">
+    <span class="nav-icon">⚙️</span> Cấu hình thiết bị
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: LOGIN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-text">PUT·TO·LIGHT</div>
+        <div class="login-logo-sub">Hệ thống phân hàng thông minh</div>
+      </div>
+
+      <div class="label" style="margin-bottom:8px">Vai trò</div>
+      <div class="role-selector" style="margin-bottom:16px">
+        <div class="role-opt selected" data-role="Quản Lý Vận Hành"><span class="role-icon">👤</span>Quản Lý Vận Hành</div>
+        <div class="role-opt" data-role="IT"><span class="role-icon">🔧</span>IT</div>
+        <div class="role-opt" data-role="Tổng Quản Lý"><span class="role-icon">📊</span>Tổng Quản Lý</div>
+      </div>
+
+      <div class="form-group">
+        <label class="label">Tên đăng nhập</label>
+        <input class="input" id="login-username" type="text" placeholder="Nhập tên đăng nhập" value="nguyen.van.a">
+      </div>
+      <div class="form-group">
+        <label class="label">Mật khẩu</label>
+        <input class="input" type="password" placeholder="Nhập mật khẩu" value="••••••••">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;display:flex;margin-top:6px" onclick="doLogin()">Đăng nhập</button>
+
+      <div class="login-footer">
+        Quên mật khẩu? Liên hệ Admin hệ thống
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2: LOT / BATCH MANAGEMENT
+══════════════════════════════════════ -->
+<div class="screen" id="screen-lot">
+  <div class="page-header">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div>
+        <div class="page-title">Quản lý LOT / Batch</div>
+        <div class="page-desc">Theo dõi các đợt phân hàng và trạng thái từng LOT</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary">📤 Export CSV</button>
+        <button class="btn btn-primary">+ Tạo LOT mới</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid stat-grid-4" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">Tổng Batch hôm nay</div><div class="stat-value" style="color:var(--accent)">12</div><div class="stat-sub">↑ 3 so với hôm qua</div></div>
+    <div class="stat-card"><div class="stat-label">Đang thực hiện</div><div class="stat-value" style="color:var(--yellow)">4</div><div class="stat-sub">2 khu vực đang chạy</div></div>
+    <div class="stat-card"><div class="stat-label">Hoàn tất</div><div class="stat-value" style="color:var(--green)">7</div><div class="stat-sub">100% không lỗi</div></div>
+    <div class="stat-card"><div class="stat-label">Có sự cố</div><div class="stat-value" style="color:var(--red)">1</div><div class="stat-sub">1 LOT thiếu hàng</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <input class="input" type="date" value="2026-05-18">
+    <select class="input select" style="width:150px">
+      <option>Tất cả trạng thái</option>
+      <option>Đang xử lý</option>
+      <option>Hoàn tất</option>
+      <option>Có sự cố</option>
+    </select>
+    <select class="input select" style="width:140px">
+      <option>Tất cả khu vực</option>
+      <option>Khu vực A</option>
+      <option>Khu vực B</option>
+    </select>
+    <input class="input" type="text" placeholder="🔍 Tìm Batch No, LOT..." style="width:220px">
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Batch No</th>
+            <th>Ngày nhận</th>
+            <th>LOT No</th>
+            <th>Khu vực</th>
+            <th>Tổng ngăn</th>
+            <th>Tiến độ</th>
+            <th>Trạng thái</th>
+            <th style="text-align:right">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-mono">BATCH-20260518-001</td>
+            <td>18/05/2026 07:30</td>
+            <td><span class="badge badge-blue">LOT-001</span> <span style="color:var(--text-muted);font-size:11px">+4 LOT</span></td>
+            <td>Khu A, Khu B</td>
+            <td class="text-mono">120</td>
+            <td style="min-width:130px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="progress-bar" style="flex:1"><div class="progress-fill green" style="width:100%"></div></div>
+                <span class="text-mono text-sm">100%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-green">Hoàn tất</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-ghost btn-sm">👁 Xem</button>
+              <button class="btn btn-ghost btn-sm">📊 Báo cáo</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-mono">BATCH-20260518-002</td>
+            <td>18/05/2026 09:15</td>
+            <td><span class="badge badge-blue">LOT-006</span> <span style="color:var(--text-muted);font-size:11px">+2 LOT</span></td>
+            <td>Khu A</td>
+            <td class="text-mono">64</td>
+            <td style="min-width:130px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:73%"></div></div>
+                <span class="text-mono text-sm">73%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-yellow">Đang xử lý</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-ghost btn-sm">👁 Xem</button>
+              <button class="btn btn-primary btn-sm">▶ Tiếp tục</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-mono">BATCH-20260518-003</td>
+            <td>18/05/2026 10:00</td>
+            <td><span class="badge badge-blue">LOT-009</span> <span style="color:var(--text-muted);font-size:11px">+1 LOT</span></td>
+            <td>Khu B</td>
+            <td class="text-mono">38</td>
+            <td style="min-width:130px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:45%"></div></div>
+                <span class="text-mono text-sm">45%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-yellow">Đang xử lý</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-ghost btn-sm">👁 Xem</button>
+              <button class="btn btn-primary btn-sm">▶ Tiếp tục</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-mono">BATCH-20260518-004</td>
+            <td>18/05/2026 11:30</td>
+            <td><span class="badge badge-blue">LOT-011</span></td>
+            <td>Khu A</td>
+            <td class="text-mono">22</td>
+            <td style="min-width:130px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:90%;background:var(--yellow)"></div></div>
+                <span class="text-mono text-sm">90%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-red">Sự cố</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-ghost btn-sm">👁 Xem</button>
+              <button class="btn btn-danger btn-sm">⚠ Xử lý</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="text-mono">BATCH-20260518-005</td>
+            <td>18/05/2026 13:00</td>
+            <td><span class="text-muted text-sm">Chưa có LOT</span></td>
+            <td>—</td>
+            <td class="text-mono">—</td>
+            <td style="min-width:130px"><span class="text-muted text-sm">Chờ nhận data</span></td>
+            <td><span class="badge badge-gray">Chờ xử lý</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-primary btn-sm">📥 Nhận data</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3: API DATA IMPORT
+══════════════════════════════════════ -->
+<div class="screen" id="screen-import">
+  <div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="page-title">Nhận dữ liệu từ API</div>
+        <div class="page-desc">Kết nối 2 đầu API: hàng tiếp nhận và kế hoạch phân phối</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:4px">
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
+          API 1 đã kết nối
+        </div>
+        <div style="width:1px;height:14px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--yellow);display:inline-block"></span>
+          API 2 chờ kết nối
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Tab Bar -->
+  <div class="settings-tabs" style="margin-bottom:0;border-bottom:1px solid var(--border)">
+    <div class="settings-tab active" id="import-tab-picking" onclick="switchImportTab('picking')">
+      📥 API 1 — Hàng tiếp nhận
+      <span class="badge badge-green" style="margin-left:6px;font-size:10px">Đã nhận</span>
+    </div>
+    <div class="settings-tab" id="import-tab-storeorder" onclick="switchImportTab('storeorder')">
+      📋 API 2 — Kế hoạch phân phối
+      <span class="badge badge-yellow" style="margin-left:6px;font-size:10px">Chờ nhận</span>
+    </div>
+  </div>
+
+  <!-- TAB 1: Hàng tiếp nhận -->
+  <div id="import-panel-picking" style="padding-top:20px">
+    <div class="row" style="gap:16px;align-items:flex-start">
+      <div style="flex:1">
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div class="card-title" style="margin-bottom:0">Kết nối API 1</div>
+            <span class="badge badge-blue" style="font-size:10px">Hàng tiếp nhận</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Dữ liệu hàng hoá nhập kho: LOT, vị trí kệ, mã hàng, số lượng.</div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">Endpoint URL</div>
+            <input class="input" value="https://api.client.com/receiving/latest" style="margin-bottom:8px">
+            <div class="form-grid-2" style="gap:8px">
+              <div>
+                <div class="label">API Key</div>
+                <input class="input" type="password" value="••••••••••••••••">
+              </div>
+              <div>
+                <div class="label">Batch ID</div>
+                <input class="input" value="BATCH-20260518-002">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%">🔄 Kéo dữ liệu từ API</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="flex:2">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="card-title" style="margin-bottom:0">Xem trước dữ liệu</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span class="badge badge-green">✓ 18 dòng hợp lệ</span>
+              <span class="badge badge-red">✗ 2 lỗi</span>
+              <span class="badge badge-yellow">⚠ 1 cảnh báo</span>
+            </div>
+          </div>
+          <div class="table-wrap" style="max-height:320px;overflow-y:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Batch No</th><th>LOT No</th><th>Location Code</th><th>Parts Code</th><th>Số lượng</th><th>Seq</th><th>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="validation-row ok"><td class="text-mono text-sm">1</td><td>BATCH-001</td><td>LOT-001</td><td>A-01-01</td><td>SKU-100</td><td class="text-mono">5</td><td class="text-mono">1</td><td><span class="badge badge-green">✓ OK</span></td></tr>
+                <tr class="validation-row ok"><td class="text-mono text-sm">2</td><td>BATCH-001</td><td>LOT-001</td><td>A-01-02</td><td>SKU-101</td><td class="text-mono">3</td><td class="text-mono">2</td><td><span class="badge badge-green">✓ OK</span></td></tr>
+                <tr class="validation-row ok"><td class="text-mono text-sm">3</td><td>BATCH-001</td><td>LOT-001</td><td>A-01-03</td><td>SKU-102</td><td class="text-mono">8</td><td class="text-mono">3</td><td><span class="badge badge-green">✓ OK</span></td></tr>
+                <tr class="validation-row error"><td class="text-mono text-sm">4</td><td>BATCH-001</td><td>LOT-002</td><td style="color:var(--red)">A-99-99</td><td>SKU-103</td><td class="text-mono">2</td><td class="text-mono">1</td><td><span class="badge badge-red">✗ Lỗi</span></td></tr>
+                <tr class="validation-row warn"><td class="text-mono text-sm">5</td><td>BATCH-001</td><td>LOT-002</td><td>A-01-05</td><td style="color:var(--yellow)">SKU-999</td><td class="text-mono">1</td><td class="text-mono">2</td><td><span class="badge badge-yellow">⚠ Cảnh báo</span></td></tr>
+                <tr class="validation-row ok"><td class="text-mono text-sm">6</td><td>BATCH-001</td><td>LOT-002</td><td>A-01-06</td><td>SKU-105</td><td class="text-mono">4</td><td class="text-mono">3</td><td><span class="badge badge-green">✓ OK</span></td></tr>
+                <tr class="validation-row error"><td class="text-mono text-sm">7</td><td>BATCH-001</td><td>LOT-003</td><td>A-02-01</td><td>SKU-106</td><td class="text-mono" style="color:var(--red)">99999</td><td class="text-mono">1</td><td><span class="badge badge-red">✗ Lỗi</span></td></tr>
+                <tr class="validation-row ok"><td class="text-mono text-sm">8</td><td>BATCH-001</td><td>LOT-003</td><td>A-02-02</td><td>SKU-107</td><td class="text-mono">6</td><td class="text-mono">2</td><td><span class="badge badge-green">✓ OK</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="divider"></div>
+          <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
+            <div style="font-size:12px;color:var(--text-muted)">⚠ Dòng lỗi sẽ bị bỏ qua, các dòng hợp lệ vẫn được nhận</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-secondary">Hủy</button>
+              <button class="btn btn-primary">✓ Xác nhận nhận dữ liệu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: Kế hoạch phân phối -->
+  <div id="import-panel-storeorder" style="display:none;padding-top:20px">
+    <div class="row" style="gap:16px;align-items:flex-start">
+      <div style="flex:1">
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div class="card-title" style="margin-bottom:0">Kết nối API 2</div>
+            <span class="badge badge-purple" style="font-size:10px">Kế hoạch phân phối</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Dữ liệu nhu cầu từng cửa hàng: SKU, số lượng yêu cầu, mức ưu tiên.</div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">Endpoint URL</div>
+            <input class="input" value="https://api.client.com/distribution-plan/latest" style="margin-bottom:8px">
+            <div class="form-grid-2" style="gap:8px">
+              <div>
+                <div class="label">API Key</div>
+                <input class="input" type="password" value="••••••••••••••••">
+              </div>
+              <div>
+                <div class="label">Batch ID</div>
+                <input class="input" value="BATCH-20260518-002">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%">🔄 Kéo dữ liệu từ API</button>
+          </div>
+          <div class="tooltip-note" style="margin-bottom:0">
+            💡 Kế hoạch phân phối xác định số lượng từng SKU cần giao đến mỗi cửa hàng trong Batch này.
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:2">
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div class="card-title" style="margin-bottom:0">Xem trước — Kế hoạch phân phối</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span class="badge badge-green">✓ 6 SKU hợp lệ</span>
+              <span class="badge badge-red">✗ 1 SKU vượt tồn</span>
+            </div>
+          </div>
+          <div class="table-wrap" style="max-height:260px;overflow-y:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU</th><th>Tên hàng</th><th>Tồn kho</th><th>CH-A</th><th>CH-B</th><th>CH-C</th><th>CH-D</th><th>CH-E</th><th>Tổng yêu cầu</th><th>Trạng thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="validation-row ok">
+                  <td class="text-mono">SKU-100</td><td>Áo thun trắng M</td>
+                  <td class="text-mono" style="color:var(--green)">120</td>
+                  <td class="text-mono">30</td><td class="text-mono">25</td><td class="text-mono">28</td><td class="text-mono">20</td><td class="text-mono">17</td>
+                  <td class="text-mono" style="font-weight:600">120</td>
+                  <td><span class="badge badge-green">✓ Đủ</span></td>
+                </tr>
+                <tr class="validation-row error">
+                  <td class="text-mono">SKU-101</td><td>Quần jean xanh 30</td>
+                  <td class="text-mono" style="color:var(--red)">80</td>
+                  <td class="text-mono">20</td><td class="text-mono">18</td><td class="text-mono">22</td><td class="text-mono">15</td><td class="text-mono">12</td>
+                  <td class="text-mono" style="font-weight:600;color:var(--red)">87</td>
+                  <td><span class="badge badge-red">✗ Thiếu 7</span></td>
+                </tr>
+                <tr class="validation-row ok">
+                  <td class="text-mono">SKU-102</td><td>Giày thể thao 42</td>
+                  <td class="text-mono" style="color:var(--green)">60</td>
+                  <td class="text-mono">12</td><td class="text-mono">11</td><td class="text-mono">13</td><td class="text-mono">10</td><td class="text-mono">8</td>
+                  <td class="text-mono" style="font-weight:600">54</td>
+                  <td><span class="badge badge-green">✓ Đủ</span></td>
+                </tr>
+                <tr class="validation-row ok">
+                  <td class="text-mono">SKU-103</td><td>Túi xách da nâu</td>
+                  <td class="text-mono" style="color:var(--green)">90</td>
+                  <td class="text-mono">18</td><td class="text-mono">17</td><td class="text-mono">20</td><td class="text-mono">16</td><td class="text-mono">16</td>
+                  <td class="text-mono" style="font-weight:600">87</td>
+                  <td><span class="badge badge-green">✓ Đủ</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">Tóm tắt ghép dữ liệu</div>
+          <div class="stat-grid stat-grid-4" style="margin-bottom:12px">
+            <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">6</div></div>
+            <div class="stat-card"><div class="stat-label">SKU khớp Picking</div><div class="stat-value" style="color:var(--green)">5</div></div>
+            <div class="stat-card"><div class="stat-label">SKU thiếu hàng</div><div class="stat-value" style="color:var(--red)">1</div></div>
+            <div class="stat-card"><div class="stat-label">Cửa hàng</div><div class="stat-value" style="color:var(--purple)">5</div></div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
+            <div style="font-size:12px;color:var(--text-muted)">⚠ SKU thiếu hàng sẽ được phân phối theo tỷ lệ ưu tiên</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-secondary">Hủy</button>
+              <button class="btn btn-primary">✓ Xác nhận & Tính phân phối</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 4: AUTO ASSIGN CONFIRMATION
+══════════════════════════════════════ -->
+<div class="screen" id="screen-autoassign">
+  <div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="page-title">Xác nhận kết quả gán tự động</div>
+        <div class="page-desc">Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — Hệ thống đã phân chia số lượng theo thuật toán</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary">🔄 Tính lại</button>
+        <button class="btn btn-danger">✗ Từ chối</button>
+        <button class="btn btn-success">✓ Xác nhận & Bắt đầu</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid stat-grid-4" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">6</div></div>
+    <div class="stat-card"><div class="stat-label">Tổng hàng phân</div><div class="stat-value">348</div></div>
+    <div class="stat-card"><div class="stat-label">Địa điểm nhận</div><div class="stat-value" style="color:var(--purple)">12</div></div>
+    <div class="stat-card"><div class="stat-label">Cần điều chỉnh</div><div class="stat-value" style="color:var(--yellow)">2</div><div class="stat-sub">SL lẻ cần xác nhận</div></div>
+  </div>
+
+  <div class="tooltip-note">
+    💡 Bạn có thể chỉnh sửa trực tiếp số lượng trong bảng. Tổng sẽ tự động cập nhật.
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table class="assign-table">
+        <thead>
+          <tr>
+            <th>SKU / Địa điểm</th>
+            <th>Tổng hàng</th>
+            <th>Đã phân</th>
+            <th>Cửa hàng A</th>
+            <th>Cửa hàng B</th>
+            <th>Cửa hàng C</th>
+            <th>Cửa hàng D</th>
+            <th>Cửa hàng E</th>
+            <th>Chênh lệch</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="sku-row"><td colspan="9">📦 SKU-100 · Áo thun trắng size M</td></tr>
+          <tr>
+            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-001</td>
+            <td class="assign-total">120</td>
+            <td class="assign-total" style="color:var(--green)">120</td>
+            <td><input class="input assign-input" value="30"></td>
+            <td><input class="input assign-input" value="25"></td>
+            <td><input class="input assign-input" value="28"></td>
+            <td><input class="input assign-input" value="20"></td>
+            <td><input class="input assign-input" value="17"></td>
+            <td class="assign-diff diff-ok">0</td>
+          </tr>
+          <tr class="sku-row"><td colspan="9">📦 SKU-101 · Quần jean xanh size 30</td></tr>
+          <tr>
+            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-002</td>
+            <td class="assign-total">87</td>
+            <td class="assign-total" style="color:var(--yellow)">85</td>
+            <td><input class="input assign-input" value="20"></td>
+            <td><input class="input assign-input" value="18"></td>
+            <td><input class="input assign-input" value="22"></td>
+            <td><input class="input assign-input" value="15"></td>
+            <td><input class="input assign-input" value="10"></td>
+            <td class="assign-diff diff-warn">-2</td>
+          </tr>
+          <tr class="sku-row"><td colspan="9">📦 SKU-102 · Giày thể thao size 42</td></tr>
+          <tr>
+            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-003</td>
+            <td class="assign-total">54</td>
+            <td class="assign-total" style="color:var(--red)">56</td>
+            <td><input class="input assign-input" value="12"></td>
+            <td><input class="input assign-input" value="11"></td>
+            <td><input class="input assign-input" value="13"></td>
+            <td><input class="input assign-input" value="10"></td>
+            <td><input class="input assign-input" value="10"></td>
+            <td class="assign-diff diff-err">+2</td>
+          </tr>
+          <tr class="sku-row"><td colspan="9">📦 SKU-103 · Túi xách da nâu</td></tr>
+          <tr>
+            <td style="padding-left:20px;color:var(--text-muted);font-size:12px">LOT-004</td>
+            <td class="assign-total">87</td>
+            <td class="assign-total" style="color:var(--green)">87</td>
+            <td><input class="input assign-input" value="18"></td>
+            <td><input class="input assign-input" value="17"></td>
+            <td><input class="input assign-input" value="20"></td>
+            <td><input class="input assign-input" value="16"></td>
+            <td><input class="input assign-input" value="16"></td>
+            <td class="assign-diff diff-ok">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 5: LAYOUT BUILDER
+══════════════════════════════════════ -->
+<div class="screen" id="screen-layout">
+  <div class="page-header">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="page-title">Tạo Layout kho</div>
+        <div class="page-desc">Cấu hình khu vực, kệ hàng và gán đèn vào từng ngăn</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="input select" id="zone-area-select" onchange="switchLayoutZone(this.value)" style="width:160px"></select>
+        <button class="btn btn-secondary" id="btn-undo" onclick="undoDrag()" disabled title="Hoàn tác kéo thả (Ctrl+Z)" style="opacity:.4">↩ Hoàn tác</button>
+        <button class="btn btn-secondary" onclick="openAddZoneModal()">+ Thêm khu vực</button>
+        <button class="btn btn-primary" onclick="saveLayout()">💾 Lưu layout</button>
+      </div>
+    </div>
+    <div id="layout-role-banner" style="margin-top:10px;background:var(--yellow-dim);border:1px solid rgba(210,153,34,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--yellow)">
+      🔒 Chế độ xem — Đăng nhập bằng role <strong>Quản Lý Vận Hành</strong> để: kéo thả đèn, thêm/xóa kệ &amp; tầng, chỉnh sửa ngăn
+    </div>
+  </div>
+
+  <div class="view-toggle">
+    <button class="view-btn active" id="vbtn-overview" onclick="showLayoutView('overview')">🗺 Tổng quan</button>
+    <button class="view-btn" id="vbtn-detail"   onclick="showLayoutView('detail')">✏️ Chi tiết</button>
+    <button class="view-btn" id="vbtn-test"     onclick="showLayoutView('test')">🔬 Test đèn</button>
+  </div>
+
+  <div id="layout-overview-panel"><!-- rendered by JS --></div>
+
+  <div id="layout-test-panel" style="display:none"><!-- rendered by JS --></div>
+
+  <div class="layout-builder" id="layout-detail-panel" style="display:none">
+    <div class="layout-sidebar">
+      <div class="card">
+        <div class="card-title">Ngăn đang chọn</div>
+        <div id="cell-selected-info" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:12px;margin-bottom:12px">
+          <div style="color:var(--text-muted)">Chưa chọn ngăn nào</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1">
+            <div class="label">Mã ngăn</div>
+            <div id="cell-code" style="font-family:var(--font-mono);font-size:13px;color:var(--accent);padding:4px 0">—</div>
+          </div>
+          <div style="flex:1">
+            <div class="label">Địa chỉ đèn</div>
+            <div id="cell-addr" style="font-family:var(--font-mono);font-size:13px;color:var(--yellow);padding:4px 0">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Thống kê layout</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Tổng ngăn</span><span class="text-mono" id="stat-total">—</span></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Đã gán đèn</span><span class="text-mono" id="stat-assigned" style="color:var(--green)">—</span></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Chưa gán</span><span class="text-mono" id="stat-unassigned" style="color:var(--yellow)">—</span></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Khu vực</span><span class="text-mono" id="stat-zones">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Chú thích</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:14px;height:14px;background:var(--green-dim);border:1px solid var(--green);border-radius:3px"></div> Đã gán đèn</div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:14px;height:14px;background:var(--surface2);border:1px solid var(--border);border-radius:3px"></div> Chưa gán</div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:14px;height:14px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:3px"></div> Đang chọn</div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:14px;height:14px;background:var(--accent-dim);border:2px dashed var(--accent);border-radius:3px"></div> Vùng thả</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="layout-zones-panel"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 6: REPLENISHMENT
+══════════════════════════════════════ -->
+<div class="screen" id="screen-replenishment">
+  <div class="page-header">
+    <div class="page-title">Bổ sung hàng (Replenishment)</div>
+    <div class="page-desc">Quét hoặc nhập mã hàng để bổ sung vào ngăn kệ</div>
+  </div>
+
+  <div class="row" style="gap:16px;align-items:flex-start">
+    <div style="flex:1">
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Nhập mã hàng cần bổ sung</div>
+        <div class="replen-input-bar">
+          <div class="form-group" style="flex:1">
+            <label class="label">Mã hàng (Item Code)</label>
+            <input class="input" placeholder="Quét BCR I/F hoặc nhập tay..." value="SKU-100">
+          </div>
+          <div class="form-group" style="width:140px">
+            <label class="label">Block</label>
+            <select class="input select"><option>Block 1</option><option>Block 2</option></select>
+          </div>
+          <button class="btn btn-primary">▶ Bắt đầu</button>
+        </div>
+        <div class="tooltip-note" style="margin-bottom:0">
+          💡 Đèn tại ngăn cần bổ sung sẽ sáng lên và phát tiếng còi. Bổ sung hàng xong thì bấm nút CONFIRM trên đèn.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Đang bổ sung</div>
+        <div class="light-status-grid">
+          <div class="light-item" style="border-color:var(--light-on);background:rgba(255,214,10,.05)">
+            <div class="light-dot on"></div>
+            <div class="light-item-info">
+              <div class="light-item-code">SKU-100 · Địa chỉ 0001</div>
+              <div class="light-item-name">Áo thun trắng M</div>
+              <div class="light-item-loc">📍 Khu A · Kệ 1 · T2 · N01</div>
+            </div>
+          </div>
+          <div class="light-item" style="border-color:var(--light-on);background:rgba(255,214,10,.05)">
+            <div class="light-dot on"></div>
+            <div class="light-item-info">
+              <div class="light-item-code">SKU-100 · Địa chỉ 0005</div>
+              <div class="light-item-name">Áo thun trắng M</div>
+              <div class="light-item-loc">📍 Khu A · Kệ 1 · T3 · N05</div>
+            </div>
+          </div>
+          <div class="light-item" style="border-color:var(--green);background:var(--green-dim)">
+            <div class="light-dot done"></div>
+            <div class="light-item-info">
+              <div class="light-item-code">SKU-100 · Địa chỉ 0003</div>
+              <div class="light-item-name">Áo thun trắng M</div>
+              <div class="light-item-loc">✓ Đã bổ sung xong</div>
+            </div>
+          </div>
+          <div class="light-item">
+            <div class="light-dot off"></div>
+            <div class="light-item-info">
+              <div class="light-item-code">SKU-100 · Địa chỉ 0009</div>
+              <div class="light-item-name">Áo thun trắng M</div>
+              <div class="light-item-loc">📍 Khu A · Kệ 2 · T1 · N01</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:260px">
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Tiến độ ca này</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Đã bổ sung</span><span class="text-mono" style="color:var(--green)">12</span></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Đang xử lý</span><span class="text-mono" style="color:var(--yellow)">4</span></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Còn lại</span><span class="text-mono">8</span></div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Người thực hiện</span><span>Trần B</span></div>
+          <div style="display:flex;justify-content:space-between"><span class="text-muted">Bắt đầu lúc</span><span class="text-mono">09:30</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Lịch sử gần đây</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div style="display:flex;gap:8px;align-items:center"><span class="text-mono text-muted">09:45</span><span class="badge badge-green">✓</span><span>SKU-099 · Khu A</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span class="text-mono text-muted">09:42</span><span class="badge badge-green">✓</span><span>SKU-098 · Khu B</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span class="text-mono text-muted">09:38</span><span class="badge badge-green">✓</span><span>SKU-097 · Khu A</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><span class="text-mono text-muted">09:35</span><span class="badge badge-green">✓</span><span>SKU-096 · Khu A</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 7: LIGHT MODULE TEST
+══════════════════════════════════════ -->
+<div class="screen" id="screen-lighttest">
+  <div class="page-header">
+    <div class="page-title">Light Module Test</div>
+    <div class="page-desc">Kiểm tra hoạt động của các đèn trước khi vận hành</div>
+  </div>
+
+  <div class="row" style="gap:16px;align-items:flex-start">
+    <div style="flex:1">
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div class="test-timer">00:32</div>
+            <div>
+              <div style="font-size:12px;color:var(--text-muted)">Đang chạy kiểm tra</div>
+              <div style="font-size:11px;color:var(--text-subtle)">Tổng 50 giây · Block 1</div>
+            </div>
+          </div>
+          <div class="test-controls">
+            <div style="margin-right:4px">
+              <div class="label" style="margin-bottom:4px">Lọc theo</div>
+              <div class="test-block-select">
+                <div class="block-chip active">Block 1</div>
+                <div class="block-chip">Block 2</div>
+                <div class="block-chip">Tất cả</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:20px">
+              <button class="btn btn-danger">⏹ Dừng</button>
+              <button class="btn btn-secondary" disabled>▶ Bắt đầu</button>
+              <button class="btn btn-secondary">🔧 Maintenance</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="card-title" style="margin-bottom:0">Trạng thái đèn — Block 1 (32 đèn)</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge badge-green">✓ 28 OK</span>
+            <span class="badge badge-red">✗ 3 Lỗi</span>
+            <span class="badge badge-gray">1 Đang test</span>
+          </div>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:10px;cursor:pointer">
+          <input type="checkbox" style="accent-color:var(--accent)"> Hiển thị địa chỉ
+        </label>
+        <div class="module-grid">
+          <div class="module-cell ok"><div class="addr">0001</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0002</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0003</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell error"><div class="addr">0004</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--red)">LỖI</div></div>
+          <div class="module-cell ok"><div class="addr">0005</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0006</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0007</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0008</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0009</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell testing"><div class="addr">0010</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--yellow)">TEST</div></div>
+          <div class="module-cell ok"><div class="addr">0011</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell error"><div class="addr">0012</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--red)">LỖI</div></div>
+          <div class="module-cell ok"><div class="addr">0013</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0014</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0015</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0016</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0017</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0018</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell ok"><div class="addr">0019</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
+          <div class="module-cell error"><div class="addr">0020</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--red)">LỖI</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:280px">
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">Danh sách lỗi (3)</div>
+        <div class="error-list">
+          <div class="error-row">
+            <div>
+              <div class="err-addr">Địa chỉ 0004</div>
+              <div style="color:var(--text-muted)">Lỗi kết nối đèn · Block 1 · CTRL-001</div>
+            </div>
+          </div>
+          <div class="error-row">
+            <div>
+              <div class="err-addr">Địa chỉ 0012</div>
+              <div style="color:var(--text-muted)">Không phản hồi · Block 1 · CTRL-001</div>
+            </div>
+          </div>
+          <div class="error-row">
+            <div>
+              <div class="err-addr">Địa chỉ 0020</div>
+              <div style="color:var(--text-muted)">Lỗi kết nối đèn · Block 1 · CTRL-001</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn btn-secondary btn-sm" style="width:100%">📋 Xuất log lỗi</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Hành động sau test</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-primary" disabled>▶ Bắt đầu vận hành</button>
+          <div style="font-size:11px;color:var(--red);text-align:center">Còn 3 lỗi chưa xử lý</div>
+          <button class="btn btn-secondary">🔄 Chạy lại test</button>
+          <button class="btn btn-ghost btn-sm">Bỏ qua lỗi và tiếp tục →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 8: SETTINGS
+══════════════════════════════════════ -->
+<div class="screen" id="screen-settings">
+  <div class="page-header">
+    <div class="page-title">Cấu hình thiết bị</div>
+    <div class="page-desc">Quản lý đèn, controller, block và tài khoản người dùng</div>
+  </div>
+
+  <div class="settings-tabs">
+    <div class="settings-tab active" onclick="showTab('tab-controller')">🔌 Controller</div>
+    <div class="settings-tab" onclick="showTab('tab-block')">📦 Block</div>
+    <div class="settings-tab" onclick="showTab('tab-den')">💡 Đèn</div>
+    <div class="settings-tab" onclick="showTab('tab-user')">👤 Người dùng</div>
+  </div>
+
+  <!-- Controller Tab -->
+  <div class="settings-section active" id="tab-controller">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn btn-primary">+ Thêm Controller</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Controller ID</th><th>IP Address</th><th>Port</th><th>Khu vực</th><th>Số đèn</th><th>Trạng thái</th><th style="text-align:right">Thao tác</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="text-mono">CTRL-001</td>
+              <td class="text-mono">192.168.1.1</td>
+              <td class="text-mono">5003</td>
+              <td>Khu vực A</td>
+              <td class="text-mono">64</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">CTRL-002</td>
+              <td class="text-mono">192.168.1.2</td>
+              <td class="text-mono">5003</td>
+              <td>Khu vực B</td>
+              <td class="text-mono">48</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">CTRL-003</td>
+              <td class="text-mono">192.168.1.3</td>
+              <td class="text-mono">5003</td>
+              <td>Khu vực C</td>
+              <td class="text-mono">32</td>
+              <td><span class="badge badge-red">● Offline</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block Tab -->
+  <div class="settings-section" id="tab-block">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn btn-primary">+ Thêm Block</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Block No</th><th>Khu vực</th><th>Hoạt động</th><th>Poka-yoke</th><th>Sequential</th><th>Completion Light</th><th>Số đèn</th><th style="text-align:right">Thao tác</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="text-mono">Block 1</td>
+              <td>Khu vực A</td>
+              <td><span class="badge badge-green">Bật</span></td>
+              <td><span class="badge badge-yellow">Bật</span></td>
+              <td><span class="badge badge-gray">Tắt</span></td>
+              <td><span class="badge badge-blue">Bật</span></td>
+              <td class="text-mono">32</td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">Block 2</td>
+              <td>Khu vực B</td>
+              <td><span class="badge badge-green">Bật</span></td>
+              <td><span class="badge badge-gray">Tắt</span></td>
+              <td><span class="badge badge-blue">Bật</span></td>
+              <td><span class="badge badge-gray">Tắt</span></td>
+              <td class="text-mono">24</td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Đèn Tab -->
+  <div class="settings-section" id="tab-den">
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center">
+      <div class="filter-bar" style="margin-bottom:0">
+        <select class="input select" style="width:140px"><option>Tất cả khu vực</option><option>Khu vực A</option><option>Khu vực B</option></select>
+        <select class="input select" style="width:140px"><option>Tất cả trạng thái</option><option>Online</option><option>Offline</option></select>
+        <input class="input" placeholder="🔍 Tìm địa chỉ..." style="width:180px">
+      </div>
+      <button class="btn btn-primary">+ Thêm đèn</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Địa chỉ</th><th>Loại đèn</th><th>Ngăn kệ</th><th>Block</th><th>Controller</th><th>Trạng thái</th><th style="text-align:right">Thao tác</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="text-mono">0001</td>
+              <td>Đèn picking</td>
+              <td>A-01-01 · T2N1</td>
+              <td>Block 1</td>
+              <td class="text-mono">CTRL-001</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">0002</td>
+              <td>Đèn picking</td>
+              <td>A-01-02 · T2N2</td>
+              <td>Block 1</td>
+              <td class="text-mono">CTRL-001</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">0004</td>
+              <td>Đèn picking</td>
+              <td>A-01-04 · T4N4</td>
+              <td>Block 1</td>
+              <td class="text-mono">CTRL-001</td>
+              <td><span class="badge badge-red">● Lỗi kết nối</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">1999</td>
+              <td>Đèn hoàn tất</td>
+              <td>—</td>
+              <td>Block 1</td>
+              <td class="text-mono">CTRL-001</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">9101</td>
+              <td>BCR I/F</td>
+              <td>—</td>
+              <td>Block 1</td>
+              <td class="text-mono">CTRL-001</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td class="text-mono">8001</td>
+              <td>Signal Light</td>
+              <td>—</td>
+              <td>Block 1</td>
+              <td class="text-mono">CTRL-001</td>
+              <td><span class="badge badge-green">● Online</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Tab -->
+  <div class="settings-section" id="tab-user">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn btn-primary">+ Thêm người dùng</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Họ và tên</th><th>Username</th><th>Vai trò</th><th>Mã NS nội bộ</th><th>Trạng thái</th><th style="text-align:right">Thao tác</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Nguyễn Văn A</td>
+              <td class="text-mono">nguyen.van.a</td>
+              <td><span class="badge badge-blue">Quản Lý</span></td>
+              <td class="text-mono">NS-001</td>
+              <td><span class="badge badge-green">Hoạt động</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td>Trần Thị B</td>
+              <td class="text-mono">tran.thi.b</td>
+              <td><span class="badge badge-purple">Nhân Viên VH</span></td>
+              <td class="text-mono">NS-002</td>
+              <td><span class="badge badge-green">Hoạt động</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td>Lê Văn C</td>
+              <td class="text-mono">le.van.c</td>
+              <td><span class="badge badge-purple">Nhân Viên VH</span></td>
+              <td class="text-mono">NS-003</td>
+              <td><span class="badge badge-green">Hoạt động</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+            <tr>
+              <td>Phạm D</td>
+              <td class="text-mono">pham.d</td>
+              <td><span class="badge badge-gray">IT</span></td>
+              <td class="text-mono">NS-004</td>
+              <td><span class="badge badge-red">Vô hiệu hóa</span></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- Modal: thêm khu vực -->
+<div id="modal-add-zone" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeAddZoneModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Thêm khu vực mới</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeAddZoneModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="label">Tên khu vực</label>
+        <input class="input" id="new-zone-name" placeholder="Ví dụ: Khu vực C">
+      </div>
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="label">Số kệ</label>
+          <input class="input" type="number" id="new-zone-shelves" value="2" min="1" max="10">
+        </div>
+        <div class="form-group">
+          <label class="label">Số tầng</label>
+          <input class="input" type="number" id="new-zone-floors" value="3" min="1" max="6">
+        </div>
+        <div class="form-group">
+          <label class="label">Ngăn/tầng</label>
+          <input class="input" type="number" id="new-zone-cols" value="6" min="1" max="16">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddZoneModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="addZone()">Tạo khu vực</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: thêm kệ -->
+<div id="modal-add-shelf" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeShelfModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Thêm kệ mới</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeShelfModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="label">Số tầng</label>
+          <input class="input" type="number" id="new-shelf-floors" value="3" min="1" max="6">
+        </div>
+        <div class="form-group">
+          <label class="label">Số đèn mỗi tầng</label>
+          <input class="input" type="number" id="new-shelf-cols" value="6" min="1" max="16">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeShelfModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmAddShelf()">Thêm kệ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: thêm tầng -->
+<div id="modal-add-floor" style="display:none" class="modal-backdrop" onclick="if(event.target===this)closeFloorModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Thêm tầng mới</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeFloorModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="label">Số đèn trên tầng này</label>
+        <input class="input" type="number" id="new-floor-cols" value="6" min="1" max="16">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeFloorModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="confirmAddFloor()">Thêm tầng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="display:none"></div>
+
+<script>
+const screens = {
+  'login':'Đăng nhập','lot':'Quản lý LOT / Batch','import':'Nhận dữ liệu API',
+  'autoassign':'Kết quả gán tự động','replenishment':'Bổ sung hàng',
+  'layout':'Tạo Layout kho','lighttest':'Light Module Test','settings':'Cấu hình thiết bị'
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('screen-' + id);
+  if (el) el.classList.add('active');
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+  document.getElementById('topbar-screen-name').textContent = '🖥 ' + (screens[id] || id);
+  if (id === 'layout') {
+    if (!isITRole()) { showToast('Chỉ Quản Lý Vận Hành mới có thể truy cập Tạo Layout kho', 'warn'); return; }
+    renderLayoutScreen();
+  }
+}
+
+function showTab(tabId) {
+  document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── ROLE & LOGIN ──
+let currentRole = 'Quản Lý Vận Hành';
+
+document.querySelectorAll('.role-opt').forEach(opt => {
+  opt.addEventListener('click', function() {
+    document.querySelectorAll('.role-opt').forEach(o => o.classList.remove('selected'));
+    this.classList.add('selected');
+  });
+});
+
+function doLogin() {
+  const sel = document.querySelector('.role-opt.selected');
+  if (sel) currentRole = sel.dataset.role || sel.textContent.trim();
+  const uname = document.getElementById('login-username')?.value || 'Người dùng';
+  document.querySelector('.user-name').textContent = uname;
+  document.querySelector('.user-role').textContent = currentRole;
+  updateSidebarByRole();
+  showScreen('lot');
+}
+
+function updateSidebarByRole() {
+  const navLayout = document.getElementById('nav-layout');
+  if (navLayout) navLayout.style.display = canEditLayout() ? '' : 'none';
+  // Cấu hình thiết bị & Light Module Test chỉ IT thấy
+  ['nav-settings','nav-lighttest'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = (currentRole === 'IT') ? '' : 'none';
+  });
+}
+
+function canEditLayout() { return currentRole === 'Quản Lý Vận Hành'; }
+function isITRole() { return canEditLayout(); }
+
+// ── LAYOUT DATA ──
+const ZONE_COLORS = ['#58a6ff','#3fb950','#d29922','#bc8cff','#f85149'];
+
+// Danh sách controller do IT cấu hình ở "Cấu hình thiết bị"
+const itControllers = ['CTRL-001','CTRL-002','CTRL-003','CTRL-004'];
+
+function autoAssignController() {
+  const used = new Set(layoutZones.map(z => z.controller).filter(Boolean));
+  return itControllers.find(c => !used.has(c)) || null;
+}
+
+let layoutZones = [];
+
+let _curZone = null, _selPos = null, _dragSrc = null;
+const UNDO_LIMIT = 20;
+let _undoStack = []; // [{srcZ,srcSi,srcFi,srcCi,srcAddr, dstZ,dstSi,dstFi,dstCi,dstAddr}]
+
+function _pushUndo(s, sAddr, d, dAddr) {
+  _undoStack.push({ s:{...s}, sAddr, d:{...d}, dAddr });
+  if (_undoStack.length > UNDO_LIMIT) _undoStack.shift();
+  _syncUndoBtn();
+}
+
+function _syncUndoBtn() {
+  const btn = document.getElementById('btn-undo');
+  if (!btn) return;
+  const n = _undoStack.length;
+  btn.disabled = n === 0;
+  btn.style.opacity = n === 0 ? '.4' : '';
+  btn.title = n > 0 ? `Hoàn tác kéo thả (Ctrl+Z) — còn ${n} bước` : 'Không có thao tác nào';
+  btn.textContent = n > 0 ? `↩ Hoàn tác (${n})` : '↩ Hoàn tác';
+}
+
+function undoDrag() {
+  if (!_undoStack.length) { showToast('Không có thao tác nào để hoàn tác', 'info'); return; }
+  const { s, sAddr, d, dAddr } = _undoStack.pop();
+  getZone(s.z).shelves[s.si].floors[s.fi].cells[s.ci] = sAddr;
+  getZone(d.z).shelves[d.si].floors[d.fi].cells[d.ci] = dAddr;
+  _selPos = null;
+  renderCurZone(); updateLayoutStats(); _syncUndoBtn();
+  showToast('Đã hoàn tác', 'info');
+}
+function getZone(id) { return layoutZones.find(z => z.id === id); }
+
+// ── RENDER ──
+function renderLayoutScreen() {
+  renderZoneDrop(); updateLayoutStats(); updateRoleBanner();
+  showLayoutView(_layoutView);
+}
+
+function updateRoleBanner() {
+  const b = document.getElementById('layout-role-banner');
+  if (b) b.style.display = isITRole() ? 'none' : '';
+  const btn = document.getElementById('btn-update-cell');
+  if (btn) { btn.disabled = !isITRole(); btn.style.opacity = isITRole() ? '' : '.4'; }
+}
+
+function renderZoneDrop() {
+  const sel = document.getElementById('zone-area-select');
+  if (!sel) return;
+  sel.innerHTML = layoutZones.length
+    ? layoutZones.map(z => `<option value="${z.id}">${z.name}</option>`).join('')
+    : '<option value="">— Chưa có khu vực —</option>';
+  if (_curZone) sel.value = _curZone;
+}
+
+function renderCurZone() {
+  const panel = document.getElementById('layout-zones-panel');
+  if (!panel) return;
+  const zone = getZone(_curZone);
+  if (!zone) {
+    panel.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:16px;color:var(--text-muted)">
+        <div style="font-size:48px">🏗</div>
+        <div style="font-size:15px;font-weight:500;color:var(--text)">Kho chưa có khu vực nào</div>
+        <div style="font-size:13px">Tạo khu vực đầu tiên để bắt đầu cấu hình layout</div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="openAddZoneModal()">+ Tạo khu vực đầu tiên</button>
+      </div>`;
+    return;
+  }
+  panel.innerHTML = buildZoneHTML(zone);
+}
+
+function buildZoneHTML(zone) {
+  const it = isITRole();
+  const lk = it ? '' : 'opacity:.4;cursor:not-allowed';
+  const lt = it ? '' : 'title="Yêu cầu đăng nhập bằng role Quản Lý Vận Hành"';
+
+  const shelvesHTML = zone.shelves.map((shelf, si) => `
+    <div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--text-muted)">${shelf.name}</span>
+        <button class="btn btn-secondary btn-sm" style="${lk}" ${lt} onclick="addFloor('${zone.id}',${si})">+ Tầng</button>
+        <button class="btn btn-danger btn-sm" style="${lk}" ${lt} onclick="deleteShelf('${zone.id}',${si})">Xóa kệ</button>
+      </div>
+      <div class="shelf-visual">
+        ${shelf.floors.map((floor, fi) => `
+          <div class="shelf-row">
+            <div class="shelf-label">${floor.label}</div>
+            ${floor.cells.map((addr, ci) => {
+              const has = addr && addr.trim() !== '' && addr !== '—';
+              const isSel = _selPos && _selPos.z===zone.id && _selPos.si===si && _selPos.fi===fi && _selPos.ci===ci;
+              const cls = 'shelf-cell' + (has?' has-light':'') + (isSel?' selected':'');
+              const drag = it
+                ? `draggable="true" ondragstart="ldStart(event,this)" ondragover="ldOver(event,this)" ondrop="ldDrop(event,this)" ondragleave="ldLeave(event,this)" ondragend="ldEnd(event,this)"`
+                : `ondragover="ldOver(event,this)" ondrop="ldDrop(event,this)" ondragleave="ldLeave(event,this)"`;
+              return `<div class="${cls}" data-z="${zone.id}" data-si="${si}" data-fi="${fi}" data-ci="${ci}" data-addr="${addr}" onclick="selCell(this)" ${drag}>${has?addr:'—'}</div>`;
+            }).join('')}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const ctrlLabel = zone.controller
+    ? `<span class="badge badge-gray" style="font-family:var(--font-mono);font-size:10px">${zone.controller}</span>`
+    : `<span class="text-muted text-sm" style="font-style:italic">Chưa gán controller</span>`;
+
+  return `<div class="khu-vuc-block">
+    <div class="khu-vuc-header">
+      <div class="area-dot" style="background:${zone.color}"></div>
+      <span>${zone.name}</span>
+      <span class="text-muted text-sm" style="margin-left:4px">— ${zone.shelves.length} kệ · ${zone.shelves.reduce((a,s)=>a+s.floors.length,0)} tầng</span>
+      ${ctrlLabel}
+      <div class="ml-auto" style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" style="${lk}" ${lt} onclick="addShelf('${zone.id}')">+ Thêm kệ</button>
+        <button class="btn btn-danger btn-sm" style="${lk}" ${lt} onclick="deleteZone('${zone.id}')">Xóa khu vực</button>
+      </div>
+    </div>
+    <div class="khu-vuc-content">${shelvesHTML}</div>
+  </div>`;
+}
+
+// ── CELL SELECT ──
+function selCell(el) {
+  document.querySelectorAll('#layout-zones-panel .shelf-cell.selected').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const z=el.dataset.z, si=+el.dataset.si, fi=+el.dataset.fi, ci=+el.dataset.ci;
+  _selPos = {z,si,fi,ci};
+  const zone=getZone(z), shelf=zone.shelves[si], floor=shelf.floors[fi];
+  const code = `${z}-${String(si+1).padStart(2,'0')}-${String(ci+1).padStart(2,'0')}`;
+  document.getElementById('cell-selected-info').innerHTML =
+    `<div style="color:var(--accent);font-weight:600;margin-bottom:3px">${code}</div>
+     <div class="text-muted">${zone.name} · ${shelf.name} · ${floor.label} · Ngăn ${ci+1}</div>`;
+  document.getElementById('cell-code').textContent = code;
+  const addrVal = (el.dataset.addr && el.dataset.addr !== '—' && el.dataset.addr.trim() !== '') ? el.dataset.addr : '—';
+  document.getElementById('cell-addr').textContent = addrVal;
+  document.getElementById('cell-addr').style.color = addrVal !== '—' ? 'var(--yellow)' : 'var(--text-muted)';
+}
+
+function updateCell() {
+  if (!isITRole()) { showToast('Chỉ Quản Lý Vận Hành mới có thể chỉnh sửa layout','warn'); return; }
+  if (!_selPos) { showToast('Chưa chọn ngăn nào','warn'); return; }
+  renderCurZone();
+  const cel = document.querySelector(`[data-z="${_selPos.z}"][data-si="${_selPos.si}"][data-fi="${_selPos.fi}"][data-ci="${_selPos.ci}"]`);
+  if (cel) selCell(cel);
+  showToast('Đã cập nhật ngăn','success');
+}
+
+// ── DRAG & DROP ──
+function ldStart(e, el) {
+  _dragSrc = {z:el.dataset.z,si:+el.dataset.si,fi:+el.dataset.fi,ci:+el.dataset.ci};
+  el.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', el.dataset.addr);
+}
+function ldOver(e, el)  { e.preventDefault(); e.dataTransfer.dropEffect='move'; el.classList.add('drag-over'); }
+function ldLeave(e, el) { el.classList.remove('drag-over'); }
+function ldEnd(e, el)   { el.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(c=>c.classList.remove('drag-over')); }
+
+function ldDrop(e, el) {
+  e.preventDefault(); el.classList.remove('drag-over');
+  if (!_dragSrc) return;
+  const dst = {z:el.dataset.z,si:+el.dataset.si,fi:+el.dataset.fi,ci:+el.dataset.ci};
+  const s = _dragSrc;
+  if (s.z===dst.z && s.si===dst.si && s.fi===dst.fi && s.ci===dst.ci) return;
+  const sZ=getZone(s.z), dZ=getZone(dst.z);
+  const sAddr=sZ.shelves[s.si].floors[s.fi].cells[s.ci];
+  const dAddr=dZ.shelves[dst.si].floors[dst.fi].cells[dst.ci];
+  _pushUndo(s, sAddr, dst, dAddr);
+  sZ.shelves[s.si].floors[s.fi].cells[s.ci] = dAddr;
+  dZ.shelves[dst.si].floors[dst.fi].cells[dst.ci] = sAddr;
+  _selPos = dst; renderCurZone(); updateLayoutStats();
+  const cel = document.querySelector(`[data-z="${dst.z}"][data-si="${dst.si}"][data-fi="${dst.fi}"][data-ci="${dst.ci}"]`);
+  if (cel) selCell(cel);
+}
+
+// ── ZONE MANAGEMENT ──
+function switchLayoutZone(zoneId) {
+  _curZone = zoneId; _selPos = null;
+  document.getElementById('cell-selected-info').innerHTML = '<div style="color:var(--text-muted)">Chưa chọn ngăn nào</div>';
+  document.getElementById('cell-code').textContent = '—';
+  document.getElementById('cell-addr').textContent = '—';
+  renderCurZone();
+}
+
+function openAddZoneModal() {
+  if (!isITRole()) { showToast('Chỉ Quản Lý Vận Hành mới có thể thêm khu vực','warn'); return; }
+  document.getElementById('new-zone-name').value = `Khu vực ${String.fromCharCode(65+layoutZones.length)}`;
+  document.getElementById('modal-add-zone').style.display = 'flex';
+}
+function closeAddZoneModal() { document.getElementById('modal-add-zone').style.display = 'none'; }
+
+// Tự gán địa chỉ đèn tuần tự
+function allocAddrs(count) {
+  let max = 0;
+  layoutZones.forEach(z=>z.shelves.forEach(s=>s.floors.forEach(f=>f.cells.forEach(c=>{
+    const n = parseInt(c); if (!isNaN(n) && n > max) max = n;
+  }))));
+  return Array.from({length:count}, (_,i) => String(max+i+1).padStart(4,'0'));
+}
+
+function addZone() {
+  const name = document.getElementById('new-zone-name').value.trim();
+  if (!name) { showToast('Nhập tên khu vực','warn'); return; }
+  const nS=+document.getElementById('new-zone-shelves').value||2;
+  const nF=+document.getElementById('new-zone-floors').value||3;
+  const nC=+document.getElementById('new-zone-cols').value||6;
+  const id = 'Z'+Date.now();
+  const addrs = allocAddrs(nS * nF * nC);
+  let ai = 0;
+  const mkF = ()=>Array.from({length:nF},(_,i)=>({label:`T${nF-i}`,cells:Array.from({length:nC},()=>addrs[ai++])}));
+  const controller = autoAssignController();
+  if (!controller) showToast('Không còn controller trống — IT cần thêm controller','warn');
+  layoutZones.push({id,name,color:ZONE_COLORS[layoutZones.length%ZONE_COLORS.length],
+    controller,
+    shelves:Array.from({length:nS},(_,i)=>({name:`Kệ ${i+1}`,floors:mkF()}))});
+  _curZone = id; closeAddZoneModal();
+  renderZoneDrop(); updateLayoutStats();
+  if (_layoutView === 'overview') renderOverview();
+  else renderCurZone();
+  showToast(`Đã tạo ${name}`,'success');
+}
+
+let _pendingShelfZone = null, _pendingFloorZone = null, _pendingFloorSi = null;
+
+function addShelf(zoneId) {
+  _pendingShelfZone = zoneId;
+  const ref = getZone(zoneId).shelves[0];
+  document.getElementById('new-shelf-floors').value = ref?.floors.length || 3;
+  document.getElementById('new-shelf-cols').value = ref?.floors[0]?.cells.length || 6;
+  document.getElementById('modal-add-shelf').style.display = 'flex';
+}
+function closeShelfModal() { document.getElementById('modal-add-shelf').style.display = 'none'; }
+function confirmAddShelf() {
+  const nF = +document.getElementById('new-shelf-floors').value || 3;
+  const nC = +document.getElementById('new-shelf-cols').value || 6;
+  const zone = getZone(_pendingShelfZone);
+  const addrs = allocAddrs(nF * nC); let ai = 0;
+  zone.shelves.push({ name:`Kệ ${zone.shelves.length+1}`,
+    floors: Array.from({length:nF},(_,i)=>({label:`T${nF-i}`, cells:Array.from({length:nC},()=>addrs[ai++])})) });
+  closeShelfModal(); renderCurZone(); updateLayoutStats();
+}
+
+function addFloor(zoneId, si) {
+  _pendingFloorZone = zoneId; _pendingFloorSi = si;
+  const shelf = getZone(zoneId).shelves[si];
+  document.getElementById('new-floor-cols').value = shelf.floors[0]?.cells.length || 6;
+  document.getElementById('modal-add-floor').style.display = 'flex';
+}
+function closeFloorModal() { document.getElementById('modal-add-floor').style.display = 'none'; }
+function confirmAddFloor() {
+  const nC = +document.getElementById('new-floor-cols').value || 6;
+  const shelf = getZone(_pendingFloorZone).shelves[_pendingFloorSi];
+  const n = shelf.floors.length + 1;
+  const addrs = allocAddrs(nC);
+  shelf.floors.unshift({ label:`T${n}`, cells:[...addrs] });
+  closeFloorModal(); renderCurZone(); updateLayoutStats();
+}
+
+function deleteShelf(zoneId, si) {
+  const zone=getZone(zoneId);
+  if (zone.shelves.length<=1){showToast('Cần ít nhất 1 kệ','warn');return;}
+  zone.shelves.splice(si,1); _selPos=null; renderCurZone(); updateLayoutStats();
+}
+
+function deleteZone(zoneId) {
+  if (!confirm(`Xóa ${getZone(zoneId)?.name}? Thao tác không thể hoàn tác.`)) return;
+  layoutZones = layoutZones.filter(z=>z.id!==zoneId);
+  _curZone = layoutZones.length ? layoutZones[0].id : null;
+  _selPos = null;
+  renderZoneDrop(); renderCurZone(); updateLayoutStats();
+  showToast('Đã xóa khu vực','success');
+}
+
+function updateLayoutStats() {
+  let tot=0,asgn=0;
+  layoutZones.forEach(z=>z.shelves.forEach(s=>s.floors.forEach(f=>f.cells.forEach(c=>{
+    tot++; if(c&&c.trim()!==''&&c!=='—') asgn++;
+  }))));
+  document.getElementById('stat-total').textContent=tot;
+  document.getElementById('stat-assigned').textContent=asgn;
+  document.getElementById('stat-unassigned').textContent=tot-asgn;
+  document.getElementById('stat-zones').textContent=layoutZones.length;
+}
+
+function saveLayout() { showToast('✓ Layout đã được lưu','success'); }
+
+// ── TOAST ──
+let _tTimer;
+function showToast(msg, type='info') {
+  const t=document.getElementById('toast');
+  const c={success:'var(--green)',warn:'var(--yellow)',error:'var(--red)',info:'var(--accent)'}[type];
+  t.style.cssText=`display:block;position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${c};border-radius:var(--radius);padding:12px 18px;font-size:13px;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.4)`;
+  t.textContent=msg;
+  clearTimeout(_tTimer);
+  _tTimer=setTimeout(()=>{t.style.display='none';},2500);
+}
+
+// ── LAYOUT VIEW TOGGLE ──
+let _layoutView = 'overview';
+
+function showLayoutView(view) {
+  _layoutView = view;
+  document.getElementById('layout-overview-panel').style.display = view === 'overview' ? '' : 'none';
+  document.getElementById('layout-detail-panel').style.display   = view === 'detail'   ? '' : 'none';
+  document.getElementById('layout-test-panel').style.display     = view === 'test'     ? '' : 'none';
+  ['overview','detail','test'].forEach(v =>
+    document.getElementById('vbtn-'+v).classList.toggle('active', v === view));
+  document.getElementById('zone-area-select').style.display = view === 'detail' ? '' : 'none';
+  document.getElementById('btn-undo').style.display = view === 'detail' ? '' : 'none';
+  if (view === 'overview') renderOverview();
+  else if (view === 'detail') renderCurZone();
+  else if (view === 'test') renderTestPanel();
+}
+
+function renderOverview() {
+  const panel = document.getElementById('layout-overview-panel');
+  if (!panel) return;
+  if (!layoutZones.length) {
+    panel.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:16px;color:var(--text-muted)">
+        <div style="font-size:48px">🏗</div>
+        <div style="font-size:15px;font-weight:500;color:var(--text)">Kho chưa có khu vực nào</div>
+        <div style="font-size:13px">Tạo khu vực đầu tiên để bắt đầu cấu hình layout</div>
+        <button class="btn btn-primary" style="margin-top:4px" onclick="openAddZoneModal()">+ Tạo khu vực đầu tiên</button>
+      </div>`;
+    return;
+  }
+  panel.innerHTML = `<div class="zone-overview-grid">${layoutZones.map(buildZoneCardHTML).join('')}</div>`;
+}
+
+function buildZoneCardHTML(zone) {
+  let total = 0, assigned = 0;
+  zone.shelves.forEach(s => s.floors.forEach(f => f.cells.forEach(c => {
+    total++; if (c && c.trim() !== '' && c !== '—') assigned++;
+  })));
+  const pct = total ? Math.round(assigned / total * 100) : 0;
+  const full = assigned === total && total > 0;
+
+  const mapHTML = zone.shelves.map((shelf, si) => `
+    <div class="mini-shelf-block">
+      <div style="font-size:9px;color:var(--text-subtle);margin-bottom:3px;font-family:var(--font-mono)">${shelf.name}</div>
+      ${shelf.floors.map(floor => `
+        <div class="mini-row">
+          <div class="mini-label">${floor.label}</div>
+          ${floor.cells.map(c => `<div class="mini-cell ${c && c.trim() && c !== '—' ? 'mc-on' : 'mc-off'}"></div>`).join('')}
+        </div>`).join('')}
+    </div>`).join('');
+
+  const ctrlBadge = zone.controller
+    ? `<span class="badge badge-gray" style="font-size:10px;font-family:var(--font-mono)">${zone.controller}</span>`
+    : `<span style="font-size:10px;color:var(--text-subtle);font-style:italic">Chưa gán</span>`;
+
+  return `
+    <div class="zone-card" onclick="openZoneDetail('${zone.id}')">
+      <div class="zone-card-header">
+        <div class="area-dot" style="background:${zone.color}"></div>
+        <span style="font-weight:500;font-size:13px;flex:1">${zone.name}</span>
+        ${ctrlBadge}
+      </div>
+      <div class="zone-card-map">${mapHTML}</div>
+      <div class="zone-card-stats">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:5px">
+          <span>${zone.shelves.length} kệ · ${zone.shelves.reduce((a,s)=>a+s.floors.length,0)} tầng</span>
+          <span style="font-family:var(--font-mono);color:${full?'var(--green)':'var(--yellow)'}">${assigned}/${total} đèn</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill ${full?'green':''}" style="width:${pct}%"></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function openZoneDetail(zoneId) {
+  _curZone = zoneId;
+  document.getElementById('zone-area-select').value = zoneId;
+  showLayoutView('detail');
+}
+
+// ── TEST ĐÈN ──
+let testResults = {}; // addr → 'ok' | 'error' | 'pending'
+let _testZoneId = null;
+let _testRunning = false;
+
+function renderTestPanel() {
+  const panel = document.getElementById('layout-test-panel');
+  if (!layoutZones.length) {
+    panel.innerHTML = `<div class="empty-state"><div class="empty-icon">🔬</div><div class="empty-text">Chưa có khu vực nào để test</div></div>`;
+    return;
+  }
+  if (!_testZoneId) _testZoneId = layoutZones[0].id;
+  const zone = getZone(_testZoneId);
+
+  // đếm kết quả
+  let nOk=0, nErr=0, nPending=0, nTotal=0;
+  zone.shelves.forEach(s=>s.floors.forEach(f=>f.cells.forEach(c=>{
+    if (!c||c==='—'||!c.trim()) return;
+    nTotal++;
+    const st = testResults[c];
+    if (st==='ok') nOk++;
+    else if (st==='error') nErr++;
+    else if (st==='pending') nPending++;
+  })));
+  const nUntested = nTotal - nOk - nErr - nPending;
+
+  const zoneTabsHTML = layoutZones.map(z => `
+    <button class="btn ${_testZoneId===z.id?'btn-primary':'btn-secondary'} btn-sm"
+      onclick="setTestZone('${z.id}')" style="display:flex;align-items:center;gap:6px">
+      <div style="width:7px;height:7px;border-radius:50%;background:${z.color}"></div>${z.name}
+    </button>`).join('');
+
+  const shelvesHTML = zone.shelves.map((shelf,si) => `
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">${shelf.name}</div>
+      <div class="shelf-visual">
+        ${shelf.floors.map((floor,fi) => `
+          <div class="shelf-row">
+            <div class="shelf-label">${floor.label}</div>
+            ${floor.cells.map((addr,ci) => {
+              const has = addr && addr.trim() && addr !== '—';
+              if (!has) return `<div class="shelf-cell" style="opacity:.3">—</div>`;
+              const st = testResults[addr];
+              const cls = 'shelf-cell has-light' + (st==='ok'?' t-ok':st==='error'?' t-error':st==='pending'?' t-pending':'');
+              const icon = st==='ok'?'✓':st==='error'?'✕':st==='pending'?'…':addr;
+              return `<div class="${cls}" title="Địa chỉ ${addr}" onclick="testSingleLight('${addr}')">${icon}</div>`;
+            }).join('')}
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  panel.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      ${zoneTabsHTML}
+      <div class="ml-auto" style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="clearTestResults()">↺ Reset</button>
+        <button class="btn btn-primary" id="btn-run-test" onclick="runTest('${_testZoneId}')">▶ Chạy test khu vực này</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="stat-card" style="padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--green)"></div>
+        <div><div class="stat-label" style="margin-bottom:0">Hoạt động</div><div style="font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--green)">${nOk}</div></div>
+      </div>
+      <div class="stat-card" style="padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--red)"></div>
+        <div><div class="stat-label" style="margin-bottom:0">Lỗi</div><div style="font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--red)">${nErr}</div></div>
+      </div>
+      <div class="stat-card" style="padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--surface3);border:1px solid var(--border)"></div>
+        <div><div class="stat-label" style="margin-bottom:0">Chưa test</div><div style="font-family:var(--font-mono);font-size:18px;font-weight:600">${nUntested}</div></div>
+      </div>
+      <div class="stat-card" style="padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--surface2);border:1px solid var(--border)"></div>
+        <div><div class="stat-label" style="margin-bottom:0">Tổng đèn</div><div style="font-family:var(--font-mono);font-size:18px;font-weight:600">${nTotal}</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">${zone.name}</div>
+        ${zone.controller ? `<span class="badge badge-gray" style="font-family:var(--font-mono);font-size:10px">${zone.controller}</span>` : ''}
+        <span class="text-muted text-sm" style="margin-left:4px">Click vào ô để test từng đèn</span>
+      </div>
+      ${shelvesHTML}
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted);margin-top:8px;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:var(--green-dim);border:1px solid var(--green);border-radius:2px"></div> Hoạt động (✓)</span>
+        <span style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:var(--red-dim);border:1px solid var(--red);border-radius:2px"></div> Lỗi (✕)</span>
+        <span style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:var(--yellow-dim);border:1px solid var(--yellow);border-radius:2px"></div> Đang test (…)</span>
+        <span style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;background:rgba(255,214,10,.08);border:1px solid var(--yellow);border-radius:2px"></div> Chưa test</span>
+      </div>
+    </div>`;
+}
+
+function setTestZone(zoneId) {
+  _testZoneId = zoneId; renderTestPanel();
+}
+
+function runTest(zoneId) {
+  if (_testRunning) return;
+  _testRunning = true;
+  const zone = getZone(zoneId);
+  const addrs = [];
+  zone.shelves.forEach(s=>s.floors.forEach(f=>f.cells.forEach(c=>{
+    if (c && c.trim() && c !== '—') addrs.push(c);
+  })));
+
+  // đánh dấu tất cả pending
+  addrs.forEach(a => testResults[a] = 'pending');
+  renderTestPanel();
+
+  // giả lập test tuần tự, mỗi đèn 80ms
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= addrs.length) {
+      clearInterval(interval);
+      _testRunning = false;
+      const nErr = addrs.filter(a => testResults[a] === 'error').length;
+      showToast(nErr ? `Hoàn thành — ${nErr} đèn lỗi` : 'Tất cả đèn hoạt động tốt', nErr ? 'warn' : 'success');
+      renderTestPanel();
+      return;
+    }
+    const addr = addrs[i];
+    // ~10% lỗi ngẫu nhiên (demo)
+    testResults[addr] = Math.random() < 0.1 ? 'error' : 'ok';
+    i++;
+    renderTestPanel();
+  }, 80);
+}
+
+function testSingleLight(addr) {
+  if (_testRunning) return;
+  testResults[addr] = 'pending';
+  renderTestPanel();
+  setTimeout(() => {
+    testResults[addr] = Math.random() < 0.1 ? 'error' : 'ok';
+    renderTestPanel();
+  }, 600);
+}
+
+function clearTestResults() {
+  testResults = {}; renderTestPanel();
+}
+
+// Ctrl+Z khi đang ở layout screen
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    const layoutActive = document.getElementById('screen-layout')?.classList.contains('active');
+    if (layoutActive && _layoutView === 'detail') {
+      e.preventDefault();
+      undoDrag();
+    }
+  }
+});
+
+// ── IMPORT TAB ──
+function switchImportTab(tab) {
+  ['picking','storeorder'].forEach(t => {
+    document.getElementById('import-tab-'+t).classList.toggle('active', t === tab);
+    document.getElementById('import-panel-'+t).style.display = t === tab ? '' : 'none';
+  });
+}
+
+// Default screen
+updateSidebarByRole();
+showScreen('lot');
+</script>
+</body>
+</html>
