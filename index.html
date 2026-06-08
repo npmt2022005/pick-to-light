@@ -35,6 +35,7 @@
   --radius: 8px;
   --sidebar-w: 224px;
   --topbar-h: 56px;
+  --statusbar-h: 28px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
@@ -60,7 +61,7 @@ svg { display: block; }
 
 /* ── SIDEBAR ── */
 .sidebar {
-  position: fixed; top: var(--topbar-h); left: 0; bottom: 0; width: var(--sidebar-w);
+  position: fixed; top: var(--topbar-h); left: 0; bottom: var(--statusbar-h); width: var(--sidebar-w);
   background: var(--surface); border-right: 1px solid var(--border);
   overflow-y: auto; z-index: 100; padding: 10px 10px;
   display: flex; flex-direction: column;
@@ -81,7 +82,25 @@ svg { display: block; }
 .nav-step { margin-left: auto; }
 
 /* ── MAIN ── */
-.main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); padding: 24px; min-height: calc(100vh - var(--topbar-h)); }
+.main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); margin-bottom: var(--statusbar-h); padding: 24px; min-height: calc(100vh - var(--topbar-h) - var(--statusbar-h)); }
+
+/* ── WINDOW CONTROLS (desktop app) ── */
+.win-controls { display: flex; align-items: center; margin-left: 6px; }
+.win-btn { width: 40px; height: 38px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 7px; transition: background .12s, color .12s; }
+.win-btn:hover { background: var(--surface2); color: var(--text); }
+.win-btn.win-close:hover { background: var(--red); color: #fff; }
+.win-btn svg { width: 13px; height: 13px; }
+
+/* ── STATUS BAR (desktop app) ── */
+.statusbar { position: fixed; left: 0; right: 0; bottom: 0; height: var(--statusbar-h); background: var(--surface); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-size: 11px; color: var(--text-muted); z-index: 150; }
+.status-left, .status-right { display: flex; align-items: center; gap: 11px; overflow: hidden; }
+.status-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.status-item svg { width: 13px; height: 13px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.online { background: var(--green); box-shadow: 0 0 5px rgba(22,163,74,.6); }
+.status-dot.offline { background: var(--red); }
+.status-sep { width: 1px; height: 13px; background: var(--border); flex-shrink: 0; }
+@media (max-width: 760px) { .status-right .status-hide-sm { display: none; } }
 .screen { display: none; }
 .screen.active { display: block; animation: screenIn .2s ease; }
 @keyframes screenIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -361,10 +380,11 @@ tr:last-child td { border-bottom: none; }
 .op-bin.skip .op-dot { background: var(--text-subtle); }
 .op-bin.skip .op-bin-qty { color: var(--text-subtle); text-decoration: line-through; }
 
-/* Login mode: ẩn sidebar + topbar cho màn đăng nhập */
+/* Login mode: ẩn sidebar + topbar + status bar cho màn đăng nhập */
 body.login-mode .sidebar,
-body.login-mode .topbar { display: none; }
-body.login-mode .main { margin-left: 0; margin-top: 0; }
+body.login-mode .topbar,
+body.login-mode .statusbar { display: none; }
+body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
 
 /* ── HAMBURGER (mobile) ── */
 .hamburger { display: none; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: var(--radius); width: 34px; height: 34px; font-size: 16px; cursor: pointer; align-items: center; justify-content: center; }
@@ -428,9 +448,33 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
       <div class="user-role">Quản Lý</div>
     </div>
     <div class="avatar">NV</div>
+    <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
+    <div class="win-controls">
+      <button class="win-btn" onclick="winAction('min')" title="Thu nhỏ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <button class="win-btn" onclick="winAction('max')" title="Phóng to"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+      <button class="win-btn win-close" onclick="winAction('close')" title="Đóng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+    </div>
   </div>
 </div>
 <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
+<!-- STATUS BAR (desktop app) -->
+<div class="statusbar" id="statusbar">
+  <div class="status-left">
+    <span class="status-item" title="Controller Khu vực A"><span class="status-dot online"></span>CTRL-001</span>
+    <span class="status-item" title="Controller Khu vực B"><span class="status-dot online"></span>CTRL-002</span>
+    <span class="status-item" title="Controller Khu vực C — mất kết nối"><span class="status-dot offline"></span>CTRL-003</span>
+    <span class="status-sep"></span>
+    <span class="status-item"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg><span>Máy chủ: <b style="color:var(--green)">Ổn định</b></span></span>
+  </div>
+  <div class="status-right">
+    <span class="status-item status-hide-sm"><svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg><span>141 / 144 đèn hoạt động</span></span>
+    <span class="status-sep status-hide-sm"></span>
+    <span class="status-item" id="status-user">Nguyễn Văn An</span>
+    <span class="status-sep"></span>
+    <span class="status-item text-mono">v1.0.0</span>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
@@ -1782,6 +1826,8 @@ function doLogin() {
   document.querySelector('.user-role').textContent = info.name;
   const av = document.querySelector('.avatar');
   if (av) av.textContent = info.initials;
+  const su = document.getElementById('status-user');
+  if (su) su.textContent = info.person;
   applyRoleAccess();
   showScreen('dashboard');
 }
@@ -1789,6 +1835,18 @@ function doLogin() {
 function doLogout() {
   showScreen('login');
   showToast('Đã đăng xuất', 'info');
+}
+
+// ── WINDOW CONTROLS (mô phỏng — thật sẽ gọi API cửa sổ của Electron/Tauri) ──
+function winAction(a) {
+  if (a === 'close') {
+    if (confirm('Đóng ứng dụng Put-to-Light?')) showToast('Đang đóng ứng dụng...', 'info');
+  } else if (a === 'max') {
+    document.body.classList.toggle('win-maximized');
+    showToast('Phóng to / khôi phục cửa sổ', 'info');
+  } else {
+    showToast('Thu nhỏ cửa sổ', 'info');
+  }
 }
 
 // ── SIDEBAR TOGGLE (mobile) ──
