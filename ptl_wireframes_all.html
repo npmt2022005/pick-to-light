@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Put-to-Light — Wireframes</title>
+<title>Put-to-Light — Hệ thống phân hàng thông minh</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -37,7 +37,8 @@
   --topbar-h: 56px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; min-height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+svg { display: block; }
 
 /* ── TOPBAR ── */
 .topbar {
@@ -47,30 +48,37 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-ui); f
   padding: 0 20px; z-index: 200; box-shadow: var(--shadow);
 }
 .logo { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 2px; }
-.topbar-center { font-size: 11px; color: var(--text-muted); background: var(--surface2); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); }
+.brand { display: flex; align-items: center; gap: 9px; }
+.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), #5b8cf0); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(47,111,237,.35); }
+.brand-name { font-weight: 700; font-size: 15px; letter-spacing: -.2px; color: var(--text); }
+.topbar-center { font-size: 12px; font-weight: 500; color: var(--text); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); font-weight: 600; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #5b8cf0); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(47,111,237,.3); }
 .user-info { text-align: right; }
-.user-name { font-size: 12px; font-weight: 500; }
-.user-role { font-size: 10px; color: var(--text-muted); }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); }
 
 /* ── SIDEBAR ── */
 .sidebar {
   position: fixed; top: var(--topbar-h); left: 0; bottom: 0; width: var(--sidebar-w);
   background: var(--surface); border-right: 1px solid var(--border);
-  overflow-y: auto; z-index: 100; padding: 12px 0;
+  overflow-y: auto; z-index: 100; padding: 10px 10px;
   display: flex; flex-direction: column;
 }
-.sidebar-section { padding: 8px 16px 4px; font-size: 10px; font-weight: 600; color: var(--text-subtle); letter-spacing: 1px; text-transform: uppercase; }
+.sidebar-section { padding: 14px 10px 6px; font-size: 10px; font-weight: 700; color: var(--text-subtle); letter-spacing: .6px; text-transform: uppercase; }
 .nav-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 16px; cursor: pointer; font-size: 13px; color: var(--text-muted);
-  border-left: 3px solid transparent; transition: all .15s ease;
+  display: flex; align-items: center; gap: 11px;
+  padding: 8px 10px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-muted);
+  border-radius: 8px; margin-bottom: 1px; transition: background .13s ease, color .13s ease;
 }
 .nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.active { background: var(--accent-dim); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
-.nav-icon { font-size: 14px; width: 18px; text-align: center; }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+.nav-item.active .nav-icon { color: var(--accent); }
+.nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-subtle); }
+.nav-icon svg { width: 18px; height: 18px; }
+.nav-item:hover .nav-icon { color: var(--text-muted); }
 .nav-badge { margin-left: auto; font-family: var(--font-mono); font-size: 10px; background: var(--red-dim); color: var(--red); padding: 1px 5px; border-radius: 10px; }
+.nav-step { margin-left: auto; }
 
 /* ── MAIN ── */
 .main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); padding: 24px; min-height: calc(100vh - var(--topbar-h)); }
@@ -147,8 +155,9 @@ tr:last-child td { border-bottom: none; }
 .login-wrap { min-height: calc(100vh - var(--topbar-h)); display: flex; align-items: center; justify-content: center; }
 .login-card { width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 32px; box-shadow: var(--shadow-lg); }
 .login-logo { text-align: center; margin-bottom: 24px; }
-.login-logo-text { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: 3px; }
-.login-logo-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.login-brand-mark { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #5b8cf0); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 6px 16px rgba(47,111,237,.35); }
+.login-logo-text { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.4px; }
+.login-logo-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .form-group { margin-bottom: 14px; }
 .login-footer { margin-top: 20px; text-align: center; font-size: 12px; color: var(--text-muted); }
 .role-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
@@ -378,10 +387,15 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
 <!-- TOPBAR -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
-    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
-    <div class="logo">PUT·TO·LIGHT</div>
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="brand">
+      <span class="brand-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg></span>
+    <span class="brand-name">Put-to-Light</span>
+    </div>
   </div>
-  <div class="topbar-center" id="topbar-screen-name">🖥 Wireframe Preview</div>
+  <div class="topbar-center" id="topbar-screen-name">Dashboard</div>
   <div class="topbar-right">
     <div class="user-info">
       <div class="user-name">Nguyễn Văn A</div>
@@ -396,45 +410,45 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
 <div class="sidebar" id="sidebar">
   <div class="sidebar-section nav-sec" data-sec="overview">Tổng quan</div>
   <div class="nav-item" onclick="showScreen('dashboard')" id="nav-dashboard" data-screen="dashboard">
-    <span class="nav-icon">📊</span> Dashboard
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span> Dashboard
   </div>
 
   <div class="sidebar-section nav-sec" data-sec="ops">Vận hành</div>
   <div class="nav-item" onclick="showScreen('lot')" id="nav-lot" data-screen="lot">
-    <span class="nav-icon">📋</span> Quản lý LOT / Batch
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span> Quản lý LOT / Batch
   </div>
   <div class="nav-item" onclick="showScreen('import')" id="nav-import" data-screen="import">
-    <span class="nav-icon">📥</span> Nhận dữ liệu API
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Nhận dữ liệu API
   </div>
   <div class="nav-item" onclick="showScreen('autoassign')" id="nav-autoassign" data-screen="autoassign">
-    <span class="nav-icon">🤖</span> Kết quả gán tự động
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M20 9h2M20 14h2M2 9h2M2 14h2"/></svg></span> Kết quả gán tự động
   </div>
   <div class="nav-item" onclick="showScreen('operation')" id="nav-operation" data-screen="operation">
-    <span class="nav-icon">▶️</span> Vận hành phân hàng
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span> Vận hành phân hàng
   </div>
   <div class="nav-item" onclick="showScreen('replenishment')" id="nav-replenishment" data-screen="replenishment">
-    <span class="nav-icon">🔄</span> Bổ sung hàng
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></span> Bổ sung hàng
   </div>
 
   <div class="sidebar-section nav-sec" data-sec="report">Báo cáo</div>
   <div class="nav-item" onclick="showScreen('reports')" id="nav-reports" data-screen="reports">
-    <span class="nav-icon">📈</span> Báo cáo &amp; thống kê
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Báo cáo &amp; thống kê
   </div>
 
   <div class="sidebar-section nav-sec" data-sec="system">Hệ thống</div>
   <div class="nav-item" onclick="showScreen('layout')" id="nav-layout" data-screen="layout">
-    <span class="nav-icon">🏗</span> Tạo Layout kho
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></span> Tạo Layout kho
   </div>
   <div class="nav-item" onclick="showScreen('lighttest')" id="nav-lighttest" data-screen="lighttest">
-    <span class="nav-icon">💡</span> Light Module Test
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg></span> Light Module Test
   </div>
   <div class="nav-item" onclick="showScreen('settings')" id="nav-settings" data-screen="settings">
-    <span class="nav-icon">⚙️</span> Cấu hình thiết bị
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Cấu hình thiết bị
   </div>
 
-  <div style="margin-top:auto;padding:12px 16px;border-top:1px solid var(--border)">
-    <div class="nav-item" onclick="doLogout()" id="nav-logout" style="padding:8px 0;color:var(--text-muted)">
-      <span class="nav-icon">🚪</span> Đăng xuất
+  <div style="margin-top:auto;padding:10px 12px;border-top:1px solid var(--border)">
+    <div class="nav-item" onclick="doLogout()" id="nav-logout" style="color:var(--text-muted)">
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Đăng xuất
     </div>
   </div>
 </div>
@@ -452,7 +466,10 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
   <div class="login-wrap">
     <div class="login-card">
       <div class="login-logo">
-        <div class="login-logo-text">PUT·TO·LIGHT</div>
+        <div class="login-brand-mark">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/></svg>
+        </div>
+        <div class="login-logo-text">Put-to-Light</div>
         <div class="login-logo-sub">Hệ thống phân hàng thông minh</div>
       </div>
 
@@ -1819,7 +1836,7 @@ function showScreen(id) {
   if (el) el.classList.add('active');
   const nav = document.getElementById('nav-' + id);
   if (nav) nav.classList.add('active');
-  document.getElementById('topbar-screen-name').textContent = '🖥 ' + (screens[id] || id);
+  document.getElementById('topbar-screen-name').textContent = (screens[id] || id);
   renderStepper(id);
   if (id === 'dashboard')  renderDashboard();
   if (id === 'import')     renderImportPreviews();
@@ -3467,8 +3484,11 @@ document.addEventListener('click', function(e) {
     });
     return;
   }
-  // Còn lại → phản hồi demo
-  if (label) showToast(`Thao tác demo: "${label}"`, 'info');
+  // Còn lại → phản hồi như thật (không dùng từ "demo")
+  const clean = label.replace(/^[^A-Za-zÀ-ỹ0-9]+/, '').trim();
+  if (/xuất|export/i.test(clean)) { showToast('✓ Đã xuất tệp', 'success'); return; }
+  if (/log/i.test(clean))         { showToast('✓ Đã tải log', 'success'); return; }
+  if (clean) showToast(`✓ ${clean}`, 'success');
 });
 
 // ── INIT ──
