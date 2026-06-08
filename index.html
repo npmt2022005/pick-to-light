@@ -544,10 +544,11 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       </div>
 
       <div class="label" style="margin-bottom:8px">Chọn vai trò</div>
-      <div class="role-selector" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:8px">
+      <div class="role-selector" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
         <div class="role-opt selected" data-role="ops"><span class="role-icon">🏭</span>Quản Lý Vận Hành</div>
-        <div class="role-opt" data-role="it"><span class="role-icon">🔧</span>IT / Kỹ Thuật</div>
+        <div class="role-opt" data-role="worker"><span class="role-icon">👷</span>Nhân Viên Vận Hành</div>
         <div class="role-opt" data-role="manager"><span class="role-icon">📊</span>Tổng Quản Lý</div>
+        <div class="role-opt" data-role="it"><span class="role-icon">🔧</span>IT / Kỹ Thuật</div>
       </div>
       <div id="role-desc" style="font-size:11px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;margin-bottom:16px;min-height:34px"></div>
 
@@ -944,6 +945,9 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <button class="btn btn-secondary" id="op-pause-btn" onclick="opTogglePause()"></button>
         <button class="btn btn-danger" id="op-finish-btn" onclick="opFinishEarly()"></button>
       </div>
+    </div>
+    <div id="op-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(47,111,237,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
+      👁 Chế độ giám sát — bạn theo dõi tiến độ ca; chỉ <strong>Nhân Viên Vận Hành</strong> tại trạm mới quét SKU &amp; bấm CONFIRM
     </div>
   </div>
 
@@ -1699,19 +1703,20 @@ const screens = {
 
 // ════════ ROLE / PERMISSION CORE ════════
 const ROLE_INFO = {
-  manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '📊', person: 'Phạm Thị Hà',  initials: 'PH', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
-  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', person: 'Nguyễn Văn An', initials: 'NA', desc: 'Chạy nghiệp vụ hằng ngày: nhận dữ liệu API, xác nhận gán tự động, quản lý LOT/Batch, bổ sung hàng và xem báo cáo.' },
-  it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '🔧', person: 'Lê Văn Cường',  initials: 'LC', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
+  manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '📊', person: 'Phạm Thị Hà',   initials: 'PH', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
+  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', person: 'Nguyễn Văn An',  initials: 'NA', desc: 'Chuẩn bị & điều phối lô hàng: nhận dữ liệu API, xác nhận gán tự động, theo dõi ca vận hành, xem báo cáo. Không trực tiếp quét hàng.' },
+  worker:  { name: 'Nhân Viên Vận Hành',short: 'Nhân Viên', icon: '👷', person: 'Trần Thị Bình',  initials: 'TB', desc: 'Trực tiếp tại trạm: quét mã SKU, bỏ hàng vào ngăn theo đèn rồi bấm CONFIRM, và bổ sung hàng lên kệ.' },
+  it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '🔧', person: 'Lê Văn Cường',   initials: 'LC', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
 };
 
 // Màn hình mỗi role được TRUY CẬP
 const ACCESS = {
-  dashboard:     ['manager','ops','it'],
+  dashboard:     ['manager','ops','worker','it'],
   lot:           ['manager','ops'],
   import:        ['ops'],
   autoassign:    ['manager','ops'],
-  operation:     ['manager','ops'],
-  replenishment: ['ops'],
+  operation:     ['manager','ops','worker'],   // worker quét/CONFIRM; ops & manager chỉ giám sát
+  replenishment: ['ops','worker'],             // worker bổ sung; ops giám sát
   reports:       ['manager','ops'],
   layout:        ['ops','it'],
   lighttest:     ['it'],
@@ -1719,23 +1724,24 @@ const ACCESS = {
 };
 // Màn hình mỗi role được CHỈNH SỬA / THAO TÁC (con của ACCESS). Role không nằm ở đây = view-only.
 const EDIT = {
-  lot:        ['ops'],
-  autoassign: ['ops'],
-  operation:  ['ops'],
-  layout:     ['it'],
+  lot:           ['ops'],
+  autoassign:    ['ops'],
+  operation:     ['worker'],      // CHỈ Nhân Viên Vận Hành mới quét SKU & bấm CONFIRM
+  replenishment: ['worker'],
+  layout:        ['it'],
 };
 
 // Quy trình tuần tự theo role — dùng cho stepper + hướng dẫn trên dashboard
 const FLOWS = {
   ops: [
-    { screen:'import',     label:'Nhận dữ liệu',       hint:'Kéo 2 API về kho' },
-    { screen:'autoassign', label:'Gán tự động',        hint:'Kiểm tra & xác nhận' },
-    { screen:'operation',  label:'Vận hành phân hàng', hint:'Quét SKU, bật đèn' },
+    { screen:'import',     label:'Nhận dữ liệu',     hint:'Kéo 2 API về kho' },
+    { screen:'autoassign', label:'Gán tự động',      hint:'Kiểm tra & xác nhận' },
+    { screen:'operation',  label:'Theo dõi vận hành',hint:'Giám sát ca phân hàng' },
   ],
   it: [
-    { screen:'settings',   label:'Cấu hình thiết bị',  hint:'Controller, block, đèn' },
-    { screen:'layout',     label:'Tạo Layout kho',     hint:'Gán đèn vào ngăn' },
-    { screen:'lighttest',  label:'Test đèn',           hint:'Kiểm tra trước vận hành' },
+    { screen:'settings',   label:'Cấu hình thiết bị',hint:'Controller, block, đèn' },
+    { screen:'layout',     label:'Tạo Layout kho',   hint:'Gán đèn vào ngăn' },
+    { screen:'lighttest',  label:'Test đèn',         hint:'Kiểm tra trước vận hành' },
   ],
 };
 
@@ -1813,7 +1819,7 @@ function updateRoleDesc() {
   const el = document.getElementById('role-desc');
   if (el) el.innerHTML = `<strong style="color:var(--text)">${ROLE_INFO[key].icon} ${ROLE_INFO[key].name}</strong> — ${ROLE_INFO[key].desc}`;
   // gợi ý username theo role
-  const unameMap = { manager:'tong.quanly', ops:'ops.vanhanh', it:'it.kythuat' };
+  const unameMap = { manager:'tong.quanly', ops:'ops.vanhanh', worker:'nv.vanhanh', it:'it.kythuat' };
   const u = document.getElementById('login-username');
   if (u) u.value = unameMap[key];
 }
@@ -1957,7 +1963,7 @@ function renderDashboard() {
 }
 
 function dashSubtitle() {
-  return { manager: 'Giám sát & ra quyết định', ops: 'Vận hành phân hàng hằng ngày', it: 'Cài đặt & bảo trì hệ thống' }[currentRole];
+  return { manager: 'Giám sát & ra quyết định', ops: 'Chuẩn bị & điều phối lô hàng', worker: 'Trực tiếp phân hàng tại trạm', it: 'Cài đặt & bảo trì hệ thống' }[currentRole];
 }
 
 // ── COMPONENTS ──
@@ -2082,10 +2088,35 @@ function dashBodyByRole() {
         </div>
       </div>`;
   }
-  // ops
   const task = (badge, cls, text, screen, btn, primary) => `<div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--border);border-radius:10px">
       <span class="badge ${cls}" style="font-size:10px">${badge}</span><span style="flex:1;font-size:13px">${text}</span>
       <button class="btn ${primary ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="showScreen('${screen}')">${btn}</button></div>`;
+  if (currentRole === 'worker') {
+    return `
+      <div class="dash-grid">
+        ${statCard('box', 'var(--accent)', 'var(--accent-dim)', BATCH_TOTALS.skuCount, 'SKU lô hiện tại', null, BATCH.id)}
+        ${statCard('operation', 'var(--green)', 'var(--green-dim)', '0', 'Đã phân ca này', null, 'bắt đầu ca mới')}
+        ${statCard('store', 'var(--purple)', 'var(--purple-dim)', BATCH.storeBins.length, 'Cửa hàng', null, 'điểm nhận hàng')}
+        ${statCard('replenishment', 'var(--yellow)', 'var(--yellow-dim)', '8', 'Ngăn cần bổ sung', null, 'khu vực A')}
+      </div>
+      <div class="row" style="gap:16px;align-items:flex-start">
+        <div class="card" style="flex:1.6">
+          <div class="card-title">Việc của tôi</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${task('Sẵn sàng', 'badge-green', `Phân hàng lô <strong>${BATCH.id}</strong> · Block 1`, 'operation', 'Bắt đầu phân hàng', true)}
+            ${task('8 ngăn', 'badge-purple', 'Bổ sung hàng khu vực A', 'replenishment', 'Bổ sung', false)}
+          </div>
+        </div>
+        <div class="card" style="flex:1">
+          <div class="card-title">Truy cập nhanh</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${quickTile('operation', 'operation', 'Vận hành phân hàng')}
+            ${quickTile('replenishment', 'replenishment', 'Bổ sung hàng')}
+          </div>
+        </div>
+      </div>`;
+  }
+  // ops
   return `
     <div class="dash-grid">
       ${statCard('box', 'var(--accent)', 'var(--accent-dim)', BATCH_TOTALS.skuCount, 'SKU lô hiện tại', null, BATCH.id)}
@@ -3019,10 +3050,12 @@ function renderOperation() {
   document.getElementById('op-complete').style.display = 'none';
   const sub = document.getElementById('op-subdesc');
   if (sub) sub.innerHTML = `Batch <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · NV: ${BATCH.operator}`;
-  // view-only cho Tổng Quản Lý (giám sát)
+  // view-only: ops & manager chỉ giám sát, không quét (chỉ worker thao tác)
   const viewOnly = !canEdit('operation');
   const ctrl = document.getElementById('op-controls');
   if (ctrl) ctrl.style.display = viewOnly ? 'none' : '';
+  const opBanner = document.getElementById('op-view-banner');
+  if (opBanner) opBanner.style.display = viewOnly ? '' : 'none';
   const pBtn = document.getElementById('op-pause-btn');
   if (pBtn) pBtn.innerHTML = _opPaused ? `${ico('play', 15)} Tiếp tục` : `${ico('pause', 15)} Tạm dừng`;
   const fBtn = document.getElementById('op-finish-btn');
