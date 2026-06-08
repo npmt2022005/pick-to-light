@@ -3388,25 +3388,29 @@ function renderImportRecon() {
   const rows = ASSIGN_DATA.map(d => {
     const cls = d.status === 'short' ? 'error' : d.status === 'surplus' ? 'warn' : 'ok';
     const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
+    const diffStr = d.diff === 0 ? '0' : d.diff > 0 ? `+${d.diff}` : `${d.diff}`;
+    const diffCls = d.diff === 0 ? 'diff-ok' : d.diff > 0 ? 'diff-warn' : 'diff-err';
     const badge = d.status === 'short' ? `<span class="badge badge-red">Thiếu ${Math.abs(d.diff)}</span>`
                 : d.status === 'surplus' ? `<span class="badge badge-yellow">Dư ${d.diff}</span>`
                 : `<span class="badge badge-green">Đủ</span>`;
     return `<tr class="validation-row ${cls}">
       <td class="text-mono">${d.sku}</td><td>${d.name}</td>
+      <td class="text-mono text-sm" style="color:var(--text-muted)">${d.lot}</td>
       <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
-      ${d.stores.map(q => `<td class="text-mono" style="text-align:right">${q}</td>`).join('')}
       <td class="text-mono" style="text-align:right;font-weight:600">${d.plan}</td>
+      <td class="assign-diff ${diffCls}" style="text-align:right">${diffStr}</td>
       <td>${badge}</td></tr>`;
   }).join('');
 
   body.innerHTML = `
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">So sánh <strong>tổng tồn kho (API 1)</strong> với <strong>tổng kế hoạch (API 2)</strong> theo từng SKU. Việc chia cho từng cửa hàng sẽ làm ở bước Gán tự động.</div>
     <div class="table-wrap" style="max-height:300px;overflow-y:auto">
       <table>
         <thead><tr>
-          <th>SKU</th><th>Tên hàng</th>
+          <th>SKU</th><th>Tên hàng</th><th>LOT</th>
           <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
-          <th style="text-align:right">CH-A</th><th style="text-align:right">CH-B</th><th style="text-align:right">CH-C</th><th style="text-align:right">CH-D</th><th style="text-align:right">CH-E</th>
           <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
+          <th style="text-align:right">Chênh lệch</th>
           <th>Trạng thái</th>
         </tr></thead>
         <tbody>${rows}</tbody>
@@ -3414,8 +3418,8 @@ function renderImportRecon() {
     </div>
     <div class="divider"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);flex-wrap:wrap;gap:8px">
-      <span>Tổng <strong>${BATCH_TOTALS.skuCount} SKU</strong> · ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị · ${BATCH.storeBins.length} cửa hàng</span>
-      ${BATCH_TOTALS.nShort ? `<span style="color:var(--yellow)">⚠ ${BATCH_TOTALS.nShort} SKU thiếu hàng sẽ bị bỏ qua khi phân</span>` : ''}
+      <span>Tổng <strong>${BATCH_TOTALS.skuCount} SKU</strong> · tồn ${ASSIGN_DATA.reduce((a, d) => a + d.stock, 0).toLocaleString()} · kế hoạch ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị</span>
+      ${BATCH_TOTALS.nShort ? `<span style="color:var(--yellow)">⚠ ${BATCH_TOTALS.nShort} SKU thiếu — sẽ phân theo tỷ lệ tồn kho ở bước sau</span>` : ''}
     </div>`;
 }
 
