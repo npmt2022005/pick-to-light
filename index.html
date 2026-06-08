@@ -274,6 +274,19 @@ tr:last-child td { border-bottom: none; }
 
 .tooltip-note { background: var(--yellow-dim); border: 1px solid rgba(210,153,34,.3); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--yellow); margin-bottom: 12px; display: flex; gap: 8px; }
 
+/* ── WORKFLOW STEPPER ── */
+.workflow-stepper { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 16px; margin-bottom:18px; flex-wrap:wrap; }
+.wf-label { font-size:12px; color:var(--text-muted); font-weight:500; white-space:nowrap; }
+.wf-steps { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.wf-step { display:flex; align-items:center; gap:7px; padding:5px 12px; border-radius:20px; border:1px solid var(--border); font-size:12px; transition:all .15s; color:var(--text-muted); }
+.wf-step .wf-num { display:flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; font-size:11px; font-weight:600; background:var(--surface3); color:var(--text-muted); flex-shrink:0; }
+.wf-step.done { border-color:var(--green); color:var(--green); }
+.wf-step.done .wf-num { background:var(--green); color:#0d1117; }
+.wf-step.active { border-color:var(--accent); background:var(--accent-dim); color:var(--accent); font-weight:600; }
+.wf-step.active .wf-num { background:var(--accent); color:#0d1117; }
+.wf-step.clickable:hover { border-color:var(--accent); }
+.wf-arrow { color:var(--text-subtle); font-size:14px; }
+
 /* ── OPERATION (PUT-TO-LIGHT) ── */
 .op-bin { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; transition: all .15s; position: relative; }
 .op-bin .op-bin-store { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
@@ -373,6 +386,9 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
 
 <!-- MAIN -->
 <div class="main">
+
+<!-- Workflow stepper (hiện trên các màn thuộc quy trình) -->
+<div id="workflow-stepper" class="workflow-stepper" style="display:none"></div>
 
 <!-- ══════════════════════════════════════
      SCREEN 1: LOGIN
@@ -1720,6 +1736,43 @@ const EDIT = {
   layout:     ['it'],
 };
 
+// Quy trình tuần tự theo role — dùng cho stepper + hướng dẫn trên dashboard
+const FLOWS = {
+  ops: [
+    { screen:'import',     label:'Nhận dữ liệu',       hint:'Kéo 2 API về kho' },
+    { screen:'autoassign', label:'Gán tự động',        hint:'Kiểm tra & xác nhận' },
+    { screen:'operation',  label:'Vận hành phân hàng', hint:'Quét SKU, bật đèn' },
+    { screen:'reports',    label:'Báo cáo',            hint:'Xem kết quả ca' },
+  ],
+  it: [
+    { screen:'settings',   label:'Cấu hình thiết bị',  hint:'Controller, block, đèn' },
+    { screen:'layout',     label:'Tạo Layout kho',     hint:'Gán đèn vào ngăn' },
+    { screen:'lighttest',  label:'Test đèn',           hint:'Kiểm tra trước vận hành' },
+  ],
+};
+
+function renderStepper(screenId) {
+  const bar = document.getElementById('workflow-stepper');
+  if (!bar) return;
+  const flow = FLOWS[currentRole];
+  const idx = flow ? flow.findIndex(s => s.screen === screenId) : -1;
+  if (idx === -1) { bar.style.display = 'none'; return; }
+  bar.style.display = '';
+  bar.innerHTML = `
+    <div class="wf-label">🧭 Quy trình ${currentRole === 'it' ? 'cài đặt' : 'vận hành'}:</div>
+    <div class="wf-steps">
+      ${flow.map((s, i) => {
+        const state = i < idx ? 'done' : i === idx ? 'active' : 'todo';
+        const access = canAccess(s.screen);
+        const click = access ? `clickable" onclick="showScreen('${s.screen}')` : '';
+        return `<div class="wf-step ${state} ${click}">
+            <span class="wf-num">${state === 'done' ? '✓' : (i + 1)}</span>
+            <span>${s.label}</span>
+          </div>${i < flow.length - 1 ? '<span class="wf-arrow">→</span>' : ''}`;
+      }).join('')}
+    </div>`;
+}
+
 let currentRole = 'ops';
 function roleName()  { return ROLE_INFO[currentRole].name; }
 function canAccess(s){ return (ACCESS[s] || []).includes(currentRole); }
@@ -1740,6 +1793,7 @@ function showScreen(id) {
   const nav = document.getElementById('nav-' + id);
   if (nav) nav.classList.add('active');
   document.getElementById('topbar-screen-name').textContent = '🖥 ' + (screens[id] || id);
+  renderStepper(id);
   if (id === 'dashboard')  renderDashboard();
   if (id === 'autoassign') renderAssignScreen();
   if (id === 'operation')  renderOperation();
@@ -1796,6 +1850,8 @@ function applyRoleAccess() {
   document.querySelectorAll('.nav-item[data-screen]').forEach(item => {
     const s = item.dataset.screen;
     item.style.display = canAccess(s) ? '' : 'none';
+    const old = item.querySelector('.nav-step');
+    if (old) old.remove();
   });
   // ẩn header section nếu mọi nav con đều ẩn
   document.querySelectorAll('.nav-sec').forEach(sec => {
@@ -1806,6 +1862,17 @@ function applyRoleAccess() {
     }
     sec.style.display = anyVisible ? '' : 'none';
   });
+  // đánh số thứ tự bước trên sidebar cho các màn thuộc quy trình
+  (FLOWS[currentRole] || []).forEach((s, i) => {
+    const item = document.getElementById('nav-' + s.screen);
+    if (item && item.style.display !== 'none') {
+      const badge = document.createElement('span');
+      badge.className = 'nav-step';
+      badge.textContent = i + 1;
+      badge.style.cssText = 'margin-left:auto;font-size:10px;font-family:var(--font-mono);background:var(--accent-dim);color:var(--accent);min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center';
+      item.appendChild(badge);
+    }
+  });
 }
 
 // ── DASHBOARD (role-aware) ──
@@ -1815,7 +1882,33 @@ function renderDashboard() {
     `${info.icon} Xin chào, ${document.querySelector('.user-name').textContent}`;
   document.getElementById('dash-subtitle').textContent =
     `Vai trò: ${info.name} — ${dashSubtitle()}`;
-  document.getElementById('dash-body').innerHTML = dashBodyByRole();
+  document.getElementById('dash-body').innerHTML = dashFlowGuide() + dashBodyByRole();
+}
+
+// Hướng dẫn thứ tự các bước ngay trên Dashboard
+function dashFlowGuide() {
+  const flow = FLOWS[currentRole];
+  if (!flow) return '';   // Tổng Quản Lý chỉ giám sát, không có quy trình tuần tự
+  const title = currentRole === 'it' ? 'Quy trình cài đặt hệ thống' : 'Quy trình vận hành hằng ngày';
+  return `<div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin-bottom:0">🧭 ${title} — làm lần lượt từ trái sang phải</div>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('${flow[0].screen}')">▶ Bắt đầu từ Bước 1</button>
+    </div>
+    <div style="display:flex;align-items:stretch;gap:8px;flex-wrap:wrap">
+      ${flow.map((s, i) => `
+        <div onclick="showScreen('${s.screen}')" style="cursor:pointer;flex:1;min-width:150px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;transition:border-color .15s"
+             onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#0d1117;font-size:12px;font-weight:700;flex-shrink:0">${i + 1}</span>
+            <span style="font-weight:600;font-size:13px">${s.label}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);padding-left:30px">${s.hint}</div>
+        </div>
+        ${i < flow.length - 1 ? '<div style="display:flex;align-items:center;color:var(--text-subtle);font-size:18px">→</div>' : ''}
+      `).join('')}
+    </div>
+  </div>`;
 }
 
 function dashSubtitle() {
