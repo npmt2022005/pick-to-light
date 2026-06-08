@@ -378,14 +378,16 @@ tr:last-child td { border-bottom: none; }
 .op-bin.error .op-bin-qty { color: var(--red); }
 
 /* ── OP MAP (sơ đồ kho thời gian thực) ── */
-.opmap-row { display: flex; gap: 3px; align-items: center; margin-bottom: 3px; }
+.opmap-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
 .opmap-lbl { font-size: 9px; color: var(--text-subtle); width: 20px; text-align: right; font-family: var(--font-mono); flex-shrink: 0; }
-.opmap-cell { width: 28px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: var(--font-mono); flex-shrink: 0; }
-.opmap-cell.off { background: var(--surface2); border: 1px solid var(--border); }
-.opmap-cell.pending { background: var(--surface3); border: 1px solid var(--text-subtle); color: var(--text-muted); }
-.opmap-cell.on { background: var(--light-on); color: #fff; box-shadow: 0 0 9px rgba(245,163,0,.65); animation: tpulse .7s ease infinite alternate; }
-.opmap-cell.done { background: var(--green); color: #fff; }
-.opmap-cell.error { background: var(--red); color: #fff; animation: tpulse .7s ease infinite alternate; }
+.opmap-cell { width: 34px; height: 30px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); flex-shrink: 0; position: relative; }
+.opmap-cell.off { width: 34px; height: 30px; background: var(--surface2); border: 1px solid var(--border); }
+.opmap-cell.batch { border: 1.5px solid var(--border); font-size: 13px; font-weight: 700; }
+.opmap-cell .opmap-s { position: absolute; top: 1px; right: 3px; font-size: 8px; font-weight: 700; opacity: .9; }
+.opmap-cell.pending { background: var(--surface); border-color: var(--text-subtle); color: var(--text-muted); }
+.opmap-cell.on { background: var(--light-on); color: #fff; border-color: var(--light-on); box-shadow: 0 0 10px rgba(245,163,0,.7); animation: tpulse .7s ease infinite alternate; }
+.opmap-cell.done { background: var(--green); color: #fff; border-color: var(--green); }
+.opmap-cell.error { background: var(--red); color: #fff; border-color: var(--red); animation: tpulse .7s ease infinite alternate; }
 
 /* Login mode: ẩn sidebar + topbar + status bar cho màn đăng nhập */
 body.login-mode .sidebar,
@@ -3092,26 +3094,25 @@ function setOpView(v) { _opView = v; renderOperation(); }
 function renderOpMap() {
   const panel = document.getElementById('op-map-view');
   if (!panel) return;
-  const binLetter = {};
-  STORE_BINS.forEach((b, i) => binLetter[b.addr] = String.fromCharCode(65 + i));
   const cur = _opQueue[_opIndex];
-  const curStatus = {};
-  if (cur) cur.bins.forEach(b => curStatus[b.addr] = b.status);
+  const letterByAddr = {}, qtyByAddr = {}, statusByAddr = {};
+  STORE_BINS.forEach((b, i) => letterByAddr[b.addr] = String.fromCharCode(65 + i));
+  if (cur) cur.bins.forEach(b => { qtyByAddr[b.addr] = b.qty; statusByAddr[b.addr] = b.status; });
 
   const zonesHTML = layoutZones.map(z => {
     const shelves = z.shelves.map(s => {
       const floors = s.floors.map(f => {
         const cells = f.cells.map(addr => {
-          const letter = binLetter[addr];
+          const letter = letterByAddr[addr];
           if (letter) {
-            const st = curStatus[addr] || 'pending';
-            return `<div class="opmap-cell ${st}" title="Đèn ${addr} · Cửa hàng ${letter}">${letter}</div>`;
+            const st = statusByAddr[addr] || 'pending';
+            return `<div class="opmap-cell batch ${st}" title="Đèn ${addr} · Cửa hàng ${letter} · bỏ ${qtyByAddr[addr] ?? '—'}"><span>${qtyByAddr[addr] ?? ''}</span><span class="opmap-s">${letter}</span></div>`;
           }
           return `<div class="opmap-cell off" title="Đèn ${addr} · ngoài lô"></div>`;
         }).join('');
         return `<div class="opmap-row"><span class="opmap-lbl">${f.label}</span>${cells}</div>`;
       }).join('');
-      return `<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-subtle);font-family:var(--font-mono);margin-bottom:3px">${s.name}</div>${floors}</div>`;
+      return `<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-subtle);font-family:var(--font-mono);margin-bottom:4px">${s.name}</div>${floors}</div>`;
     }).join('');
     return `<div style="margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
@@ -3121,17 +3122,38 @@ function renderOpMap() {
       </div>${shelves}</div>`;
   }).join('');
 
+  // Header rõ ràng: SKU nào đang chạy + tiến độ
+  const skuDoneCount = _opIndex + (_opCurDone() ? 1 : 0);
+  const doneBins = cur ? cur.bins.filter(b => b.status === 'done' || b.status === 'error').length : 0;
+  const totalBins = cur ? cur.bins.length : 0;
+  const binPct = totalBins ? Math.round(doneBins / totalBins * 100) : 0;
+
+  const header = cur ? `
+    <div style="display:flex;align-items:center;gap:14px;background:var(--accent-dim);border:1px solid rgba(47,111,237,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;flex-wrap:wrap">
+      <span style="width:42px;height:42px;border-radius:11px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('operation', 22, 2)}</span>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:11px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Đang thực hiện · SKU ${skuDoneCount + 1 > _opQueue.length ? _opQueue.length : skuDoneCount + 1}/${_opQueue.length} trong lô</div>
+        <div style="font-size:18px;font-weight:700">${cur.sku} · ${cur.name}</div>
+        <div style="font-size:12px;color:var(--text-muted)">Đã xác nhận ${doneBins}/${totalBins} cửa hàng</div>
+      </div>
+      <div style="width:130px">
+        <div class="progress-bar" style="height:7px"><div class="progress-fill" style="width:${binPct}%"></div></div>
+        <div class="text-mono" style="font-size:11px;color:var(--text-muted);text-align:right;margin-top:3px">${binPct}%</div>
+      </div>
+    </div>` : '';
+
   panel.innerHTML = `<div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div class="card-title" style="margin-bottom:0">Sơ đồ kho — trạng thái đèn thời gian thực</div>
       <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted);flex-wrap:wrap">
-        <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell on" style="width:13px;height:13px"></span>Đang sáng</span>
-        <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell done" style="width:13px;height:13px"></span>Đã xác nhận</span>
-        <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell error" style="width:13px;height:13px"></span>Đèn lỗi</span>
+        <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell on" style="width:13px;height:13px;border:none"></span>Đang sáng</span>
+        <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell done" style="width:13px;height:13px;border:none"></span>Đã xác nhận</span>
+        <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell error" style="width:13px;height:13px;border:none"></span>Đèn lỗi</span>
         <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell off" style="width:13px;height:13px"></span>Ngoài lô</span>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Quét 1 SKU → tất cả đèn cửa hàng của SKU đó sáng cùng lúc (rải khắp kho theo layout), NV đi xác nhận cái nào trước cũng được. Đang xử lý: <b style="color:var(--text)">${cur ? cur.sku : '—'}</b></div>
+    ${header}
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Số trong ô = lượng cần bỏ · chữ góc = cửa hàng (A–E). Quét 1 SKU → tất cả đèn của SKU đó sáng cùng lúc, NV đi xác nhận cái nào trước cũng được.</div>
     ${zonesHTML}
   </div>`;
 }
