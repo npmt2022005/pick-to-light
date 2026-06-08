@@ -774,162 +774,32 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-import">
   <div class="page-header">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
-      <div>
-        <div class="page-title">Nhận dữ liệu từ API</div>
-        <div class="page-desc">Kết nối 2 đầu API: hàng tiếp nhận và kế hoạch phân phối</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;padding-top:4px">
-        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)">
-          <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
-          API 1 đã kết nối
-        </div>
-        <div style="width:1px;height:14px;background:var(--border)"></div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)">
-          <span style="width:8px;height:8px;border-radius:50%;background:var(--yellow);display:inline-block"></span>
-          API 2 chờ kết nối
-        </div>
-      </div>
-    </div>
+    <div class="page-title">Nhận dữ liệu từ API</div>
+    <div class="page-desc">Lô này cần <strong>2 nguồn</strong>: hàng tiếp nhận (tồn kho) và kế hoạch phân phối (cửa hàng). Kéo cả hai rồi xác nhận để hệ thống đối chiếu.</div>
   </div>
 
-  <!-- Import Tab Bar -->
-  <div class="settings-tabs" style="margin-bottom:0;border-bottom:1px solid var(--border)">
-    <div class="settings-tab active" id="import-tab-picking" onclick="switchImportTab('picking')">
-      📥 API 1 — Hàng tiếp nhận
-      <span class="badge badge-green" style="margin-left:6px;font-size:10px">Đã nhận</span>
+  <!-- Nguồn dữ liệu -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <div class="card-title" style="margin-bottom:0">Nguồn dữ liệu · Lô <span id="import-batch-id" class="text-mono" style="color:var(--accent);text-transform:none">—</span></div>
+      <span id="import-source-progress" style="font-size:12px;color:var(--text-muted)"></span>
     </div>
-    <div class="settings-tab" id="import-tab-storeorder" onclick="switchImportTab('storeorder')">
-      📋 API 2 — Kế hoạch phân phối
-      <span class="badge badge-yellow" style="margin-left:6px;font-size:10px">Chờ nhận</span>
-    </div>
+    <div id="import-sources" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
   </div>
 
-  <!-- TAB 1: Hàng tiếp nhận -->
-  <div id="import-panel-picking" style="padding-top:20px">
-    <div class="row" style="gap:16px;align-items:flex-start">
-      <div style="flex:1">
-        <div class="card" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-            <div class="card-title" style="margin-bottom:0">Kết nối API 1</div>
-            <span class="badge badge-blue" style="font-size:10px">Hàng tiếp nhận</span>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Dữ liệu hàng hoá nhập kho: LOT, vị trí kệ, mã hàng, số lượng.</div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px">
-            <div class="label" style="margin-bottom:6px">Endpoint URL</div>
-            <input class="input" value="https://api.client.com/receiving/latest" style="margin-bottom:8px">
-            <div class="form-grid-2" style="gap:8px">
-              <div>
-                <div class="label">API Key</div>
-                <input class="input" type="password" value="••••••••••••••••">
-              </div>
-              <div>
-                <div class="label">Batch ID</div>
-                <input class="input" value="BATCH-20260518-002">
-              </div>
-            </div>
-            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="pullApiActive()">🔄 Kéo dữ liệu từ API</button>
-          </div>
-        </div>
-
-      </div>
-
-      <div style="flex:2">
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div class="card-title" style="margin-bottom:0">Xem trước — Hàng tiếp nhận (API 1)</div>
-            <div style="display:flex;gap:6px;align-items:center" id="import-picking-badges"></div>
-          </div>
-          <div class="table-wrap" style="max-height:320px;overflow-y:auto">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th><th>Batch No</th><th>LOT No</th><th>Location Code</th><th>Parts Code</th><th>Tên hàng</th><th>Tồn nhận</th><th>Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody id="import-picking-tbody"></tbody>
-            </table>
-          </div>
-          <div class="divider"></div>
-          <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
-            <div style="font-size:12px;color:var(--text-muted)">✓ Toàn bộ dòng hợp lệ — sẵn sàng nhận vào hệ thống</div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-secondary" onclick="showScreen('lot')">Hủy</button>
-              <button class="btn btn-primary" onclick="confirmPicking()">✓ Xác nhận nhận dữ liệu</button>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Đối chiếu -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="card-title" style="margin-bottom:0">Đối chiếu tồn kho × kế hoạch</div>
+      <div style="display:flex;gap:6px;align-items:center" id="import-recon-badges"></div>
     </div>
+    <div id="import-recon-body"></div>
   </div>
 
-  <!-- TAB 2: Kế hoạch phân phối -->
-  <div id="import-panel-storeorder" style="display:none;padding-top:20px">
-    <div class="row" style="gap:16px;align-items:flex-start">
-      <div style="flex:1">
-        <div class="card" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-            <div class="card-title" style="margin-bottom:0">Kết nối API 2</div>
-            <span class="badge badge-purple" style="font-size:10px">Kế hoạch phân phối</span>
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Dữ liệu nhu cầu từng cửa hàng: SKU, số lượng yêu cầu, mức ưu tiên.</div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px">
-            <div class="label" style="margin-bottom:6px">Endpoint URL</div>
-            <input class="input" value="https://api.client.com/distribution-plan/latest" style="margin-bottom:8px">
-            <div class="form-grid-2" style="gap:8px">
-              <div>
-                <div class="label">API Key</div>
-                <input class="input" type="password" value="••••••••••••••••">
-              </div>
-              <div>
-                <div class="label">Batch ID</div>
-                <input class="input" value="BATCH-20260518-002">
-              </div>
-            </div>
-            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="pullApiActive()">🔄 Kéo dữ liệu từ API</button>
-          </div>
-          <div class="tooltip-note" style="margin-bottom:0">
-            💡 Kế hoạch phân phối xác định số lượng từng SKU cần giao đến mỗi cửa hàng trong Batch này.
-          </div>
-        </div>
-      </div>
-
-      <div style="flex:2">
-        <div class="card" style="margin-bottom:12px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div class="card-title" style="margin-bottom:0">Xem trước — Kế hoạch phân phối (API 2)</div>
-            <div style="display:flex;gap:6px;align-items:center" id="import-store-badges"></div>
-          </div>
-          <div class="table-wrap" style="max-height:300px;overflow-y:auto">
-            <table>
-              <thead>
-                <tr>
-                  <th>SKU</th><th>Tên hàng</th><th>Tồn kho</th><th>CH-A</th><th>CH-B</th><th>CH-C</th><th>CH-D</th><th>CH-E</th><th>Tổng yêu cầu</th><th>Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody id="import-store-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title" style="margin-bottom:10px">Tóm tắt ghép dữ liệu</div>
-          <div class="stat-grid stat-grid-4" style="margin-bottom:12px">
-            <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)" id="import-sum-sku">—</div></div>
-            <div class="stat-card"><div class="stat-label">SKU đủ hàng</div><div class="stat-value" style="color:var(--green)" id="import-sum-ok">—</div></div>
-            <div class="stat-card"><div class="stat-label">SKU thiếu hàng</div><div class="stat-value" style="color:var(--red)" id="import-sum-short">—</div></div>
-            <div class="stat-card"><div class="stat-label">Cửa hàng</div><div class="stat-value" style="color:var(--purple)" id="import-sum-stores">—</div></div>
-          </div>
-          <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
-            <div style="font-size:12px;color:var(--text-muted)">⚠ SKU thiếu hàng sẽ được phân phối theo tỷ lệ ưu tiên</div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-secondary" onclick="showScreen('lot')">Hủy</button>
-              <button class="btn btn-primary" onclick="confirmStoreOrder()">✓ Xác nhận & Tính phân phối</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Footer -->
+  <div style="display:flex;justify-content:flex-end;gap:8px">
+    <button class="btn btn-secondary" onclick="showScreen('lot')">Hủy</button>
+    <button class="btn btn-primary" id="import-confirm-btn" onclick="confirmImport()" disabled style="opacity:.5">Xác nhận &amp; Tính phân phối</button>
   </div>
 </div>
 
@@ -1866,7 +1736,7 @@ function showScreen(id) {
   document.getElementById('topbar-screen-name').textContent = (screens[id] || id);
   renderStepper(id);
   if (id === 'dashboard')  renderDashboard();
-  if (id === 'import')     renderImportPreviews();
+  if (id === 'import')     renderImportScreen();
   if (id === 'autoassign') renderAssignScreen();
   if (id === 'operation')  renderOperation();
   if (id === 'lot')        { refreshLotStatuses(); applyLotViewMode(); filterLot(); }
@@ -3365,90 +3235,108 @@ function filterLot() {
   if (c) c.textContent = `${shown} batch`;
 }
 
-// ── IMPORT TAB & FLOW ──
-function switchImportTab(tab) {
-  ['picking','storeorder'].forEach(t => {
-    document.getElementById('import-tab-'+t).classList.toggle('active', t === tab);
-    document.getElementById('import-panel-'+t).style.display = t === tab ? '' : 'none';
-  });
-}
+// ════════ NHẬN DỮ LIỆU API (1 luồng: kéo 2 nguồn → đối chiếu → xác nhận) ════════
+let _importState = { api1: false, api2: false };
+const IMPORT_SOURCES = [
+  { key: 'api1', name: 'Hàng tiếp nhận',     tag: 'API 1', tagCls: 'badge-blue',   icon: 'box',   url: 'https://api.client.com/receiving/latest',         desc: () => `${BATCH.skus.length} dòng tồn kho` },
+  { key: 'api2', name: 'Kế hoạch phân phối', tag: 'API 2', tagCls: 'badge-purple', icon: 'store', url: 'https://api.client.com/distribution-plan/latest', desc: () => `${BATCH_TOTALS.skuCount} SKU × ${BATCH.storeBins.length} cửa hàng` },
+];
 
-// Render 2 bảng xem trước Import từ nguồn BATCH (đồng bộ với mọi màn)
-function renderImportPreviews() {
-  // API 1 — Hàng tiếp nhận (theo location)
-  const pBadges = document.getElementById('import-picking-badges');
-  if (pBadges) pBadges.innerHTML = `<span class="badge badge-green">✓ ${BATCH.skus.length} dòng hợp lệ</span>`;
-  const pBody = document.getElementById('import-picking-tbody');
-  if (pBody) pBody.innerHTML = BATCH.skus.map((s, i) => `
-    <tr class="validation-row ok">
-      <td class="text-mono text-sm">${i+1}</td>
-      <td class="text-mono text-sm">${BATCH.id.replace('BATCH-2026','B-')}</td>
-      <td>${s.lot}</td>
-      <td class="text-mono">A-01-${String(i+1).padStart(2,'0')}</td>
-      <td class="text-mono">${s.sku}</td>
-      <td>${s.name}</td>
-      <td class="text-mono">${s.stock}</td>
-      <td><span class="badge badge-green">✓ OK</span></td>
-    </tr>`).join('');
+function renderImportScreen() {
+  const bid = document.getElementById('import-batch-id');
+  if (bid) bid.textContent = BATCH.id;
+  const n = (_importState.api1 ? 1 : 0) + (_importState.api2 ? 1 : 0);
+  const prog = document.getElementById('import-source-progress');
+  if (prog) prog.textContent = `${n}/2 nguồn đã nhận`;
 
-  // API 2 — Kế hoạch phân phối (theo cửa hàng)
-  const sBadges = document.getElementById('import-store-badges');
-  if (sBadges) sBadges.innerHTML =
-    `<span class="badge badge-green">✓ ${BATCH_TOTALS.skuCount} SKU</span>` +
-    (BATCH_TOTALS.nShort ? `<span class="badge badge-red">✗ ${BATCH_TOTALS.nShort} thiếu</span>` : '') +
-    (BATCH_TOTALS.nSurplus ? `<span class="badge badge-yellow">⚠ ${BATCH_TOTALS.nSurplus} dư</span>` : '');
-  const sBody = document.getElementById('import-store-tbody');
-  if (sBody) sBody.innerHTML = ASSIGN_DATA.map(d => {
-    const cls = d.status === 'short' ? 'error' : d.status === 'surplus' ? 'warn' : 'ok';
-    const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
-    const badge = d.status === 'short' ? `<span class="badge badge-red">✗ Thiếu ${Math.abs(d.diff)}</span>`
-                : d.status === 'surplus' ? `<span class="badge badge-yellow">⚠ Dư ${d.diff}</span>`
-                : `<span class="badge badge-green">✓ Đủ</span>`;
-    return `<tr class="validation-row ${cls}">
-      <td class="text-mono">${d.sku}</td><td>${d.name}</td>
-      <td class="text-mono" style="${stockColor}">${d.stock}</td>
-      ${d.stores.map(q => `<td class="text-mono">${q}</td>`).join('')}
-      <td class="text-mono" style="font-weight:600">${d.plan}</td>
-      <td>${badge}</td>
-    </tr>`;
+  document.getElementById('import-sources').innerHTML = IMPORT_SOURCES.map(s => {
+    const done = _importState[s.key];
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid ${done ? 'var(--green)' : 'var(--border)'};border-radius:11px;background:${done ? 'var(--green-dim)' : 'var(--surface2)'};transition:all .15s">
+      <span style="width:40px;height:40px;border-radius:10px;background:var(--surface);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--shadow)">${ico(s.icon, 20)}</span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px"><span style="font-weight:600;font-size:14px">${s.name}</span><span class="badge ${s.tagCls}" style="font-size:10px">${s.tag}</span></div>
+        <div class="text-mono" style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.url}</div>
+      </div>
+      <span class="badge ${done ? 'badge-green' : 'badge-gray'}" style="white-space:nowrap">${done ? '✓ ' + s.desc() : 'Chưa kéo'}</span>
+      <button class="btn ${done ? 'btn-secondary' : 'btn-primary'} btn-sm" style="white-space:nowrap" onclick="pullApi('${s.key}')">${ico('replenishment', 14)} ${done ? 'Kéo lại' : 'Kéo dữ liệu'}</button>
+    </div>`;
   }).join('');
 
-  // tóm tắt
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('import-sum-sku', BATCH_TOTALS.skuCount);
-  set('import-sum-ok', BATCH_TOTALS.nOk);
-  set('import-sum-short', BATCH_TOTALS.nShort);
-  set('import-sum-stores', BATCH.storeBins.length);
+  renderImportRecon();
 }
 
-// Kéo dữ liệu API (giả lập) — tự nhận biết tab đang mở
-function pullApiActive() {
-  const t = document.getElementById('import-tab-storeorder').classList.contains('active') ? 'storeorder' : 'picking';
-  pullApi(t);
-}
-function pullApi(which) {
-  showLoading(which === 'storeorder' ? 'Đang kéo kế hoạch phân phối từ API...' : 'Đang kéo dữ liệu hàng tiếp nhận từ API...');
+function pullApi(key) {
+  const s = IMPORT_SOURCES.find(x => x.key === key);
+  showLoading(`Đang kéo ${s.name.toLowerCase()} từ API...`);
   setTimeout(() => {
     hideLoading();
-    renderImportPreviews();
-    showToast(which === 'storeorder' ? `✓ Đã nhận kế hoạch phân phối (${BATCH_TOTALS.skuCount} SKU)` : `✓ Đã nhận hàng tiếp nhận (${BATCH.skus.length} dòng hợp lệ)`, 'success');
-  }, 1100);
+    _importState[key] = true;
+    renderImportScreen();
+    showToast(`✓ Đã nhận ${s.name.toLowerCase()} (${s.desc()})`, 'success');
+  }, 900);
 }
 
-// Bước 1a: xác nhận Picking → chuyển sang tab Kế hoạch phân phối
-function confirmPicking() {
-  showToast('✓ Đã nhận Hàng tiếp nhận — tiếp tục nhận Kế hoạch phân phối', 'success');
-  switchImportTab('storeorder');
+function renderImportRecon() {
+  const both = _importState.api1 && _importState.api2;
+  const btn = document.getElementById('import-confirm-btn');
+  if (btn) { btn.disabled = !both; btn.style.opacity = both ? '' : '.5'; }
+  const badges = document.getElementById('import-recon-badges');
+  const body = document.getElementById('import-recon-body');
+  if (!both) {
+    if (badges) badges.innerHTML = '';
+    body.innerHTML = `<div class="empty-state" style="padding:32px">
+      <div style="color:var(--text-subtle);display:flex;justify-content:center;margin-bottom:10px">${ico('autoassign', 34, 1.6)}</div>
+      <div class="empty-text">Kéo cả <strong>2 nguồn</strong> để hệ thống đối chiếu tồn kho với kế hoạch phân phối</div>
+    </div>`;
+    return;
+  }
+  badges.innerHTML =
+    `<span class="badge badge-green">${BATCH_TOTALS.nOk} đủ</span>` +
+    (BATCH_TOTALS.nShort ? `<span class="badge badge-red">${BATCH_TOTALS.nShort} thiếu</span>` : '') +
+    (BATCH_TOTALS.nSurplus ? `<span class="badge badge-yellow">${BATCH_TOTALS.nSurplus} dư</span>` : '');
+
+  const rows = ASSIGN_DATA.map(d => {
+    const cls = d.status === 'short' ? 'error' : d.status === 'surplus' ? 'warn' : 'ok';
+    const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
+    const badge = d.status === 'short' ? `<span class="badge badge-red">Thiếu ${Math.abs(d.diff)}</span>`
+                : d.status === 'surplus' ? `<span class="badge badge-yellow">Dư ${d.diff}</span>`
+                : `<span class="badge badge-green">Đủ</span>`;
+    return `<tr class="validation-row ${cls}">
+      <td class="text-mono">${d.sku}</td><td>${d.name}</td>
+      <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
+      ${d.stores.map(q => `<td class="text-mono" style="text-align:right">${q}</td>`).join('')}
+      <td class="text-mono" style="text-align:right;font-weight:600">${d.plan}</td>
+      <td>${badge}</td></tr>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="table-wrap" style="max-height:300px;overflow-y:auto">
+      <table>
+        <thead><tr>
+          <th>SKU</th><th>Tên hàng</th>
+          <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
+          <th style="text-align:right">CH-A</th><th style="text-align:right">CH-B</th><th style="text-align:right">CH-C</th><th style="text-align:right">CH-D</th><th style="text-align:right">CH-E</th>
+          <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
+          <th>Trạng thái</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);flex-wrap:wrap;gap:8px">
+      <span>Tổng <strong>${BATCH_TOTALS.skuCount} SKU</strong> · ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị · ${BATCH.storeBins.length} cửa hàng</span>
+      ${BATCH_TOTALS.nShort ? `<span style="color:var(--yellow)">⚠ ${BATCH_TOTALS.nShort} SKU thiếu hàng sẽ bị bỏ qua khi phân</span>` : ''}
+    </div>`;
 }
 
-// Bước 1b: xác nhận Store Order → tính phân phối → sang Bước 2 (Gán tự động)
-function confirmStoreOrder() {
-  showLoading('Đang ghép 2 API & tính phân phối...');
+function confirmImport() {
+  if (!(_importState.api1 && _importState.api2)) { showToast('Cần kéo cả 2 nguồn dữ liệu trước', 'warn'); return; }
+  showLoading('Đang đối chiếu & tính phân phối...');
   setTimeout(() => {
     hideLoading();
     showToast('✓ Đã tính xong — chuyển sang Kết quả gán tự động', 'success');
     showScreen('autoassign');
-  }, 1200);
+  }, 1100);
 }
 
 // ── SEED LAYOUT DEMO (để Layout & Light Test có dữ liệu sẵn) ──
