@@ -439,10 +439,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span> Dashboard
   </div>
 
-  <div class="sidebar-section nav-sec" data-sec="ops">Vận hành</div>
-  <div class="nav-item" onclick="showScreen('lot')" id="nav-lot" data-screen="lot">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span> Quản lý LOT / Batch
-  </div>
+  <div class="sidebar-section nav-sec" data-sec="flow">Quy trình phân hàng</div>
   <div class="nav-item" onclick="showScreen('import')" id="nav-import" data-screen="import">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Nhận dữ liệu API
   </div>
@@ -452,11 +449,14 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
   <div class="nav-item" onclick="showScreen('operation')" id="nav-operation" data-screen="operation">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span> Vận hành phân hàng
   </div>
+
+  <div class="sidebar-section nav-sec" data-sec="manage">Quản lý &amp; theo dõi</div>
+  <div class="nav-item" onclick="showScreen('lot')" id="nav-lot" data-screen="lot">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></span> Quản lý LOT / Batch
+  </div>
   <div class="nav-item" onclick="showScreen('replenishment')" id="nav-replenishment" data-screen="replenishment">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></span> Bổ sung hàng
   </div>
-
-  <div class="sidebar-section nav-sec" data-sec="report">Báo cáo</div>
   <div class="nav-item" onclick="showScreen('reports')" id="nav-reports" data-screen="reports">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Báo cáo &amp; thống kê
   </div>
@@ -1813,7 +1813,6 @@ const FLOWS = {
     { screen:'import',     label:'Nhận dữ liệu',       hint:'Kéo 2 API về kho' },
     { screen:'autoassign', label:'Gán tự động',        hint:'Kiểm tra & xác nhận' },
     { screen:'operation',  label:'Vận hành phân hàng', hint:'Quét SKU, bật đèn' },
-    { screen:'reports',    label:'Báo cáo',            hint:'Xem kết quả ca' },
   ],
   it: [
     { screen:'settings',   label:'Cấu hình thiết bị',  hint:'Controller, block, đèn' },
