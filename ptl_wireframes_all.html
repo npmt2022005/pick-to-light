@@ -811,12 +811,12 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
         <div class="page-title">Kết quả gán tự động</div>
-        <div class="page-desc">Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — Mapping API 1 (hàng tiếp nhận) × API 2 (kế hoạch phân phối)</div>
+        <div class="page-desc">Lô <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — hệ thống đã chia số lượng vào từng cửa hàng theo tồn kho × kế hoạch</div>
       </div>
       <div style="display:flex;gap:8px" id="assign-actions">
-        <button class="btn btn-secondary" onclick="openRecalcModal()">🔄 Tính lại</button>
-        <button class="btn btn-danger" onclick="openRejectModal()">✗ Từ chối</button>
-        <button class="btn btn-success" id="btn-confirm-assign" onclick="openConfirmModal()">✓ Xác nhận & Bắt đầu</button>
+        <button class="btn btn-secondary" onclick="openRecalcModal()">Tính lại</button>
+        <button class="btn btn-danger" onclick="openRejectModal()">Từ chối</button>
+        <button class="btn btn-success" id="btn-confirm-assign" onclick="openConfirmModal()">Xác nhận &amp; Bắt đầu</button>
       </div>
     </div>
     <div id="assign-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
@@ -846,34 +846,38 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
 
   <!-- Filter bar -->
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-    <span style="font-size:12px;color:var(--text-muted)">Lọc:</span>
-    <button class="btn btn-sm btn-primary" id="filter-all"   onclick="filterAssign('all')">Tất cả</button>
-    <button class="btn btn-sm btn-secondary" id="filter-ok"  onclick="filterAssign('ok')">✓ Đủ hàng</button>
-    <button class="btn btn-sm btn-secondary" id="filter-short" onclick="filterAssign('short')">✗ Thiếu hàng</button>
-    <button class="btn btn-sm btn-secondary" id="filter-surplus" onclick="filterAssign('surplus')">⚠ Dư hàng</button>
-    <div style="margin-left:auto">
-      <input class="input" placeholder="🔍 Tìm SKU..." style="width:200px" oninput="searchAssign(this.value)">
+    <span id="assign-edit-hint" style="font-size:12px;color:var(--text-muted)">Có thể chỉnh số ở cột cửa hàng trước khi xác nhận</span>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text-muted)">Lọc:</span>
+      <button class="btn btn-sm btn-primary" id="filter-all"   onclick="filterAssign('all')">Tất cả</button>
+      <button class="btn btn-sm btn-secondary" id="filter-ok"  onclick="filterAssign('ok')">Đủ</button>
+      <button class="btn btn-sm btn-secondary" id="filter-short" onclick="filterAssign('short')">Thiếu</button>
+      <button class="btn btn-sm btn-secondary" id="filter-surplus" onclick="filterAssign('surplus')">Dư</button>
+      <input class="input" placeholder="Tìm SKU..." style="width:170px" oninput="searchAssign(this.value)">
     </div>
   </div>
 
   <!-- Table -->
   <div class="card" style="padding:0">
-    <div class="table-wrap" style="max-height:calc(100vh - 340px);overflow-y:auto">
+    <div class="table-wrap" style="max-height:calc(100vh - 360px);overflow-y:auto">
       <table id="assign-table">
-        <thead style="position:sticky;top:0;background:var(--surface);z-index:10">
+        <thead style="position:sticky;top:0;background:var(--surface2);z-index:10">
           <tr>
-            <th style="min-width:110px">SKU</th>
-            <th style="min-width:180px">Tên hàng</th>
-            <th>LOT</th>
+            <th style="min-width:160px">SKU / Tên hàng</th>
             <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
             <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
-            <th style="text-align:right">CH-A</th>
-            <th style="text-align:right">CH-B</th>
-            <th style="text-align:right">CH-C</th>
-            <th style="text-align:right">CH-D</th>
-            <th style="text-align:right">CH-E</th>
-            <th style="text-align:right">Chênh lệch</th>
+            <th colspan="5" style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)">Phân vào cửa hàng <span style="font-weight:400;color:var(--text-subtle);font-size:10px;text-transform:none">(chỉnh được)</span></th>
+            <th style="text-align:right">Sẽ phân</th>
             <th>Trạng thái</th>
+          </tr>
+          <tr>
+            <th></th><th></th><th></th>
+            <th style="text-align:right;font-size:10px">A</th>
+            <th style="text-align:right;font-size:10px">B</th>
+            <th style="text-align:right;font-size:10px">C</th>
+            <th style="text-align:right;font-size:10px">D</th>
+            <th style="text-align:right;font-size:10px;border-right:1px solid var(--border)">E</th>
+            <th></th><th></th>
           </tr>
         </thead>
         <tbody id="assign-tbody"></tbody>
@@ -1531,8 +1535,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
       <div id="confirm-summary" style="margin-bottom:14px"></div>
       <!-- cảnh báo SKU thiếu -->
       <div id="confirm-short-warn" style="display:none;background:var(--red-dim);border:1px solid rgba(248,81,73,.25);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">⚠ Có SKU thiếu hàng</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Các SKU sau sẽ được bỏ qua trong lần phân hàng này:</div>
+        <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">Có SKU thiếu hàng</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Các SKU sau chỉ phân được một phần (theo tồn kho hiện có), phần còn lại chờ bổ sung:</div>
         <div id="confirm-short-list" style="display:flex;flex-wrap:wrap;gap:4px"></div>
       </div>
       <div style="font-size:12px;color:var(--text-muted)">Sau khi xác nhận, hệ thống sẽ gửi lệnh bật đèn và chuyển Batch sang trạng thái <strong style="color:var(--yellow)">Đang thực hiện</strong>.</div>
@@ -2639,12 +2643,28 @@ const BATCH = {
 };
 
 // Dữ liệu gán tự động suy ra từ BATCH
-const ASSIGN_DATA = BATCH.skus.map(s => {
+// Thuật toán phân bổ: đủ/dư → cấp đủ kế hoạch; thiếu → chia theo tỷ lệ tồn kho
+function allocateStock(stores, stock) {
+  const planTotal = stores.reduce((a, b) => a + b, 0);
+  if (stock >= planTotal) return stores.slice();              // cấp đủ, phần dư lưu kho
+  const raw = stores.map(s => stock * s / planTotal);
+  const alloc = raw.map(Math.floor);
+  let rem = stock - alloc.reduce((a, b) => a + b, 0);
+  const order = raw.map((v, i) => ({ i, frac: v - Math.floor(v) })).sort((a, b) => b.frac - a.frac);
+  for (let k = 0; k < rem; k++) alloc[order[k % order.length].i]++;   // chia phần lẻ cho cửa hàng có tỷ lệ cao
+  return alloc;
+}
+
+const ASSIGN_DATA = BATCH.skus.map((s, idx) => {
   const plan = s.plan.reduce((a, b) => a + b, 0);
   const diff = s.stock - plan;
+  const alloc = allocateStock(s.plan, s.stock);
   return {
+    idx,
     sku: s.sku, name: s.name, lot: s.lot,
     stock: s.stock, plan, stores: s.plan, diff,
+    alloc,                                              // số lượng hệ thống phân vào từng cửa hàng
+    allocTotal: alloc.reduce((a, b) => a + b, 0),       // tổng sẽ phân ra (= stock nếu thiếu, = plan nếu đủ/dư)
     status: diff === 0 ? 'ok' : diff > 0 ? 'surplus' : 'short',
   };
 });
@@ -2652,8 +2672,9 @@ const ASSIGN_DATA = BATCH.skus.map(s => {
 // Tổng hợp dùng chung
 const BATCH_TOTALS = {
   skuCount:   ASSIGN_DATA.length,
-  totalUnits: ASSIGN_DATA.reduce((a, d) => a + d.plan, 0),          // tổng đơn vị cần giao
-  totalPicks: ASSIGN_DATA.reduce((a, d) => a + d.stores.filter(q => q > 0).length, 0), // tổng lượt bật đèn (≈ "ngăn")
+  totalUnits: ASSIGN_DATA.reduce((a, d) => a + d.plan, 0),          // tổng đơn vị theo kế hoạch
+  allocUnits: ASSIGN_DATA.reduce((a, d) => a + d.allocTotal, 0),    // tổng đơn vị thực sự sẽ phân
+  totalPicks: ASSIGN_DATA.reduce((a, d) => a + d.alloc.filter(q => q > 0).length, 0),
   nOk:        ASSIGN_DATA.filter(d => d.status === 'ok').length,
   nShort:     ASSIGN_DATA.filter(d => d.status === 'short').length,
   nSurplus:   ASSIGN_DATA.filter(d => d.status === 'surplus').length,
@@ -2678,10 +2699,10 @@ function renderAssignScreen() {
 
   // stats
   document.getElementById('assign-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">${data.length}</div><div class="stat-sub">${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị · ${BATCH.id}</div></div>
-    <div class="stat-card"><div class="stat-label">Đủ hàng</div><div class="stat-value" style="color:var(--green)">${nOk}</div><div class="stat-sub">Tồn kho = kế hoạch ±0</div></div>
-    <div class="stat-card"><div class="stat-label">Thiếu hàng</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">Cần bổ sung trước khi phân</div></div>
-    <div class="stat-card"><div class="stat-label">Dư hàng</div><div class="stat-value" style="color:var(--yellow)">${nSurplus}</div><div class="stat-sub">Cần lưu kho hoặc điều phối</div></div>
+    <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">${data.length}</div><div class="stat-sub">lô ${BATCH.id}</div></div>
+    <div class="stat-card"><div class="stat-label">Tổng sẽ phân</div><div class="stat-value">${BATCH_TOTALS.allocUnits.toLocaleString()}</div><div class="stat-sub">/ ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị theo kế hoạch</div></div>
+    <div class="stat-card"><div class="stat-label">Cấp đủ kế hoạch</div><div class="stat-value" style="color:var(--green)">${nOk + nSurplus}</div><div class="stat-sub">${nSurplus} SKU dư → lưu kho</div></div>
+    <div class="stat-card"><div class="stat-label">Thiếu — chia tỷ lệ</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">phân theo tồn kho hiện có</div></div>
   `;
 
   // surplus panel
@@ -2700,6 +2721,7 @@ function renderAssignScreen() {
 }
 
 function renderAssignTable() {
+  const viewOnly = !canEdit('autoassign');
   let rows = ASSIGN_DATA;
   if (_assignFilter !== 'all') rows = rows.filter(d => d.status === _assignFilter);
   if (_assignSearch) {
@@ -2709,39 +2731,49 @@ function renderAssignTable() {
 
   const tbody = document.getElementById('assign-tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:32px;color:var(--text-muted)">Không có kết quả</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted)">Không có kết quả</td></tr>`;
     return;
   }
 
   tbody.innerHTML = rows.map(d => {
-    const diffStr  = d.diff === 0 ? '0' : d.diff > 0 ? `+${d.diff}` : `${d.diff}`;
-    const diffCls  = d.diff === 0 ? 'diff-ok' : d.diff > 0 ? 'diff-warn' : 'diff-err';
-
     let statusBadge, rowBg = '';
     if (d.status === 'ok') {
-      statusBadge = `<span class="badge badge-green">✓ Đủ</span>`;
-      rowBg = 'background:rgba(63,185,80,.04)';
+      statusBadge = `<span class="badge badge-green">Phân đủ</span>`;
     } else if (d.status === 'short') {
-      statusBadge = `<span class="badge badge-red">✗ Thiếu ${Math.abs(d.diff)}</span>`;
-      rowBg = 'background:rgba(248,81,73,.04)';
+      statusBadge = `<span class="badge badge-red">Thiếu — chia tỷ lệ</span>`;
+      rowBg = 'background:rgba(225,73,63,.04)';
     } else {
-      statusBadge = `<span class="badge badge-yellow">⚠ Dư ${d.diff}</span>`;
-      rowBg = 'background:rgba(210,153,34,.04)';
+      statusBadge = `<span class="badge badge-yellow">Dư ${d.diff} · lưu kho</span>`;
+      rowBg = 'background:rgba(199,122,27,.04)';
     }
-
     const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
 
+    const inputs = d.alloc.map((q, si) =>
+      `<td style="text-align:right;padding:4px 5px;${si === 4 ? 'border-right:1px solid var(--border)' : ''}"><input class="input assign-input" style="width:46px;text-align:center;padding:4px;font-size:12px" value="${q}" oninput="updateAlloc(${d.idx}, ${si}, this.value)" ${viewOnly ? 'disabled' : ''}></td>`
+    ).join('');
+
     return `<tr style="${rowBg}">
-      <td class="text-mono" style="font-size:12px">${d.sku}</td>
-      <td style="font-size:13px">${d.name}</td>
-      <td class="text-mono text-sm" style="color:var(--text-muted)">${d.lot}</td>
+      <td><div class="text-mono" style="font-size:12px">${d.sku}</div><div style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${d.name}</div></td>
       <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
-      <td class="text-mono" style="text-align:right">${d.plan}</td>
-      ${d.stores.map(s => `<td class="text-mono" style="text-align:right;font-size:12px">${s}</td>`).join('')}
-      <td class="assign-diff ${diffCls}" style="text-align:right">${diffStr}</td>
+      <td class="text-mono" style="text-align:right;color:var(--text-muted)">${d.plan}</td>
+      ${inputs}
+      <td class="text-mono" id="alloc-sum-${d.idx}" style="text-align:right;font-weight:700;color:${d.allocTotal > d.stock ? 'var(--red)' : 'var(--text)'}">${d.allocTotal}</td>
       <td>${statusBadge}</td>
     </tr>`;
   }).join('');
+}
+
+// Chỉnh số phân bổ trực tiếp → cập nhật tổng "Sẽ phân" + cảnh báo vượt tồn
+function updateAlloc(idx, storeIdx, val) {
+  const d = ASSIGN_DATA[idx];
+  if (!d) return;
+  d.alloc[storeIdx] = Math.max(0, parseInt(val) || 0);
+  d.allocTotal = d.alloc.reduce((a, b) => a + b, 0);
+  const cell = document.getElementById('alloc-sum-' + idx);
+  if (cell) {
+    cell.textContent = d.allocTotal;
+    cell.style.color = d.allocTotal > d.stock ? 'var(--red)' : 'var(--text)';
+  }
 }
 
 function filterAssign(f) {
@@ -2837,11 +2869,10 @@ function doReject() {
 
 // ── FLOW 3: XÁC NHẬN & BẮT ĐẦU ──
 function openConfirmModal() {
-  const data      = ASSIGN_DATA;
-  const nOk       = data.filter(d => d.status === 'ok').length;
-  const nShort    = data.filter(d => d.status === 'short').length;
-  const nSurplus  = data.filter(d => d.status === 'surplus').length;
-  const totalPlan = data.reduce((s, d) => s + d.plan, 0);
+  const data       = ASSIGN_DATA;
+  const nShort     = data.filter(d => d.status === 'short').length;
+  const allocUnits = data.reduce((s, d) => s + d.allocTotal, 0);   // theo số đã gán (tính cả chỉnh tay)
+  const picks      = data.reduce((s, d) => s + d.alloc.filter(q => q > 0).length, 0);
 
   document.getElementById('confirm-summary').innerHTML = `
     <div class="stat-grid stat-grid-4" style="margin-bottom:0">
@@ -2850,16 +2881,16 @@ function openConfirmModal() {
         <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--accent)">${data.length}</div>
       </div>
       <div class="stat-card" style="padding:10px 12px">
-        <div class="stat-label">Sẽ phân hàng</div>
-        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--green)">${nOk + nSurplus}</div>
+        <div class="stat-label">Đơn vị sẽ phân</div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--green)">${allocUnits.toLocaleString()}</div>
       </div>
       <div class="stat-card" style="padding:10px 12px">
-        <div class="stat-label">Bỏ qua (thiếu)</div>
+        <div class="stat-label">Lượt bật đèn</div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--purple)">${picks}</div>
+      </div>
+      <div class="stat-card" style="padding:10px 12px">
+        <div class="stat-label">SKU thiếu</div>
         <div style="font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--red)">${nShort}</div>
-      </div>
-      <div class="stat-card" style="padding:10px 12px">
-        <div class="stat-label">Tổng đơn vị</div>
-        <div style="font-family:var(--font-mono);font-size:20px;font-weight:600">${totalPlan.toLocaleString()}</div>
       </div>
     </div>`;
 
@@ -2869,7 +2900,7 @@ function openConfirmModal() {
     warnEl.style.display = '';
     const shortItems = data.filter(d => d.status === 'short');
     listEl.innerHTML = shortItems.map(d =>
-      `<span style="background:var(--surface);border:1px solid rgba(248,81,73,.3);border-radius:20px;padding:2px 8px;font-size:11px;font-family:var(--font-mono);color:var(--red)">${d.sku} <span style="color:var(--text-muted)">thiếu ${Math.abs(d.diff)}</span></span>`
+      `<span style="background:var(--surface);border:1px solid var(--red-dim);border-radius:20px;padding:2px 8px;font-size:11px;font-family:var(--font-mono);color:var(--red)">${d.sku} <span style="color:var(--text-muted)">phân ${d.allocTotal}/${d.plan}</span></span>`
     ).join('');
   } else {
     warnEl.style.display = 'none';
@@ -2904,15 +2935,16 @@ let _opScanned = false;
 let _opPaused = false;
 
 function buildOpQueue() {
-  // chỉ phân các SKU đủ/dư (SKU thiếu đã bỏ qua ở bước xác nhận)
-  const picked = ASSIGN_DATA.filter(d => d.status !== 'short');
-  _opQueue = picked.map(d => ({
-    sku: d.sku,
-    name: d.name,
-    bins: STORE_BINS
-      .map((b, i) => ({ ...b, qty: d.stores[i], confirmedQty: null, status: 'pending' }))
-      .filter(b => b.qty > 0)
-  }));
+  // phân theo số ĐÃ GÁN (alloc): SKU đủ/dư cấp đủ kế hoạch, SKU thiếu chia theo tỷ lệ
+  _opQueue = ASSIGN_DATA
+    .filter(d => d.allocTotal > 0)
+    .map(d => ({
+      sku: d.sku,
+      name: d.name,
+      bins: STORE_BINS
+        .map((b, i) => ({ ...b, qty: d.alloc[i], confirmedQty: null, status: 'pending' }))
+        .filter(b => b.qty > 0)
+    }));
   _opIndex = 0;
   _opScanned = false;
   _opPaused = false;
