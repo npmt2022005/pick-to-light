@@ -362,23 +362,20 @@ tr:last-child td { border-bottom: none; }
 .op-confirm { width: 100%; padding: 13px; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
 .op-xbtn { padding: 9px; font-size: 13px; }
 .op-scan-input-lg { font-size: 16px !important; padding: 12px 14px !important; }
-/* waiting (chưa quét SKU) */
-.op-bin.waiting { opacity: .45; }
-/* on (đèn sáng, chờ confirm) */
+/* pending (chưa tới lượt) */
+.op-bin.pending { opacity: .5; }
+/* on (đèn sáng, chờ NV xác nhận) */
 .op-bin.on { border-color: var(--light-on); background: rgba(245,163,0,.10); box-shadow: 0 0 0 2px rgba(245,163,0,.22), var(--shadow-md); }
 .op-bin.on .op-dot { background: var(--light-on); box-shadow: 0 0 12px rgba(245,163,0,.7); animation: tpulse .7s ease infinite alternate; }
 .op-bin.on .op-bin-qty { color: var(--light-on); }
-/* done */
+/* done (đã xác nhận) */
 .op-bin.done { border-color: var(--green); background: var(--green-dim); }
 .op-bin.done .op-dot { background: var(--green); }
 .op-bin.done .op-bin-qty { color: var(--green); }
-/* short (thiếu) */
-.op-bin.short { border-color: var(--red); background: var(--red-dim); }
-.op-bin.short .op-dot { background: var(--red); }
-/* skip */
-.op-bin.skip { border-color: var(--text-subtle); }
-.op-bin.skip .op-dot { background: var(--text-subtle); }
-.op-bin.skip .op-bin-qty { color: var(--text-subtle); text-decoration: line-through; }
+/* error (đèn lỗi) */
+.op-bin.error { border-color: var(--red); background: var(--red-dim); }
+.op-bin.error .op-dot { background: var(--red); animation: tpulse .7s ease infinite alternate; }
+.op-bin.error .op-bin-qty { color: var(--red); }
 
 /* Login mode: ẩn sidebar + topbar + status bar cho màn đăng nhập */
 body.login-mode .sidebar,
@@ -544,11 +541,10 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       </div>
 
       <div class="label" style="margin-bottom:8px">Chọn vai trò</div>
-      <div class="role-selector" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
+      <div class="role-selector" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:8px">
         <div class="role-opt selected" data-role="ops"><span class="role-icon">🏭</span>Quản Lý Vận Hành</div>
-        <div class="role-opt" data-role="worker"><span class="role-icon">👷</span>Nhân Viên Vận Hành</div>
-        <div class="role-opt" data-role="manager"><span class="role-icon">📊</span>Tổng Quản Lý</div>
         <div class="role-opt" data-role="it"><span class="role-icon">🔧</span>IT / Kỹ Thuật</div>
+        <div class="role-opt" data-role="manager"><span class="role-icon">📊</span>Tổng Quản Lý</div>
       </div>
       <div id="role-desc" style="font-size:11px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;margin-bottom:16px;min-height:34px"></div>
 
@@ -947,45 +943,55 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       </div>
     </div>
     <div id="op-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(47,111,237,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
-      👁 Chế độ giám sát — bạn theo dõi tiến độ ca; chỉ <strong>Nhân Viên Vận Hành</strong> tại trạm mới quét SKU &amp; bấm CONFIRM
+      👁 Chế độ xem (Tổng Quản Lý) — theo dõi ca chạy; chỉ <strong>Quản Lý Vận Hành</strong> mới tạm dừng / kết thúc ca
     </div>
   </div>
 
   <div id="op-live">
+  <!-- KPI tổng quan ca chạy -->
+  <div class="dash-grid" id="op-kpi" style="margin-bottom:14px"></div>
+
   <!-- progress bar -->
   <div class="card" style="margin-bottom:14px;padding:12px 16px">
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="font-size:12px;color:var(--text-muted);white-space:nowrap">Tiến độ batch</div>
-      <div class="progress-bar" style="flex:1;height:8px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;display:flex;align-items:center;gap:6px"><span id="op-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>Tiến độ ca</div>
+      <div class="progress-bar" style="flex:1;min-width:160px;height:8px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
       <div class="text-mono text-sm" id="op-progress-text" style="white-space:nowrap">0 / 0 SKU</div>
     </div>
   </div>
 
   <div class="row" style="gap:16px;align-items:flex-start">
-    <!-- LEFT: scan + light grid -->
+    <!-- LEFT: trạm đang chạy + bảng đèn -->
     <div style="flex:2">
-      <!-- current SKU + scan -->
-      <div class="card" style="margin-bottom:14px" id="op-scan-card">
-        <!-- rendered by JS -->
+      <div class="card" style="margin-bottom:14px" id="op-station-card">
+        <!-- rendered by JS: trạm + SKU đang xử lý -->
       </div>
 
-      <!-- store-bin light grid -->
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="card-title" style="margin-bottom:0">Đèn cửa hàng — bỏ hàng &amp; bấm CONFIRM</div>
+          <div class="card-title" style="margin-bottom:0">Bảng đèn cửa hàng — thời gian thực</div>
           <div id="op-bins-summary" style="font-size:11px;color:var(--text-muted)"></div>
         </div>
-        <div id="op-bins-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+        <div id="op-bins-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
           <!-- rendered by JS -->
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: SKU queue -->
-    <div style="width:280px">
+    <!-- RIGHT: hàng đợi SKU + sự cố -->
+    <div style="width:290px">
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">Tiến độ SKU trong lô</div>
+        <div id="op-queue-list" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto">
+          <!-- rendered by JS -->
+        </div>
+      </div>
       <div class="card">
-        <div class="card-title">Danh sách SKU trong batch</div>
-        <div id="op-queue-list" style="display:flex;flex-direction:column;gap:6px;max-height:480px;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="card-title" style="margin-bottom:0">Sự cố cần xử lý</div>
+          <span id="op-exc-count" class="badge badge-gray" style="font-size:10px">0</span>
+        </div>
+        <div id="op-exceptions" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto">
           <!-- rendered by JS -->
         </div>
       </div>
@@ -1704,19 +1710,18 @@ const screens = {
 // ════════ ROLE / PERMISSION CORE ════════
 const ROLE_INFO = {
   manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '📊', person: 'Phạm Thị Hà',   initials: 'PH', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
-  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', person: 'Nguyễn Văn An',  initials: 'NA', desc: 'Chuẩn bị & điều phối lô hàng: nhận dữ liệu API, xác nhận gán tự động, theo dõi ca vận hành, xem báo cáo. Không trực tiếp quét hàng.' },
-  worker:  { name: 'Nhân Viên Vận Hành',short: 'Nhân Viên', icon: '👷', person: 'Trần Thị Bình',  initials: 'TB', desc: 'Trực tiếp tại trạm: quét mã SKU, bỏ hàng vào ngăn theo đèn rồi bấm CONFIRM, và bổ sung hàng lên kệ.' },
+  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', person: 'Nguyễn Văn An',  initials: 'NA', desc: 'Chuẩn bị & điều phối lô hàng: nhận dữ liệu API, xác nhận gán tự động, giám sát & điều khiển ca phân hàng, xem báo cáo.' },
   it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '🔧', person: 'Lê Văn Cường',   initials: 'LC', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
 };
 
 // Màn hình mỗi role được TRUY CẬP
 const ACCESS = {
-  dashboard:     ['manager','ops','worker','it'],
+  dashboard:     ['manager','ops','it'],
   lot:           ['manager','ops'],
   import:        ['ops'],
   autoassign:    ['manager','ops'],
-  operation:     ['manager','ops','worker'],   // worker quét/CONFIRM; ops & manager chỉ giám sát
-  replenishment: ['ops','worker'],             // worker bổ sung; ops giám sát
+  operation:     ['manager','ops'],   // ops điều khiển & giám sát; manager chỉ xem
+  replenishment: ['ops'],
   reports:       ['manager','ops'],
   layout:        ['ops','it'],
   lighttest:     ['it'],
@@ -1726,8 +1731,8 @@ const ACCESS = {
 const EDIT = {
   lot:           ['ops'],
   autoassign:    ['ops'],
-  operation:     ['worker'],      // CHỈ Nhân Viên Vận Hành mới quét SKU & bấm CONFIRM
-  replenishment: ['worker'],
+  operation:     ['ops'],      // ops điều khiển ca (tạm dừng / kết thúc); manager chỉ giám sát
+  replenishment: ['ops'],
   layout:        ['it'],
 };
 
@@ -1736,7 +1741,7 @@ const FLOWS = {
   ops: [
     { screen:'import',     label:'Nhận dữ liệu',     hint:'Kéo 2 API về kho' },
     { screen:'autoassign', label:'Gán tự động',      hint:'Kiểm tra & xác nhận' },
-    { screen:'operation',  label:'Theo dõi vận hành',hint:'Giám sát ca phân hàng' },
+    { screen:'operation',  label:'Giám sát vận hành',hint:'Theo dõi ca chạy thực tế' },
   ],
   it: [
     { screen:'settings',   label:'Cấu hình thiết bị',hint:'Controller, block, đèn' },
@@ -1819,7 +1824,7 @@ function updateRoleDesc() {
   const el = document.getElementById('role-desc');
   if (el) el.innerHTML = `<strong style="color:var(--text)">${ROLE_INFO[key].icon} ${ROLE_INFO[key].name}</strong> — ${ROLE_INFO[key].desc}`;
   // gợi ý username theo role
-  const unameMap = { manager:'tong.quanly', ops:'ops.vanhanh', worker:'nv.vanhanh', it:'it.kythuat' };
+  const unameMap = { manager:'tong.quanly', ops:'ops.vanhanh', it:'it.kythuat' };
   const u = document.getElementById('login-username');
   if (u) u.value = unameMap[key];
 }
@@ -1963,7 +1968,7 @@ function renderDashboard() {
 }
 
 function dashSubtitle() {
-  return { manager: 'Giám sát & ra quyết định', ops: 'Chuẩn bị & điều phối lô hàng', worker: 'Trực tiếp phân hàng tại trạm', it: 'Cài đặt & bảo trì hệ thống' }[currentRole];
+  return { manager: 'Giám sát & ra quyết định', ops: 'Chuẩn bị & điều phối lô hàng', it: 'Cài đặt & bảo trì hệ thống' }[currentRole];
 }
 
 // ── COMPONENTS ──
@@ -2091,31 +2096,6 @@ function dashBodyByRole() {
   const task = (badge, cls, text, screen, btn, primary) => `<div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--border);border-radius:10px">
       <span class="badge ${cls}" style="font-size:10px">${badge}</span><span style="flex:1;font-size:13px">${text}</span>
       <button class="btn ${primary ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="showScreen('${screen}')">${btn}</button></div>`;
-  if (currentRole === 'worker') {
-    return `
-      <div class="dash-grid">
-        ${statCard('box', 'var(--accent)', 'var(--accent-dim)', BATCH_TOTALS.skuCount, 'SKU lô hiện tại', null, BATCH.id)}
-        ${statCard('operation', 'var(--green)', 'var(--green-dim)', '0', 'Đã phân ca này', null, 'bắt đầu ca mới')}
-        ${statCard('store', 'var(--purple)', 'var(--purple-dim)', BATCH.storeBins.length, 'Cửa hàng', null, 'điểm nhận hàng')}
-        ${statCard('replenishment', 'var(--yellow)', 'var(--yellow-dim)', '8', 'Ngăn cần bổ sung', null, 'khu vực A')}
-      </div>
-      <div class="row" style="gap:16px;align-items:flex-start">
-        <div class="card" style="flex:1.6">
-          <div class="card-title">Việc của tôi</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            ${task('Sẵn sàng', 'badge-green', `Phân hàng lô <strong>${BATCH.id}</strong> · Block 1`, 'operation', 'Bắt đầu phân hàng', true)}
-            ${task('8 ngăn', 'badge-purple', 'Bổ sung hàng khu vực A', 'replenishment', 'Bổ sung', false)}
-          </div>
-        </div>
-        <div class="card" style="flex:1">
-          <div class="card-title">Truy cập nhanh</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            ${quickTile('operation', 'operation', 'Vận hành phân hàng')}
-            ${quickTile('replenishment', 'replenishment', 'Bổ sung hàng')}
-          </div>
-        </div>
-      </div>`;
-  }
   // ops
   return `
     <div class="dash-grid">
@@ -3007,21 +2987,24 @@ function doConfirmAssign() {
     setTimeout(() => {
       hideLoading();
       _batchStatuses[BATCH.id] = 'running';
-      showToast('✓ Đã bắt đầu — đèn đang sáng tại khu vực A', 'success');
+      showToast('✓ Đã bắt đầu ca — nhân viên đang quét tại trạm', 'success');
       buildOpQueue();
-      setTimeout(() => showScreen('operation'), 600);
+      setTimeout(() => { showScreen('operation'); opStartRun(); }, 600);
     }, 900);
   }, 1200);
 }
 
-// ════════ VẬN HÀNH PHÂN HÀNG (PUT-TO-LIGHT OPERATION) ════════
-// Mapping cửa hàng → đèn lấy từ nguồn dữ liệu chung BATCH
+// ════════ GIÁM SÁT VẬN HÀNH (PUT-TO-LIGHT) ════════
+// Nhân viên quét barcode tại trạm bằng thiết bị riêng; màn này để Quản Lý Vận Hành
+// GIÁM SÁT ca chạy thời gian thực (mô phỏng tiến trình do hệ thống báo về).
 const STORE_BINS = BATCH.storeBins;
 
 let _opQueue = [];
 let _opIndex = 0;
-let _opScanned = false;
-let _opPaused = false;
+let _opRunning = false;     // ca đang chạy (mô phỏng)
+let _opTimer = null;
+let _opElapsed = 0;         // giây
+let _opExceptions = [];
 
 function buildOpQueue() {
   // phân theo số ĐÃ GÁN (alloc): SKU đủ/dư cấp đủ kế hoạch, SKU thiếu chia theo tỷ lệ
@@ -3031,124 +3014,116 @@ function buildOpQueue() {
       sku: d.sku,
       name: d.name,
       bins: STORE_BINS
-        .map((b, i) => ({ ...b, qty: d.alloc[i], confirmedQty: null, status: 'pending' }))
+        .map((b, i) => ({ ...b, qty: d.alloc[i], status: 'pending' }))   // pending → on → done | error
         .filter(b => b.qty > 0)
     }));
   _opIndex = 0;
-  _opScanned = false;
-  _opPaused = false;
+  _opRunning = false;
+  _opElapsed = 0;
+  _opExceptions = [];
+  if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
 }
 
-function _opCurResolved() {
+function _opCurDone() {
   const cur = _opQueue[_opIndex];
-  return cur && cur.bins.every(b => b.status !== 'on' && b.status !== 'pending');
+  return cur && cur.bins.every(b => b.status === 'done' || b.status === 'error');
 }
 
+// ── RENDER ──
 function renderOperation() {
   if (!_opQueue.length) buildOpQueue();
   document.getElementById('op-live').style.display = '';
   document.getElementById('op-complete').style.display = 'none';
-  const sub = document.getElementById('op-subdesc');
-  if (sub) sub.innerHTML = `Batch <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · NV: ${BATCH.operator}`;
-  // view-only: ops & manager chỉ giám sát, không quét (chỉ worker thao tác)
-  const viewOnly = !canEdit('operation');
+
+  const canControl = canEdit('operation');           // ops điều khiển; manager chỉ xem
   const ctrl = document.getElementById('op-controls');
-  if (ctrl) ctrl.style.display = viewOnly ? 'none' : '';
+  if (ctrl) ctrl.style.display = canControl ? '' : 'none';
   const opBanner = document.getElementById('op-view-banner');
-  if (opBanner) opBanner.style.display = viewOnly ? '' : 'none';
+  if (opBanner) opBanner.style.display = canControl ? 'none' : '';
+
+  const sub = document.getElementById('op-subdesc');
+  if (sub) sub.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · NV trạm: ${BATCH.operator}`;
+
   const pBtn = document.getElementById('op-pause-btn');
-  if (pBtn) pBtn.innerHTML = _opPaused ? `${ico('play', 15)} Tiếp tục` : `${ico('pause', 15)} Tạm dừng`;
+  if (pBtn) pBtn.innerHTML = _opRunning ? `${ico('pause', 15)} Tạm dừng ca` : `${ico('play', 15)} Tiếp tục ca`;
   const fBtn = document.getElementById('op-finish-btn');
-  if (fBtn) fBtn.innerHTML = `${ico('stop', 15)} Kết thúc`;
-  renderOpScanCard(viewOnly);
-  renderOpBins(viewOnly);
+  if (fBtn) fBtn.innerHTML = `${ico('stop', 15)} Kết thúc ca`;
+
+  renderOpKpi();
+  renderOpStation();
+  renderOpBins();
   renderOpQueue();
+  renderOpExceptions();
   renderOpProgress();
 }
 
-function renderOpScanCard(viewOnly) {
-  const cur = _opQueue[_opIndex];
-  const card = document.getElementById('op-scan-card');
-  if (!cur) { card.innerHTML = ''; return; }
-
-  const ioBox = (color, dim, name) => `<span style="width:52px;height:52px;border-radius:13px;background:${dim};color:${color};display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico(name, 26, 2)}</span>`;
-
-  if (_opPaused) {
-    card.innerHTML = `<div style="display:flex;align-items:center;gap:16px">
-      ${ioBox('var(--yellow)', 'var(--yellow-dim)', 'pause')}
-      <div style="flex:1"><div style="font-size:18px;font-weight:600;color:var(--yellow)">Đang tạm dừng</div>
-      <div style="font-size:12px;color:var(--text-muted)">Bấm "Tiếp tục" để vận hành trở lại</div></div></div>`;
-    return;
-  }
-
-  if (!_opScanned) {
-    card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
-        ${ioBox('var(--accent)', 'var(--accent-dim)', 'scan')}
-        <div style="flex:1;min-width:200px">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">SKU cần xử lý (${_opIndex+1}/${_opQueue.length})</div>
-          <div style="font-size:24px;font-weight:700">${cur.sku} · ${cur.name}</div>
-          <div style="font-size:13px;color:var(--accent)">Quét mã vạch tại trạm rồi nhấn Enter để bật đèn cửa hàng</div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <input class="input op-scan-input-lg" id="op-scan-input" placeholder="Quét / nhập mã SKU..." style="width:210px" value="${cur.sku}"
-                 onkeydown="if(event.key==='Enter')opScan()" ${viewOnly?'disabled':''}>
-          <button class="btn btn-primary" style="padding:12px 18px;font-size:15px" onclick="opScan()" ${viewOnly?'disabled style="opacity:.5"':''}>${ico('scan', 16)} Quét SKU</button>
-        </div>
-      </div>`;
-    if (!viewOnly) setTimeout(() => { const el = document.getElementById('op-scan-input'); if (el) { el.focus(); el.select(); } }, 60);
-  } else {
-    const done = _opCurResolved();
-    card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
-        ${done ? ioBox('var(--green)', 'var(--green-dim)', 'checkCircle') : ioBox('var(--light-on)', 'var(--yellow-dim)', 'bulb')}
-        <div style="flex:1;min-width:200px">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">Đang xử lý (${_opIndex+1}/${_opQueue.length})</div>
-          <div style="font-size:24px;font-weight:700">${cur.sku} · ${cur.name}</div>
-          <div style="font-size:13px;color:${done?'var(--green)':'var(--yellow)'}">${done ? 'Đã xong SKU này — tự chuyển sang SKU kế tiếp...' : 'Đèn đang sáng — bỏ hàng vào từng cửa hàng rồi bấm CONFIRM'}</div>
-        </div>
-        <button class="btn ${done?'btn-success':'btn-secondary'}" id="op-next-btn" style="padding:12px 20px;font-size:15px" onclick="opNextSku()" ${(!done||viewOnly)?'disabled style="opacity:.5"':''}>
-          ${_opIndex < _opQueue.length-1 ? 'SKU tiếp theo' : 'Hoàn tất batch'} ${ico('arrowRight', 15, 2)}
-        </button>
-      </div>`;
-  }
+function _opUnitsDone() {
+  let u = 0;
+  _opQueue.forEach(q => q.bins.forEach(b => { if (b.status === 'done') u += b.qty; }));
+  return u;
+}
+function _opUnitsTotal() {
+  return _opQueue.reduce((s, q) => s + q.bins.reduce((a, b) => a + b.qty, 0), 0);
 }
 
-function renderOpBins(viewOnly) {
+function renderOpKpi() {
+  const skuDone = _opIndex + (_opCurDone() ? 1 : 0);
+  const mm = String(Math.floor(_opElapsed / 60)).padStart(2, '0');
+  const ss = String(_opElapsed % 60).padStart(2, '0');
+  document.getElementById('op-kpi').innerHTML = `
+    ${statCard('operation', 'var(--accent)', 'var(--accent-dim)', `${skuDone}/${_opQueue.length}`, 'SKU đã xong', null, 'trong lô')}
+    ${statCard('box', 'var(--green)', 'var(--green-dim)', _opUnitsDone().toLocaleString(), 'Đơn vị đã phân', null, `/ ${_opUnitsTotal().toLocaleString()} tổng`)}
+    ${statCard('alert', 'var(--red)', 'var(--red-dim)', _opExceptions.length, 'Sự cố', null, 'đèn lỗi / cảnh báo')}
+    ${statCard('clock', 'var(--purple)', 'var(--purple-dim)', `${mm}:${ss}`, 'Thời gian ca', null, _opRunning ? 'đang chạy' : 'tạm dừng')}
+  `;
+  const dot = document.getElementById('op-live-dot');
+  if (dot) dot.style.background = _opRunning ? 'var(--green)' : 'var(--yellow)';
+}
+
+function renderOpStation() {
+  const cur = _opQueue[_opIndex];
+  const card = document.getElementById('op-station-card');
+  if (!cur) { card.innerHTML = ''; return; }
+  const doneBins = cur.bins.filter(b => b.status === 'done' || b.status === 'error').length;
+  const statusTxt = !_opRunning ? 'Ca đang tạm dừng'
+    : `Đang phân SKU này — ${doneBins}/${cur.bins.length} cửa hàng đã xác nhận`;
+  const statusColor = !_opRunning ? 'var(--yellow)' : 'var(--accent)';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <span style="width:52px;height:52px;border-radius:13px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('scan', 26, 2)}</span>
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">Trạm ${BATCH.block} · NV ${BATCH.operator} đang xử lý (SKU ${_opIndex + 1}/${_opQueue.length})</div>
+        <div style="font-size:24px;font-weight:700">${cur.sku} · ${cur.name}</div>
+        <div style="font-size:13px;color:${statusColor}">${statusTxt}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text-muted)">Quét tại trạm bằng máy BCR</div>
+        <div class="text-mono" style="font-size:12px;color:var(--text-subtle)">addr 9101</div>
+      </div>
+    </div>`;
+}
+
+function renderOpBins() {
   const cur = _opQueue[_opIndex];
   const grid = document.getElementById('op-bins-grid');
   const summary = document.getElementById('op-bins-summary');
   if (!cur) { grid.innerHTML = ''; return; }
-  const resolved = cur.bins.filter(b => b.status !== 'on' && b.status !== 'pending').length;
-  summary.textContent = `${resolved}/${cur.bins.length} cửa hàng đã xử lý`;
+  const resolved = cur.bins.filter(b => b.status === 'done' || b.status === 'error').length;
+  summary.textContent = `${resolved}/${cur.bins.length} cửa hàng`;
 
-  grid.innerHTML = cur.bins.map((b, i) => {
-    let cls = 'op-bin ' + (!_opScanned ? 'waiting' : b.status);
-    let action;
-    if (_opScanned && b.status === 'on' && !viewOnly) {
-      action = `
-        <button class="btn btn-success op-confirm" onclick="opConfirmBin(${i})">${ico('check2', 16, 2.4)} CONFIRM</button>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-secondary op-xbtn" style="flex:1" onclick="opShortBin(${i})">${ico('alert', 13)} Thiếu</button>
-          <button class="btn btn-ghost op-xbtn" style="flex:1" onclick="opSkipBin(${i})">${ico('ban', 13)} Bỏ qua</button>
-        </div>`;
-    } else if (b.status === 'done') {
-      action = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--green);font-weight:600;padding:6px 0">${ico('check2', 15, 2.4)} Đã bỏ ${b.confirmedQty ?? b.qty}</div>`;
-    } else if (b.status === 'short') {
-      action = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">${ico('alert', 14)} Thiếu — bỏ ${b.confirmedQty}/${b.qty}</div>`;
-    } else if (b.status === 'skip') {
-      action = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--text-subtle);padding:6px 0">${ico('ban', 14)} Đã bỏ qua</div>`;
-    } else if (_opScanned && b.status === 'on' && viewOnly) {
-      action = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--light-on);font-weight:600;padding:6px 0">${ico('bulb', 14)} Đèn đang sáng</div>`;
-    } else {
-      action = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 0">Chờ quét SKU</div>`;
-    }
+  grid.innerHTML = cur.bins.map(b => {
+    const cls = 'op-bin ' + b.status;
+    let foot;
+    if (b.status === 'done')       foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--green);font-weight:600;padding:6px 0">${ico('check2', 15, 2.4)} Đã xác nhận</div>`;
+    else if (b.status === 'error') foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">${ico('alert', 14)} Đèn lỗi</div>`;
+    else if (b.status === 'on')    foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--light-on);font-weight:600;padding:6px 0">${ico('bulb', 14)} Đèn sáng — chờ NV</div>`;
+    else                           foot = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 0">Chờ tới lượt</div>`;
     return `<div class="${cls}">
       <div class="op-dot"></div>
       <div class="op-bin-store">${b.store}</div>
       <div class="op-bin-loc">Đèn ${b.addr} · ${b.loc}</div>
       <div class="op-bin-qty">${b.qty}</div>
-      ${action}
+      ${foot}
     </div>`;
   }).join('');
 }
@@ -3157,88 +3132,112 @@ function renderOpQueue() {
   const list = document.getElementById('op-queue-list');
   list.innerHTML = _opQueue.map((q, i) => {
     let iconName, color, bg, border = 'var(--border)';
-    if (i < _opIndex)        { iconName='check2'; color='var(--green)';  bg='var(--green-dim)';  border='var(--green)'; }
-    else if (i === _opIndex) { iconName='play';   color='var(--accent)'; bg='var(--accent-dim)'; border='var(--accent)'; }
-    else                     { iconName='circle'; color='var(--text-subtle)'; bg='transparent'; }
+    if (i < _opIndex)        { iconName = 'check2'; color = 'var(--green)';  bg = 'var(--green-dim)';  border = 'var(--green)'; }
+    else if (i === _opIndex) { iconName = 'play';   color = 'var(--accent)'; bg = 'var(--accent-dim)'; border = 'var(--accent)'; }
+    else                     { iconName = 'circle'; color = 'var(--text-subtle)'; bg = 'transparent'; }
     return `<div style="display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid ${border};border-radius:var(--radius);background:${bg}">
       <span style="color:${color};display:flex;flex-shrink:0">${ico(iconName, 15, 2.4)}</span>
       <div style="flex:1;min-width:0">
         <div class="text-mono" style="font-size:11px;color:var(--text-muted)">${q.sku}</div>
         <div style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${q.name}</div>
       </div>
-      <span class="text-mono text-sm" style="color:var(--text-subtle);display:flex;align-items:center;gap:3px">${q.bins.length} ${ico('store', 13)}</span>
+      <span class="text-mono text-sm" style="color:var(--text-subtle)">${q.bins.length}</span>
     </div>`;
   }).join('');
 }
 
+function renderOpExceptions() {
+  const box = document.getElementById('op-exceptions');
+  const cnt = document.getElementById('op-exc-count');
+  if (cnt) { cnt.textContent = _opExceptions.length; cnt.className = 'badge ' + (_opExceptions.length ? 'badge-red' : 'badge-gray'); cnt.style.fontSize = '10px'; }
+  if (!_opExceptions.length) {
+    box.innerHTML = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 2px">Chưa có sự cố — ca đang chạy ổn định</div>`;
+    return;
+  }
+  box.innerHTML = _opExceptions.map((e, i) => `
+    <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--red-dim);background:var(--red-dim);border-radius:10px">
+      <span style="color:var(--red);display:flex;flex-shrink:0">${ico('alert', 16)}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--red)">${e.title}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${e.detail}</div>
+      </div>
+      ${canEdit('operation') ? `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="opResolveExc(${i})">Đã xử lý</button>` : ''}
+    </div>`).join('');
+}
+
 function renderOpProgress() {
   const total = _opQueue.length;
-  let done = _opIndex + (_opScanned && _opCurResolved() ? 1 : 0);
+  const done = _opIndex + (_opCurDone() ? 1 : 0);
   const pct = total ? Math.round(done / total * 100) : 0;
   document.getElementById('op-progress-fill').style.width = pct + '%';
   document.getElementById('op-progress-text').textContent = `${done} / ${total} SKU`;
 }
 
-function opScan() {
-  if (_opPaused) { showToast('Đang tạm dừng — bấm Tiếp tục để vận hành', 'warn'); return; }
+// ── MÔ PHỎNG CA CHẠY (do nhân viên quét ở trạm; hệ thống báo tiến độ về) ──
+function opStartRun() {
+  if (_opRunning || !_opQueue.length) return;
+  _opRunning = true;
+  if (_opTimer) clearInterval(_opTimer);
+  _opTimer = setInterval(opTick, 700);
+  renderOperation();
+}
+function opPauseRun() {
+  _opRunning = false;
+  if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
+  renderOperation();
+}
+function opTick() {
+  _opElapsed++;
   const cur = _opQueue[_opIndex];
-  const val = (document.getElementById('op-scan-input')?.value || '').trim().toUpperCase();
-  if (val !== cur.sku) { showToast(`⚠ Sai SKU! Trạm cần quét ${cur.sku} (poka-yoke)`, 'error'); return; }
-  _opScanned = true;
-  cur.bins.forEach(b => { if (b.status === 'pending') b.status = 'on'; });
-  renderOperation();
-  showToast(`💡 Đã bật ${cur.bins.length} đèn cửa hàng cho ${cur.sku}`, 'success');
-}
+  if (!cur) { opFinishRun(false); return; }
 
-function opConfirmBin(i) {
-  const b = _opQueue[_opIndex].bins[i];
-  b.status = 'done'; b.confirmedQty = b.qty;
-  _afterBin();
-}
-function opShortBin(i) {
-  const b = _opQueue[_opIndex].bins[i];
-  const v = prompt(`Số lượng THỰC TẾ bỏ vào ${b.store} (kế hoạch ${b.qty}):`, String(Math.max(0, b.qty - 1)));
-  if (v === null) return;
-  b.confirmedQty = Math.max(0, Math.min(b.qty, parseInt(v) || 0));
-  b.status = 'short';
-  _afterBin();
-}
-function opSkipBin(i) {
-  if (!confirm(`Bỏ qua ${_opQueue[_opIndex].bins[i].store}? Cửa hàng này sẽ không được phân hàng.`)) return;
-  _opQueue[_opIndex].bins[i].status = 'skip';
-  _afterBin();
-}
-function _afterBin() {
-  renderOperation();
-  if (_opCurResolved()) {
-    // tự động chuyển sang SKU kế tiếp sau 1 giây (operator không phải bấm thêm)
-    const atIdx = _opIndex;
-    showToast('✓ SKU hoàn tất — tự chuyển SKU kế tiếp', 'success');
-    setTimeout(() => { if (_opIndex === atIdx && _opCurResolved() && !_opPaused) opNextSku(); }, 1000);
-  }
-}
-
-function opNextSku() {
-  if (!_opCurResolved()) { showToast('Còn cửa hàng chưa xử lý', 'warn'); return; }
-  if (_opIndex < _opQueue.length - 1) {
-    _opIndex++; _opScanned = false;
-    renderOperation();
+  // tìm đèn kế tiếp: pending → on (sáng), on → done (NV xác nhận), thỉnh thoảng lỗi
+  let bin = cur.bins.find(b => b.status === 'on');
+  if (bin) {
+    if (Math.random() < 0.06) {
+      bin.status = 'error';
+      _opExceptions.push({ title: `Đèn ${bin.addr} không phản hồi`, detail: `${cur.sku} · ${bin.store} · ${BATCH.block}` });
+    } else {
+      bin.status = 'done';
+    }
   } else {
-    renderOpComplete();
+    bin = cur.bins.find(b => b.status === 'pending');
+    if (bin) bin.status = 'on';
   }
+
+  // SKU xong → chuyển SKU kế tiếp
+  if (_opCurDone()) {
+    renderOperation();
+    setTimeout(() => {
+      if (!_opRunning) return;
+      if (_opIndex < _opQueue.length - 1) { _opIndex++; renderOperation(); }
+      else opFinishRun(false);
+    }, 500);
+    return;
+  }
+  renderOperation();
 }
 
+function opResolveExc(i) {
+  _opExceptions.splice(i, 1);
+  renderOpExceptions();
+  renderOpKpi();
+  showToast('✓ Đã ghi nhận xử lý sự cố', 'success');
+}
+
+// Điều khiển ca (ops)
 function opTogglePause() {
-  _opPaused = !_opPaused;
-  const btn = document.getElementById('op-pause-btn');
-  if (btn) btn.className = _opPaused ? 'btn btn-primary' : 'btn btn-secondary';
-  renderOperation();   // cập nhật nội dung nút (icon + chữ) qua renderOperation
-  showToast(_opPaused ? 'Đã tạm dừng vận hành' : 'Tiếp tục vận hành', 'info');
+  if (_opRunning) { opPauseRun(); showToast('Đã tạm dừng ca', 'info'); }
+  else { opStartRun(); showToast('Tiếp tục ca', 'info'); }
 }
-
 function opFinishEarly() {
-  if (!confirm('Kết thúc batch sớm? Các SKU chưa xử lý sẽ được ghi nhận là còn dở.')) return;
-  renderOpComplete(true);
+  if (!confirm('Kết thúc ca sớm? Các SKU chưa xong sẽ được ghi nhận còn dở.')) return;
+  opFinishRun(true);
+}
+function opFinishRun(early) {
+  _opRunning = false;
+  if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
+  renderOpComplete(early);
 }
 
 function renderOpComplete(early) {
@@ -3246,32 +3245,25 @@ function renderOpComplete(early) {
   const el = document.getElementById('op-complete');
   el.style.display = '';
 
-  // tổng hợp
-  let totalDone = 0, totalShort = 0, totalSkip = 0, unitsPut = 0, unitsPlan = 0;
-  _opQueue.slice(0, _opIndex + (_opCurResolved() && _opScanned ? 1 : 0)).forEach(q => {
-    q.bins.forEach(b => {
-      unitsPlan += b.qty;
-      if (b.status === 'done')  { totalDone++;  unitsPut += b.qty; }
-      if (b.status === 'short') { totalShort++; unitsPut += (b.confirmedQty || 0); }
-      if (b.status === 'skip')  { totalSkip++; }
-    });
-  });
-  const skuDone = _opIndex + (_opCurResolved() && _opScanned ? 1 : 0);
+  let done = 0, errs = 0, unitsPut = 0;
+  const skuDone = _opIndex + (_opCurDone() ? 1 : 0);
+  _opQueue.slice(0, skuDone).forEach(q => q.bins.forEach(b => {
+    if (b.status === 'done') { done++; unitsPut += b.qty; }
+    if (b.status === 'error') errs++;
+  }));
   _batchStatuses[BATCH.id] = early ? 'running' : 'done';
 
   el.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:14px;text-align:center">
       <span style="width:72px;height:72px;border-radius:50%;background:${early ? 'var(--yellow-dim)' : 'var(--green-dim)'};color:${early ? 'var(--yellow)' : 'var(--green)'};display:flex;align-items:center;justify-content:center">${ico(early ? 'stop' : 'checkCircle', 38, 2)}</span>
-      <div style="font-size:22px;font-weight:700">${early ? 'Đã kết thúc batch sớm' : 'Hoàn tất phân hàng!'}</div>
-      <div style="font-size:13px;color:var(--text-muted)">Batch ${BATCH.id} · ${skuDone}/${_opQueue.length} SKU đã xử lý</div>
-
+      <div style="font-size:22px;font-weight:700">${early ? 'Đã kết thúc ca sớm' : 'Hoàn tất ca phân hàng!'}</div>
+      <div style="font-size:13px;color:var(--text-muted)">Lô ${BATCH.id} · ${skuDone}/${_opQueue.length} SKU đã xử lý</div>
       <div class="stat-grid stat-grid-4" style="width:100%;max-width:660px;margin-top:8px">
-        <div class="stat-card"><div class="stat-label">Cửa hàng xong</div><div class="stat-value" style="color:var(--green)">${totalDone}</div></div>
-        <div class="stat-card"><div class="stat-label">Thiếu hàng</div><div class="stat-value" style="color:var(--red)">${totalShort}</div></div>
-        <div class="stat-card"><div class="stat-label">Bỏ qua</div><div class="stat-value" style="color:var(--text-muted)">${totalSkip}</div></div>
-        <div class="stat-card"><div class="stat-label">Đơn vị đã bỏ</div><div class="stat-value">${unitsPut}/${unitsPlan}</div></div>
+        <div class="stat-card"><div class="stat-label">Cửa hàng xác nhận</div><div class="stat-value" style="color:var(--green)">${done}</div></div>
+        <div class="stat-card"><div class="stat-label">Đơn vị đã phân</div><div class="stat-value">${unitsPut.toLocaleString()}</div></div>
+        <div class="stat-card"><div class="stat-label">Sự cố đèn</div><div class="stat-value" style="color:var(--red)">${errs}</div></div>
+        <div class="stat-card"><div class="stat-label">Thời gian ca</div><div class="stat-value">${String(Math.floor(_opElapsed / 60)).padStart(2, '0')}:${String(_opElapsed % 60).padStart(2, '0')}</div></div>
       </div>
-
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center">
         <button class="btn btn-secondary" onclick="showScreen('lot')">${ico('lot', 15)} Về danh sách Batch</button>
         <button class="btn btn-secondary" onclick="showScreen('reports')">${ico('reports', 15)} Xem báo cáo</button>
@@ -3281,7 +3273,7 @@ function renderOpComplete(early) {
 }
 
 function printShipDocs() {
-  showToast('🖨 Đang tạo phiếu giao cho 5 cửa hàng...', 'success');
+  showToast('Đang tạo phiếu giao cho 5 cửa hàng...', 'success');
 }
 
 // ── BATCH STATUS (cho LOT screen highlight) ──
