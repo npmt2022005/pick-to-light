@@ -2707,13 +2707,13 @@ const BATCH = {
   zone:      'Khu A',
   operator:  'Trần Thị B',
   block:     'Block 1',
-  // mỗi cửa hàng = 1 đèn/bin vật lý
+  // mỗi cửa hàng = 1 bin/đèn vật lý — vị trí do LAYOUT cấu hình, rải khắp kho (không thành 1 hàng)
   storeBins: [
-    { store:'Cửa hàng A', addr:'0001', loc:'Khu A · Kệ 1 · T3 · N01' },
-    { store:'Cửa hàng B', addr:'0002', loc:'Khu A · Kệ 1 · T3 · N02' },
-    { store:'Cửa hàng C', addr:'0003', loc:'Khu A · Kệ 1 · T3 · N03' },
-    { store:'Cửa hàng D', addr:'0004', loc:'Khu A · Kệ 1 · T3 · N04' },
-    { store:'Cửa hàng E', addr:'0005', loc:'Khu A · Kệ 1 · T3 · N05' },
+    { store:'Cửa hàng A', addr:'0002', loc:'Khu A · Kệ 1 · T3 · N02' },
+    { store:'Cửa hàng B', addr:'0016', loc:'Khu A · Kệ 1 · T1 · N04' },
+    { store:'Cửa hàng C', addr:'0027', loc:'Khu A · Kệ 2 · T2 · N03' },
+    { store:'Cửa hàng D', addr:'0041', loc:'Khu B · Kệ 1 · T3 · N05' },
+    { store:'Cửa hàng E', addr:'0062', loc:'Khu B · Kệ 2 · T2 · N02' },
   ],
   // stock = tồn kho (API 1); plan[] = số lượng cần giao mỗi cửa hàng (API 2)
   skus: [
@@ -3131,7 +3131,7 @@ function renderOpMap() {
         <span style="display:flex;align-items:center;gap:5px"><span class="opmap-cell off" style="width:13px;height:13px"></span>Ngoài lô</span>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">5 lane cửa hàng (A–E) của lô này nằm ở Khu A · Kệ 1 · T3. Đang xử lý SKU: <b style="color:var(--text)">${cur ? cur.sku : '—'}</b></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Quét 1 SKU → tất cả đèn cửa hàng của SKU đó sáng cùng lúc (rải khắp kho theo layout), NV đi xác nhận cái nào trước cũng được. Đang xử lý: <b style="color:var(--text)">${cur ? cur.sku : '—'}</b></div>
     ${zonesHTML}
   </div>`;
 }
@@ -3252,12 +3252,19 @@ function renderOpProgress() {
   document.getElementById('op-progress-text').textContent = `${done} / ${total} SKU`;
 }
 
-// ── MÔ PHỎNG CA CHẠY (do nhân viên quét ở trạm; hệ thống báo tiến độ về) ──
+// ── MÔ PHỎNG CA CHẠY ──
+// Quét 1 SKU → TẤT CẢ đèn cửa hàng của SKU đó sáng cùng lúc (rải khắp kho).
+// Nhân viên đi tới đèn nào trước cũng được → xác nhận theo thứ tự ngẫu nhiên.
+function _lightCurrentSku() {
+  const cur = _opQueue[_opIndex];
+  if (cur) cur.bins.forEach(b => { if (b.status === 'pending') b.status = 'on'; });
+}
 function opStartRun() {
   if (_opRunning || !_opQueue.length) return;
   _opRunning = true;
+  _lightCurrentSku();                 // bật đồng thời toàn bộ đèn của SKU hiện tại
   if (_opTimer) clearInterval(_opTimer);
-  _opTimer = setInterval(opTick, 700);
+  _opTimer = setInterval(opTick, 650);
   renderOperation();
 }
 function opPauseRun() {
@@ -3270,31 +3277,28 @@ function opTick() {
   const cur = _opQueue[_opIndex];
   if (!cur) { opFinishRun(false); return; }
 
-  // tìm đèn kế tiếp: pending → on (sáng), on → done (NV xác nhận), thỉnh thoảng lỗi
-  let bin = cur.bins.find(b => b.status === 'on');
-  if (bin) {
+  const onBins = cur.bins.filter(b => b.status === 'on');
+  if (onBins.length) {
+    // nhân viên tới MỘT đèn bất kỳ đang sáng (không theo thứ tự) để xác nhận
+    const b = onBins[Math.floor(Math.random() * onBins.length)];
     if (Math.random() < 0.06) {
-      bin.status = 'error';
-      _opExceptions.push({ title: `Đèn ${bin.addr} không phản hồi`, detail: `${cur.sku} · ${bin.store} · ${BATCH.block}` });
+      b.status = 'error';
+      _opExceptions.push({ title: `Đèn ${b.addr} không phản hồi`, detail: `${cur.sku} · ${b.store} · ${b.loc}` });
     } else {
-      bin.status = 'done';
+      b.status = 'done';
     }
-  } else {
-    bin = cur.bins.find(b => b.status === 'pending');
-    if (bin) bin.status = 'on';
-  }
-
-  // SKU xong → chuyển SKU kế tiếp
-  if (_opCurDone()) {
     renderOperation();
-    setTimeout(() => {
-      if (!_opRunning) return;
-      if (_opIndex < _opQueue.length - 1) { _opIndex++; renderOperation(); }
-      else opFinishRun(false);
-    }, 500);
     return;
   }
-  renderOperation();
+
+  // hết đèn sáng → SKU xong → quét SKU kế tiếp (bật đồng thời đèn của nó)
+  if (_opIndex < _opQueue.length - 1) {
+    _opIndex++;
+    _lightCurrentSku();
+    renderOperation();
+  } else {
+    opFinishRun(false);
+  }
 }
 
 function opResolveExc(i) {
