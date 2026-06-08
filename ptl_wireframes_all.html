@@ -308,6 +308,32 @@ tr:last-child td { border-bottom: none; }
 .wf-step.clickable:hover { border-color:var(--accent); }
 .wf-arrow { color:var(--text-subtle); font-size:14px; }
 
+/* ── DASHBOARD ── */
+.dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+.stat-card2 { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); transition: box-shadow .15s ease, transform .15s ease; }
+.stat-card2:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.stat-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.stat-ico { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; }
+.stat-num { font-family: var(--font-mono); font-size: 27px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+.stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 7px; }
+.stat-sub2 { font-size: 11px; color: var(--text-subtle); margin-top: 8px; }
+.trend { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.trend.up { background: var(--green-dim); color: var(--green); }
+.trend.down { background: var(--red-dim); color: var(--red); }
+.quick-tile { display: flex; align-items: center; gap: 11px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color .13s ease, background .13s ease; }
+.quick-tile:hover { border-color: var(--accent); background: var(--accent-dim); }
+.quick-ico { width: 34px; height: 34px; border-radius: 9px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+.quick-tile:hover .quick-ico { background: var(--surface); }
+.quick-txt { flex: 1; font-size: 13px; font-weight: 500; }
+.quick-arrow { color: var(--text-subtle); display: flex; }
+.quick-tile:hover .quick-arrow { color: var(--accent); }
+.dash-bars { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 8px; }
+.dash-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; height: 100%; justify-content: flex-end; }
+.dash-bar .bar { width: 100%; max-width: 36px; border-radius: 6px 6px 0 0; }
+.dash-bar .lbl { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+@media (max-width: 1100px) { .dash-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 460px) { .dash-grid { grid-template-columns: 1fr; } }
+
 /* ── OPERATION (PUT-TO-LIGHT) ── */
 .op-bin { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 16px; transition: all .15s; position: relative; box-shadow: var(--shadow); }
 .op-bin .op-bin-store { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
@@ -503,14 +529,16 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-dashboard">
   <div class="page-header">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
       <div>
-        <div class="page-title" id="dash-greeting">Xin chào 👋</div>
-        <div class="page-desc" id="dash-subtitle">Tổng quan hệ thống Put-to-Light</div>
+        <div class="page-title" id="dash-greeting">Xin chào</div>
+        <div class="page-desc" id="dash-subtitle">Tổng quan hệ thống</div>
       </div>
-      <div style="font-size:12px;color:var(--text-muted);text-align:right">
-        <div>📅 Thứ Năm, 04/06/2026</div>
-        <div class="text-mono" id="dash-clock" style="color:var(--accent)">08:30</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:7px 12px;box-shadow:var(--shadow)">
+        <span style="display:flex;color:var(--text-subtle)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span id="dash-date">—</span>
+        <span style="width:1px;height:14px;background:var(--border)"></span>
+        <span class="text-mono" id="dash-clock" style="color:var(--accent);font-weight:600">—</span>
       </div>
     </div>
   </div>
@@ -1753,9 +1781,9 @@ const screens = {
 
 // ════════ ROLE / PERMISSION CORE ════════
 const ROLE_INFO = {
-  manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '📊', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
-  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', desc: 'Chạy nghiệp vụ hằng ngày: nhận dữ liệu API, xác nhận gán tự động, quản lý LOT/Batch, bổ sung hàng và xem báo cáo.' },
-  it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '🔧', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
+  manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '📊', person: 'Phạm Thị Hà',  initials: 'PH', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
+  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', person: 'Nguyễn Văn An', initials: 'NA', desc: 'Chạy nghiệp vụ hằng ngày: nhận dữ liệu API, xác nhận gán tự động, quản lý LOT/Batch, bổ sung hàng và xem báo cáo.' },
+  it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '🔧', person: 'Lê Văn Cường',  initials: 'LC', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
 };
 
 // Màn hình mỗi role được TRUY CẬP
@@ -1876,11 +1904,11 @@ function updateRoleDesc() {
 function doLogin() {
   const sel = document.querySelector('.role-opt.selected');
   currentRole = sel?.dataset.role || 'ops';
-  const uname = document.getElementById('login-username')?.value || 'Người dùng';
-  document.querySelector('.user-name').textContent = uname;
-  document.querySelector('.user-role').textContent = ROLE_INFO[currentRole].name;
+  const info = ROLE_INFO[currentRole];
+  document.querySelector('.user-name').textContent = info.person;   // tên hiển thị thật
+  document.querySelector('.user-role').textContent = info.name;
   const av = document.querySelector('.avatar');
-  if (av) av.textContent = ROLE_INFO[currentRole].icon;
+  if (av) av.textContent = info.initials;
   applyRoleAccess();
   showScreen('dashboard');
 }
@@ -1933,28 +1961,115 @@ function applyRoleAccess() {
 }
 
 // ── DASHBOARD (role-aware) ──
-function renderDashboard() {
-  const info = ROLE_INFO[currentRole];
-  document.getElementById('dash-greeting').textContent =
-    `${info.icon} Xin chào, ${document.querySelector('.user-name').textContent}`;
-  document.getElementById('dash-subtitle').textContent =
-    `Vai trò: ${info.name} — ${dashSubtitle()}`;
-  document.getElementById('dash-body').innerHTML = dashFlowGuide() + dashBodyByRole();
+// ── ICON SET (SVG, Lucide-style) ──
+const ICONS = {
+  dashboard:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+  lot:'<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>',
+  import:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  autoassign:'<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M20 9h2M20 14h2M2 9h2M2 14h2"/>',
+  operation:'<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+  replenishment:'<path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>',
+  reports:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  layout:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>',
+  lighttest:'<path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  store:'<path d="M2 7l1.5-4h17L22 7"/><path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7"/><line x1="2" y1="7" x2="22" y2="7"/><path d="M9 21V12h6v9"/>',
+  server:'<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  truck:'<path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/><path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  trendUp:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  trendDown:'<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
+  arrowRight:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+};
+function ico(name, size = 18, sw = 1.8) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
 }
 
-// Hướng dẫn thứ tự các bước ngay trên Dashboard
+// ── ĐỒNG HỒ LIVE ──
+let _clockTimer = null;
+function startClock() {
+  const upd = () => {
+    const c = document.getElementById('dash-clock'); if (!c) return;
+    const d = new Date();
+    c.textContent = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const dt = document.getElementById('dash-date');
+    if (dt) dt.textContent = d.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+  upd();
+  if (_clockTimer) clearInterval(_clockTimer);
+  _clockTimer = setInterval(upd, 1000);
+}
+function greetPrefix() {
+  const h = new Date().getHours();
+  return h < 11 ? 'Chào buổi sáng' : h < 13 ? 'Chào buổi trưa' : h < 18 ? 'Chào buổi chiều' : 'Chào buổi tối';
+}
+
+function renderDashboard() {
+  const info = ROLE_INFO[currentRole];
+  document.getElementById('dash-greeting').textContent = `${greetPrefix()}, ${info.person}`;
+  document.getElementById('dash-subtitle').textContent = `${info.name} · ${dashSubtitle()}`;
+  document.getElementById('dash-body').innerHTML = dashFlowGuide() + dashBodyByRole();
+  startClock();
+}
+
+function dashSubtitle() {
+  return { manager: 'Giám sát & ra quyết định', ops: 'Vận hành phân hàng hằng ngày', it: 'Cài đặt & bảo trì hệ thống' }[currentRole];
+}
+
+// ── COMPONENTS ──
+function statCard(icon, color, dim, value, label, trend, sub) {
+  const t = trend ? `<span class="trend ${trend.up ? 'up' : 'down'}">${ico(trend.up ? 'trendUp' : 'trendDown', 12, 2.2)} ${trend.v}</span>` : '';
+  return `<div class="stat-card2">
+    <div class="stat-top"><span class="stat-ico" style="background:${dim};color:${color}">${ico(icon, 20)}</span>${t}</div>
+    <div class="stat-num">${value}</div>
+    <div class="stat-lbl">${label}</div>${sub ? `<div class="stat-sub2">${sub}</div>` : ''}
+  </div>`;
+}
+function quickTile(screen, iconName, text) {
+  return `<div class="quick-tile" onclick="showScreen('${screen}')">
+    <span class="quick-ico">${ico(iconName, 17)}</span>
+    <span class="quick-txt">${text}</span>
+    <span class="quick-arrow">${ico('arrowRight', 15, 2)}</span>
+  </div>`;
+}
+function batchDonut() {
+  const { nOk, nShort, nSurplus, skuCount } = BATCH_TOTALS;
+  const a1 = (nOk / skuCount * 360).toFixed(1);
+  const a2 = ((nOk + nShort) / skuCount * 360).toFixed(1);
+  const leg = (c, l, n) => `<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:10px;height:10px;border-radius:3px;background:${c};flex-shrink:0"></span><span style="flex:1">${l}</span><span class="text-mono" style="font-weight:600">${n}</span></div>`;
+  return `<div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+    <div style="width:128px;height:128px;border-radius:50%;background:conic-gradient(var(--green) 0 ${a1}deg, var(--red) ${a1}deg ${a2}deg, var(--yellow) ${a2}deg 360deg);position:relative;flex-shrink:0">
+      <div style="position:absolute;inset:15px;background:var(--surface);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-family:var(--font-mono);font-size:26px;font-weight:700;line-height:1">${skuCount}</div>
+        <div style="font-size:10px;color:var(--text-muted)">SKU</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:140px;display:flex;flex-direction:column;gap:10px">
+      ${leg('var(--green)', 'Đủ hàng', nOk)}${leg('var(--red)', 'Thiếu hàng', nShort)}${leg('var(--yellow)', 'Dư hàng', nSurplus)}
+    </div>
+  </div>`;
+}
+function weekBars() {
+  const data = [62, 78, 55, 90, 100, 40, 18], days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  return `<div class="dash-bars">${data.map((v, i) =>
+    `<div class="dash-bar"><div class="bar" style="height:${v}%;background:${i === 4 ? 'var(--accent)' : 'var(--surface3)'}"></div><div class="lbl">${days[i]}</div></div>`).join('')}</div>`;
+}
+
 function dashFlowGuide() {
   const flow = FLOWS[currentRole];
-  if (!flow) return '';   // Tổng Quản Lý chỉ giám sát, không có quy trình tuần tự
+  if (!flow) return '';
   const title = currentRole === 'it' ? 'Quy trình cài đặt hệ thống' : 'Quy trình vận hành hằng ngày';
   return `<div class="card" style="margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <div class="card-title" style="margin-bottom:0">🧭 ${title} — làm lần lượt từ trái sang phải</div>
-      <button class="btn btn-primary btn-sm" onclick="showScreen('${flow[0].screen}')">▶ Bắt đầu từ Bước 1</button>
+      <div class="card-title" style="margin-bottom:0;display:flex;align-items:center;gap:7px"><span style="display:flex;color:var(--accent)">${ico('reports', 15)}</span>${title}</div>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('${flow[0].screen}')">${ico('operation', 14)} Bắt đầu từ Bước 1</button>
     </div>
-    <div style="display:flex;align-items:stretch;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap">
       ${flow.map((s, i) => `
-        <div onclick="showScreen('${s.screen}')" style="cursor:pointer;flex:1;min-width:150px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;transition:border-color .15s"
+        <div onclick="showScreen('${s.screen}')" style="cursor:pointer;flex:1;min-width:150px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;transition:border-color .15s"
              onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
             <span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:12px;font-weight:700;flex-shrink:0">${i + 1}</span>
@@ -1962,121 +2077,100 @@ function dashFlowGuide() {
           </div>
           <div style="font-size:11px;color:var(--text-muted);padding-left:30px">${s.hint}</div>
         </div>
-        ${i < flow.length - 1 ? '<div style="display:flex;align-items:center;color:var(--text-subtle);font-size:18px">→</div>' : ''}
+        ${i < flow.length - 1 ? `<div style="display:flex;align-items:center;color:var(--text-subtle)">${ico('arrowRight', 16)}</div>` : ''}
       `).join('')}
     </div>
   </div>`;
 }
 
-function dashSubtitle() {
-  return { manager:'Giám sát & ra quyết định', ops:'Vận hành phân hàng hằng ngày', it:'Cài đặt & bảo trì hệ thống' }[currentRole];
-}
-
-function dashCard(label, value, color, sub) {
-  return `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-value" style="color:${color}">${value}</div><div class="stat-sub">${sub||''}</div></div>`;
-}
-function quickBtn(screen, icon, text) {
-  return `<button class="btn btn-secondary" style="justify-content:flex-start;display:flex;align-items:center;gap:8px;padding:12px 14px" onclick="showScreen('${screen}')"><span style="font-size:18px">${icon}</span><span style="font-weight:500">${text}</span></button>`;
-}
-
 function dashBodyByRole() {
   if (currentRole === 'manager') {
     return `
-      <div class="stat-grid stat-grid-4" style="margin-bottom:16px">
-        ${dashCard('Batch hôm nay','12','var(--accent)','↑ 3 so với hôm qua')}
-        ${dashCard('Đang thực hiện','4','var(--yellow)','2 khu vực đang chạy')}
-        ${dashCard('Tỷ lệ chính xác','99.6%','var(--green)','182 lỗi / 48,250')}
-        ${dashCard('Có sự cố','1','var(--red)','1 LOT thiếu hàng')}
+      <div class="dash-grid">
+        ${statCard('box', 'var(--accent)', 'var(--accent-dim)', '12', 'Batch hôm nay', { up: true, v: '+3' }, 'so với hôm qua')}
+        ${statCard('operation', 'var(--yellow)', 'var(--yellow-dim)', '4', 'Đang thực hiện', null, '2 khu vực đang chạy')}
+        ${statCard('check', 'var(--green)', 'var(--green-dim)', '99.6%', 'Tỷ lệ chính xác', { up: true, v: '+0.2%' }, '182 lỗi / 48.250 đơn vị')}
+        ${statCard('alert', 'var(--red)', 'var(--red-dim)', '1', 'Có sự cố', null, '1 LOT thiếu hàng')}
       </div>
-      <div class="row" style="gap:16px;align-items:flex-start">
-        <div class="card" style="flex:2">
-          <div class="card-title">Tiến độ các Batch đang chạy</div>
-          ${dashProgressRow('BATCH-...002','Khu A',73,'')}
-          ${dashProgressRow('BATCH-...003','Khu B',45,'')}
-          ${dashProgressRow('BATCH-...004','Khu A',90,'yellow')}
+      <div class="row" style="gap:16px;align-items:flex-start;margin-bottom:16px">
+        <div class="card" style="flex:1.4">
+          <div class="card-title">Sản lượng phân hàng 7 ngày</div>
+          ${weekBars()}
         </div>
         <div class="card" style="flex:1">
-          <div class="card-title">Truy cập nhanh</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            ${quickBtn('lot','📋','Xem LOT / Batch')}
-            ${quickBtn('autoassign','🤖','Kết quả gán tự động')}
-            ${quickBtn('reports','📈','Báo cáo & thống kê')}
-          </div>
+          <div class="card-title">Phân bổ lô ${BATCH.id}</div>
+          ${batchDonut()}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Truy cập nhanh</div>
+        <div class="dash-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:0">
+          ${quickTile('lot', 'lot', 'Quản lý LOT / Batch')}
+          ${quickTile('autoassign', 'autoassign', 'Kết quả gán tự động')}
+          ${quickTile('reports', 'reports', 'Báo cáo & thống kê')}
         </div>
       </div>`;
   }
   if (currentRole === 'it') {
+    const alertRow = (t, d) => `<div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--red-dim);background:var(--red-dim);border-radius:10px">
+        <span style="color:var(--red);display:flex;flex-shrink:0">${ico('alert', 18)}</span>
+        <div style="flex:1"><div style="font-weight:600;font-size:13px;color:var(--red)">${t}</div><div style="font-size:12px;color:var(--text-muted)">${d}</div></div></div>`;
     return `
-      <div class="stat-grid stat-grid-4" style="margin-bottom:16px">
-        ${dashCard('Controller online','2 / 3','var(--green)','CTRL-003 offline')}
-        ${dashCard('Tổng đèn','144','var(--accent)','3 khu vực')}
-        ${dashCard('Đèn lỗi','3','var(--red)','cần thay thế')}
-        ${dashCard('Lần test gần nhất','Hôm nay','var(--purple)','28/32 OK')}
+      <div class="dash-grid">
+        ${statCard('server', 'var(--green)', 'var(--green-dim)', '2/3', 'Controller online', null, 'CTRL-003 offline')}
+        ${statCard('zap', 'var(--accent)', 'var(--accent-dim)', '144', 'Tổng đèn', null, '3 khu vực')}
+        ${statCard('alert', 'var(--red)', 'var(--red-dim)', '3', 'Đèn lỗi', { up: false, v: '+1' }, 'cần thay thế')}
+        ${statCard('lighttest', 'var(--purple)', 'var(--purple-dim)', '28/32', 'Test gần nhất', null, '87.5% OK')}
       </div>
       <div class="row" style="gap:16px;align-items:flex-start">
-        <div class="card" style="flex:2">
+        <div class="card" style="flex:1.6">
           <div class="card-title">Cảnh báo thiết bị</div>
-          <div class="error-list">
-            <div class="error-row"><div><div class="err-addr">CTRL-003 · Offline</div><div style="color:var(--text-muted)">Mất kết nối từ 07:12 — Khu vực C</div></div></div>
-            <div class="error-row"><div><div class="err-addr">Địa chỉ 0004</div><div style="color:var(--text-muted)">Lỗi kết nối đèn · Block 1</div></div></div>
-            <div class="error-row"><div><div class="err-addr">Địa chỉ 0012</div><div style="color:var(--text-muted)">Không phản hồi · Block 1</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${alertRow('CTRL-003 · Mất kết nối', 'Offline từ 07:12 — Khu vực C')}
+            ${alertRow('Đèn 0004 · Lỗi kết nối', 'Block 1 · CTRL-001')}
+            ${alertRow('Đèn 0012 · Không phản hồi', 'Block 1 · CTRL-001')}
           </div>
         </div>
         <div class="card" style="flex:1">
           <div class="card-title">Truy cập nhanh</div>
           <div style="display:flex;flex-direction:column;gap:8px">
-            ${quickBtn('layout','🏗','Tạo Layout kho')}
-            ${quickBtn('lighttest','💡','Light Module Test')}
-            ${quickBtn('settings','⚙️','Cấu hình thiết bị')}
+            ${quickTile('layout', 'layout', 'Tạo Layout kho')}
+            ${quickTile('lighttest', 'lighttest', 'Light Module Test')}
+            ${quickTile('settings', 'settings', 'Cấu hình thiết bị')}
           </div>
         </div>
       </div>`;
   }
   // ops
+  const task = (badge, cls, text, screen, btn, primary) => `<div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--border);border-radius:10px">
+      <span class="badge ${cls}" style="font-size:10px">${badge}</span><span style="flex:1;font-size:13px">${text}</span>
+      <button class="btn ${primary ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="showScreen('${screen}')">${btn}</button></div>`;
   return `
-    <div class="stat-grid stat-grid-4" style="margin-bottom:16px">
-      ${dashCard('Batch chờ xử lý','2','var(--yellow)','cần nhận data API')}
-      ${dashCard('Đang phân hàng','4','var(--accent)','Khu A & B')}
-      ${dashCard('Hoàn tất hôm nay','7','var(--green)','100% không lỗi')}
-      ${dashCard('Cần bổ sung','8','var(--purple)','ngăn sắp hết hàng')}
+    <div class="dash-grid">
+      ${statCard('box', 'var(--accent)', 'var(--accent-dim)', BATCH_TOTALS.skuCount, 'SKU lô hiện tại', null, BATCH.id)}
+      ${statCard('truck', 'var(--yellow)', 'var(--yellow-dim)', '2', 'Batch chờ xử lý', null, 'cần nhận data API')}
+      ${statCard('check', 'var(--green)', 'var(--green-dim)', '7', 'Hoàn tất hôm nay', { up: true, v: '+2' }, '100% không lỗi')}
+      ${statCard('store', 'var(--purple)', 'var(--purple-dim)', BATCH.storeBins.length, 'Cửa hàng nhận hàng', null, 'lô ' + BATCH.id)}
     </div>
     <div class="row" style="gap:16px;align-items:flex-start">
-      <div class="card" style="flex:2">
+      <div class="card" style="flex:1.6">
         <div class="card-title">Việc cần làm hôm nay</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius)">
-            <span class="badge badge-yellow">Chờ</span><span style="flex:1">Nhận dữ liệu API cho <strong>BATCH-...005</strong></span>
-            <button class="btn btn-primary btn-sm" onclick="showScreen('import')">Nhận data</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius)">
-            <span class="badge badge-blue">Mới</span><span style="flex:1">Xác nhận gán tự động <strong>BATCH-...002</strong></span>
-            <button class="btn btn-primary btn-sm" onclick="showScreen('autoassign')">Xem kết quả</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius)">
-            <span class="badge badge-purple">8 ngăn</span><span style="flex:1">Bổ sung hàng khu vực A</span>
-            <button class="btn btn-secondary btn-sm" onclick="showScreen('replenishment')">Bổ sung</button>
-          </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${task('Chờ', 'badge-yellow', 'Nhận dữ liệu API cho <strong>BATCH-…005</strong>', 'import', 'Nhận data', true)}
+          ${task('Mới', 'badge-blue', `Xác nhận gán tự động <strong>${BATCH.id}</strong>`, 'autoassign', 'Xem kết quả', true)}
+          ${task('8 ngăn', 'badge-purple', 'Bổ sung hàng khu vực A', 'replenishment', 'Bổ sung', false)}
         </div>
       </div>
       <div class="card" style="flex:1">
         <div class="card-title">Truy cập nhanh</div>
         <div style="display:flex;flex-direction:column;gap:8px">
-          ${quickBtn('lot','📋','Quản lý LOT / Batch')}
-          ${quickBtn('import','📥','Nhận dữ liệu API')}
-          ${quickBtn('autoassign','🤖','Kết quả gán tự động')}
-          ${quickBtn('replenishment','🔄','Bổ sung hàng')}
+          ${quickTile('lot', 'lot', 'Quản lý LOT / Batch')}
+          ${quickTile('import', 'import', 'Nhận dữ liệu API')}
+          ${quickTile('operation', 'operation', 'Vận hành phân hàng')}
+          ${quickTile('replenishment', 'replenishment', 'Bổ sung hàng')}
         </div>
       </div>
     </div>`;
-}
-
-function dashProgressRow(batch, zone, pct, color) {
-  return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-    <span class="text-mono text-sm" style="width:110px;color:var(--text-muted)">${batch}</span>
-    <span class="badge badge-gray" style="font-size:10px">${zone}</span>
-    <div class="progress-bar" style="flex:1"><div class="progress-fill ${color}" style="width:${pct}%"></div></div>
-    <span class="text-mono text-sm" style="width:40px;text-align:right">${pct}%</span>
-  </div>`;
 }
 
 // ── LOT view-only theo role ──
