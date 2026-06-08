@@ -647,8 +647,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
             </td>
             <td><span class="badge badge-green">Hoàn tất</span></td>
             <td style="text-align:right">
-              <button class="btn btn-ghost btn-sm">👁 Xem</button>
-              <button class="btn btn-ghost btn-sm">📊 Báo cáo</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('operation')">👁 Xem</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('reports')">📊 Báo cáo</button>
             </td>
           </tr>
           <tr id="lot-row-BATCH-002">
@@ -683,8 +683,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
             </td>
             <td><span class="badge badge-yellow">Đang xử lý</span></td>
             <td style="text-align:right">
-              <button class="btn btn-ghost btn-sm">👁 Xem</button>
-              <button class="btn btn-primary btn-sm">▶ Tiếp tục</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('autoassign')">👁 Xem</button>
+              <button class="btn btn-primary btn-sm" onclick="showScreen('operation')">▶ Tiếp tục</button>
             </td>
           </tr>
           <tr>
@@ -701,8 +701,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
             </td>
             <td><span class="badge badge-red">Sự cố</span></td>
             <td style="text-align:right">
-              <button class="btn btn-ghost btn-sm">👁 Xem</button>
-              <button class="btn btn-danger btn-sm">⚠ Xử lý</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('autoassign')">👁 Xem</button>
+              <button class="btn btn-danger btn-sm" onclick="showScreen('autoassign')">⚠ Xử lý</button>
             </td>
           </tr>
           <tr>
@@ -714,7 +714,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
             <td style="min-width:130px"><span class="text-muted text-sm">Chờ nhận data</span></td>
             <td><span class="badge badge-gray">Chờ xử lý</span></td>
             <td style="text-align:right">
-              <button class="btn btn-primary btn-sm">📥 Nhận data</button>
+              <button class="btn btn-primary btn-sm" onclick="showScreen('import')">📥 Nhận data</button>
             </td>
           </tr>
         </tbody>
@@ -782,7 +782,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
                 <input class="input" value="BATCH-20260518-002">
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%">🔄 Kéo dữ liệu từ API</button>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="pullApiActive()">🔄 Kéo dữ liệu từ API</button>
           </div>
         </div>
 
@@ -821,8 +821,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
           <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
             <div style="font-size:12px;color:var(--text-muted)">⚠ Dòng lỗi sẽ bị bỏ qua, các dòng hợp lệ vẫn được nhận</div>
             <div style="display:flex;gap:8px">
-              <button class="btn btn-secondary">Hủy</button>
-              <button class="btn btn-primary">✓ Xác nhận nhận dữ liệu</button>
+              <button class="btn btn-secondary" onclick="showScreen('lot')">Hủy</button>
+              <button class="btn btn-primary" onclick="confirmPicking()">✓ Xác nhận nhận dữ liệu</button>
             </div>
           </div>
         </div>
@@ -853,7 +853,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
                 <input class="input" value="BATCH-20260518-002">
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%">🔄 Kéo dữ liệu từ API</button>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="pullApiActive()">🔄 Kéo dữ liệu từ API</button>
           </div>
           <div class="tooltip-note" style="margin-bottom:0">
             💡 Kế hoạch phân phối xác định số lượng từng SKU cần giao đến mỗi cửa hàng trong Batch này.
@@ -922,8 +922,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
           <div style="display:flex;gap:8px;justify-content:space-between;align-items:center">
             <div style="font-size:12px;color:var(--text-muted)">⚠ SKU thiếu hàng sẽ được phân phối theo tỷ lệ ưu tiên</div>
             <div style="display:flex;gap:8px">
-              <button class="btn btn-secondary">Hủy</button>
-              <button class="btn btn-primary">✓ Xác nhận & Tính phân phối</button>
+              <button class="btn btn-secondary" onclick="showScreen('lot')">Hủy</button>
+              <button class="btn btn-primary" onclick="confirmStoreOrder()">✓ Xác nhận & Tính phân phối</button>
             </div>
           </div>
         </div>
@@ -1172,17 +1172,17 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
             <label class="label">Block</label>
             <select class="input select"><option>Block 1</option><option>Block 2</option></select>
           </div>
-          <button class="btn btn-primary">▶ Bắt đầu</button>
+          <button class="btn btn-primary" onclick="startReplen()">▶ Bắt đầu</button>
         </div>
         <div class="tooltip-note" style="margin-bottom:0">
-          💡 Đèn tại ngăn cần bổ sung sẽ sáng lên và phát tiếng còi. Bổ sung hàng xong thì bấm nút CONFIRM trên đèn.
+          💡 Đèn tại ngăn cần bổ sung sẽ sáng lên và phát tiếng còi. Bổ sung xong thì <strong>bấm vào ngăn</strong> (mô phỏng nút CONFIRM trên đèn).
         </div>
       </div>
 
       <div class="card">
         <div class="card-title">Đang bổ sung</div>
-        <div class="light-status-grid">
-          <div class="light-item" style="border-color:var(--light-on);background:rgba(255,214,10,.05)">
+        <div class="light-status-grid" id="replen-grid">
+          <div class="light-item" style="border-color:var(--light-on);background:rgba(245,163,0,.06);cursor:pointer" onclick="replenDone(this)">
             <div class="light-dot on"></div>
             <div class="light-item-info">
               <div class="light-item-code">SKU-100 · Địa chỉ 0001</div>
@@ -1190,7 +1190,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
               <div class="light-item-loc">📍 Khu A · Kệ 1 · T2 · N01</div>
             </div>
           </div>
-          <div class="light-item" style="border-color:var(--light-on);background:rgba(255,214,10,.05)">
+          <div class="light-item" style="border-color:var(--light-on);background:rgba(245,163,0,.06);cursor:pointer" onclick="replenDone(this)">
             <div class="light-dot on"></div>
             <div class="light-item-info">
               <div class="light-item-code">SKU-100 · Địa chỉ 0005</div>
@@ -1206,7 +1206,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
               <div class="light-item-loc">✓ Đã bổ sung xong</div>
             </div>
           </div>
-          <div class="light-item">
+          <div class="light-item" style="cursor:pointer" onclick="replenDone(this)">
             <div class="light-dot off"></div>
             <div class="light-item-info">
               <div class="light-item-code">SKU-100 · Địa chỉ 0009</div>
@@ -1273,8 +1273,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
               </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:20px">
-              <button class="btn btn-danger">⏹ Dừng</button>
-              <button class="btn btn-secondary" disabled>▶ Bắt đầu</button>
+              <button class="btn btn-danger" onclick="stopLightTest()">⏹ Dừng</button>
+              <button class="btn btn-primary" onclick="runLightTestDemo()">▶ Chạy test</button>
               <button class="btn btn-secondary">🔧 Maintenance</button>
             </div>
           </div>
@@ -1293,7 +1293,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:10px;cursor:pointer">
           <input type="checkbox" style="accent-color:var(--accent)"> Hiển thị địa chỉ
         </label>
-        <div class="module-grid">
+        <div class="module-grid" id="lighttest-grid">
           <div class="module-cell ok"><div class="addr">0001</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
           <div class="module-cell ok"><div class="addr">0002</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
           <div class="module-cell ok"><div class="addr">0003</div><div class="light-indicator"></div><div style="font-size:9px;color:var(--green)">OK</div></div>
@@ -1350,7 +1350,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; }
         <div style="display:flex;flex-direction:column;gap:8px">
           <button class="btn btn-primary" disabled>▶ Bắt đầu vận hành</button>
           <div style="font-size:11px;color:var(--red);text-align:center">Còn 3 lỗi chưa xử lý</div>
-          <button class="btn btn-secondary">🔄 Chạy lại test</button>
+          <button class="btn btn-secondary" onclick="runLightTestDemo()">🔄 Chạy lại test</button>
           <button class="btn btn-ghost btn-sm">Bỏ qua lỗi và tiếp tục →</button>
         </div>
       </div>
@@ -3264,12 +3264,41 @@ function refreshLotStatuses() {
   }
 }
 
-// ── IMPORT TAB ──
+// ── IMPORT TAB & FLOW ──
 function switchImportTab(tab) {
   ['picking','storeorder'].forEach(t => {
     document.getElementById('import-tab-'+t).classList.toggle('active', t === tab);
     document.getElementById('import-panel-'+t).style.display = t === tab ? '' : 'none';
   });
+}
+
+// Kéo dữ liệu API (giả lập) — tự nhận biết tab đang mở
+function pullApiActive() {
+  const t = document.getElementById('import-tab-storeorder').classList.contains('active') ? 'storeorder' : 'picking';
+  pullApi(t);
+}
+function pullApi(which) {
+  showLoading(which === 'storeorder' ? 'Đang kéo kế hoạch phân phối từ API...' : 'Đang kéo dữ liệu hàng tiếp nhận từ API...');
+  setTimeout(() => {
+    hideLoading();
+    showToast(which === 'storeorder' ? '✓ Đã nhận kế hoạch phân phối (6 SKU)' : '✓ Đã nhận hàng tiếp nhận (18 dòng hợp lệ)', 'success');
+  }, 1100);
+}
+
+// Bước 1a: xác nhận Picking → chuyển sang tab Kế hoạch phân phối
+function confirmPicking() {
+  showToast('✓ Đã nhận Hàng tiếp nhận — tiếp tục nhận Kế hoạch phân phối', 'success');
+  switchImportTab('storeorder');
+}
+
+// Bước 1b: xác nhận Store Order → tính phân phối → sang Bước 2 (Gán tự động)
+function confirmStoreOrder() {
+  showLoading('Đang ghép 2 API & tính phân phối...');
+  setTimeout(() => {
+    hideLoading();
+    showToast('✓ Đã tính xong — chuyển sang Kết quả gán tự động', 'success');
+    showScreen('autoassign');
+  }, 1200);
 }
 
 // ── SEED LAYOUT DEMO (để Layout & Light Test có dữ liệu sẵn) ──
@@ -3293,6 +3322,60 @@ function seedLayoutDemo() {
   _curZone   = 'ZA';
   _testZoneId = 'ZA';
 }
+
+// ── BỔ SUNG HÀNG (REPLENISHMENT) ──
+function startReplen() {
+  const v = document.querySelector('#screen-replenishment input')?.value || 'SKU';
+  showToast(`💡 Đèn đang sáng tại các ngăn chứa ${v} — bấm vào ngăn đã bổ sung xong để CONFIRM`, 'info');
+}
+function replenDone(el) {
+  const dot = el.querySelector('.light-dot');
+  if (dot.classList.contains('done')) return;
+  dot.className = 'light-dot done';
+  el.style.borderColor = 'var(--green)';
+  el.style.background = 'var(--green-dim)';
+  el.style.cursor = 'default';
+  el.removeAttribute('onclick');
+  const loc = el.querySelector('.light-item-loc');
+  if (loc) loc.textContent = '✓ Đã bổ sung xong';
+  showToast('✓ Đã bổ sung xong 1 ngăn', 'success');
+}
+
+// ── LIGHT MODULE TEST (animation demo) ──
+let _ltTimer = null;
+function runLightTestDemo() {
+  const cells = [...document.querySelectorAll('#lighttest-grid .module-cell')];
+  if (!cells.length) return;
+  if (_ltTimer) { clearInterval(_ltTimer); _ltTimer = null; }
+  cells.forEach(c => { if (!c.dataset.final) c.dataset.final = c.className; c.className = 'module-cell'; });
+  showToast('▶ Đang chạy test các đèn...', 'info');
+  let i = 0;
+  _ltTimer = setInterval(() => {
+    if (i > 0) cells[i-1].className = cells[i-1].dataset.final;   // chốt kết quả đèn trước
+    if (i >= cells.length) {
+      clearInterval(_ltTimer); _ltTimer = null;
+      const errs = cells.filter(c => (c.dataset.final||'').includes('error')).length;
+      showToast(errs ? `Hoàn thành — ${errs} đèn lỗi cần xử lý` : 'Tất cả đèn hoạt động tốt', errs ? 'warn' : 'success');
+      return;
+    }
+    cells[i].className = 'module-cell testing';
+    i++;
+  }, 70);
+}
+function stopLightTest() {
+  if (_ltTimer) { clearInterval(_ltTimer); _ltTimer = null; }
+  document.querySelectorAll('#lighttest-grid .module-cell').forEach(c => { if (c.dataset.final) c.className = c.dataset.final; });
+  showToast('⏹ Đã dừng test', 'info');
+}
+
+// ── CATCH-ALL: mọi nút chưa wire vẫn phản hồi (không click nào "chết") ──
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button.btn');
+  if (!btn || btn.disabled) return;
+  if (btn.getAttribute('onclick')) return;     // đã có hành động riêng
+  const label = (btn.textContent || '').trim().replace(/\s+/g, ' ');
+  if (label) showToast(`Thao tác demo: "${label}"`, 'info');
+});
 
 // ── INIT ──
 seedLayoutDemo();        // tạo sẵn 2 khu vực mẫu
