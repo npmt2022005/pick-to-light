@@ -362,6 +362,40 @@ tr:last-child td { border-bottom: none; }
 .op-confirm { width: 100%; padding: 13px; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
 .op-xbtn { padding: 9px; font-size: 13px; }
 .op-scan-input-lg { font-size: 16px !important; padding: 12px 14px !important; }
+/* ── TRẠM PHÂN HÀNG (scan gate) ── */
+.op-station { border: 1.5px solid var(--border); }
+.op-station.stage-idle      { border-color: var(--yellow); box-shadow: 0 0 0 1px rgba(210,153,34,.25); }
+.op-station.stage-await     { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(47,111,237,.25); }
+.op-station.stage-putting   { border-color: var(--light-on); box-shadow: 0 0 0 1px rgba(245,163,0,.25); }
+.op-station.stage-paused    { border-color: var(--border); }
+.op-station-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.op-worker { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
+#op-worker-slot { gap: 10px 20px; }
+.op-zworker { display: flex; align-items: center; gap: 9px; padding: 4px 14px 4px 0; border-right: 1px solid var(--border); }
+.op-zworker:last-child { border-right: none; }
+.op-worker-ava { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+.op-worker-ava.on  { background: var(--green-dim); color: var(--green); border: 1.5px solid var(--green); }
+.op-worker-ava.off { background: var(--surface2); color: var(--text-subtle); border: 1.5px dashed var(--border); }
+.op-stage-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.op-stage-dot { width: 8px; height: 8px; border-radius: 50%; }
+.op-scan-zone { display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; transition: all .15s; }
+.op-scan-zone.locked { opacity: .55; }
+.op-scan-zone.err { border-color: var(--red); animation: opShake .32s; }
+@keyframes opShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+.op-scan-ico { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.op-scan-hint { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+.op-quick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 11px; }
+.op-quick-lbl { font-size: 11px; color: var(--text-subtle); }
+.op-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-family: var(--font-mono); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .12s; }
+.op-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.op-chip.suggest { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.op-chip.bad { color: var(--red); }
+.op-chip.bad:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.op-scan-err { font-size: 12px; color: var(--red); font-weight: 600; margin-top: 9px; display: flex; align-items: center; gap: 6px; }
+.op-exc-btn { font-size: 11px !important; padding: 5px 9px !important; display: inline-flex; align-items: center; gap: 4px; }
+.op-spd { font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all .12s; }
+.op-spd:hover { border-color: var(--accent); color: var(--accent); }
+.op-spd.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
 /* pending (chưa tới lượt) */
 .op-bin.pending { opacity: .5; }
 /* on (đèn sáng, chờ NV xác nhận) */
@@ -380,17 +414,58 @@ tr:last-child td { border-bottom: none; }
 .op-bin.op-active { box-shadow: 0 0 0 2px var(--accent), var(--shadow-md); }
 .opmap-cell.active { box-shadow: 0 0 0 3px var(--accent); position: relative; z-index: 1; }
 
-/* ── OP MAP (sơ đồ kho thời gian thực) ── */
-.opmap-row { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
-.opmap-lbl { font-size: 9px; color: var(--text-subtle); width: 20px; text-align: right; font-family: var(--font-mono); flex-shrink: 0; }
+/* ── OP MAP: legend swatch nhỏ (dùng lại) ── */
 .opmap-cell { width: 34px; height: 30px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); flex-shrink: 0; position: relative; }
-.opmap-cell.off { width: 34px; height: 30px; background: var(--surface2); border: 1px solid var(--border); }
-.opmap-cell.batch { border: 1.5px solid var(--border); font-size: 13px; font-weight: 700; }
-.opmap-cell .opmap-s { position: absolute; top: 1px; right: 3px; font-size: 8px; font-weight: 700; opacity: .9; }
-.opmap-cell.pending { background: var(--surface); border-color: var(--text-subtle); color: var(--text-muted); }
-.opmap-cell.on { background: var(--light-on); color: #fff; border-color: var(--light-on); box-shadow: 0 0 10px rgba(245,163,0,.7); animation: tpulse .7s ease infinite alternate; }
-.opmap-cell.done { background: var(--green); color: #fff; border-color: var(--green); }
-.opmap-cell.error { background: var(--red); color: #fff; border-color: var(--red); animation: tpulse .7s ease infinite alternate; }
+.opmap-cell.off { background: var(--surface2); border: 1px solid var(--border); }
+.opmap-cell.on { background: var(--light-on); border-color: var(--light-on); box-shadow: 0 0 10px rgba(245,163,0,.7); }
+.opmap-cell.done { background: var(--green); border-color: var(--green); }
+.opmap-cell.error { background: var(--red); border-color: var(--red); }
+
+/* ── OP MAP: KỆ HÀNG DẠNG ĐỨNG (elevation) + module LED ── */
+/* Co giãn: mỗi kệ tự cuộn ngang khi nhiều ngăn → KHÔNG vỡ trang, KHÔNG cắt ô */
+.rack-aisle { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+.rack-unit { width: fit-content; max-width: 100%; min-width: 0; }
+.rack-name { font-size: 10.5px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+.rack-name i { width: 13px; height: 13px; background: linear-gradient(135deg,#9aa4b6,#6b7688); border-radius: 2px; display: inline-block; }
+.rack { width: fit-content; max-width: 100%; border: 2px solid #5b6678; border-top-width: 5px; border-radius: 4px 4px 0 0; box-shadow: var(--shadow-md); overflow-x: auto; overflow-y: hidden; }
+.rack::-webkit-scrollbar { height: 8px; }
+.rack::-webkit-scrollbar-thumb { background: #6b7688; border-radius: 4px; }
+.rack::-webkit-scrollbar-track { background: transparent; }
+.rack-level { display: flex; align-items: stretch; border-bottom: 5px solid #6b7688; width: max-content; min-width: 100%; }
+.rack-level:last-child { border-bottom: 4px solid #4b5563; }
+.rack-lvl-lbl { width: 26px; flex-shrink: 0; position: sticky; left: 0; z-index: 2; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: #dde2ea; background: linear-gradient(180deg,#5b6678,#454e5c); border-right: 3px solid #6b7688; letter-spacing: .5px; }
+.rack-bays { display: flex; gap: 7px; padding: 7px; background: var(--surface); }
+.cubby { width: 50px; height: 48px; flex-shrink: 0; border-radius: 4px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--border); box-shadow: inset 0 1px 3px rgba(16,24,40,.10); }
+.cubby .led { position: absolute; top: 3px; left: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--text-subtle); opacity: .35; }
+.cubby .cb-qty { font-family: var(--font-mono); font-weight: 700; font-size: 16px; line-height: 1; }
+.cubby .cb-store { position: absolute; top: 2px; right: 4px; font-size: 8.5px; font-weight: 800; color: var(--text-muted); }
+.cubby .cb-ic { position: absolute; bottom: 3px; right: 3px; display: flex; }
+/* ngăn chứa hàng khác (ngoài lô) — mờ, có hàng nhưng không liên quan */
+.cubby.off { background: repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 5px,var(--surface) 5px,var(--surface) 10px); opacity: .45; box-shadow: none; }
+.cubby.off .led { display: none; }
+/* batch — chưa sáng */
+.cubby.pending .cb-qty { color: var(--text-muted); opacity: .7; }
+/* đèn sáng — chờ NV bỏ */
+.cubby.on { border-color: var(--light-on); background: rgba(245,163,0,.16); box-shadow: 0 0 13px rgba(245,163,0,.55), inset 0 0 8px rgba(245,163,0,.18); }
+.cubby.on .led { background: var(--light-on); opacity: 1; box-shadow: 0 0 7px 2px rgba(245,163,0,.9); animation: tpulse .6s ease infinite alternate; }
+.cubby.on .cb-qty { color: var(--light-on); }
+/* đã xác nhận */
+.cubby.done { border-color: var(--green); background: var(--green-dim); }
+.cubby.done .led { background: var(--green); opacity: 1; }
+.cubby.done .cb-qty { color: var(--green); }
+/* thiếu hàng */
+.cubby.short { border-color: var(--yellow); background: var(--yellow-dim); }
+.cubby.short .led { background: var(--yellow); opacity: 1; }
+.cubby.short .cb-qty { color: var(--yellow); }
+/* đèn lỗi */
+.cubby.error { border-color: var(--red); background: var(--red-dim); }
+.cubby.error .led { background: var(--red); opacity: 1; box-shadow: 0 0 7px 2px rgba(248,81,73,.8); animation: tpulse .6s ease infinite alternate; }
+.cubby.error .cb-qty { color: var(--red); }
+/* NV đang bỏ đèn này */
+.cubby.active { outline: 2px solid var(--accent); outline-offset: 1px; z-index: 1; }
+/* chân kệ */
+.rack-feet { display: flex; justify-content: space-between; padding: 0 9px; }
+.rack-feet span { width: 13px; height: 8px; background: linear-gradient(180deg,#4b5563,#374151); border-radius: 0 0 2px 2px; }
 
 /* Login mode: ẩn sidebar + topbar + status bar cho màn đăng nhập */
 body.login-mode .sidebar,
@@ -963,6 +1038,25 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   </div>
 
   <div id="op-live">
+  <!-- TRẠM PHÂN HÀNG — cổng quét: NV quét thẻ → quét SKU → đèn mới sáng -->
+  <div class="card op-station stage-idle" id="op-station" style="margin-bottom:14px">
+    <div class="op-station-head">
+      <div class="op-worker" id="op-worker-slot"><!-- JS --></div>
+      <div class="op-stage-badge" id="op-stage-badge"><!-- JS --></div>
+    </div>
+    <div class="op-scan-zone" id="op-scan-zone">
+      <div class="op-scan-ico" id="op-scan-ico"></div>
+      <div style="flex:1;min-width:0">
+        <div class="op-scan-hint" id="op-scan-hint">—</div>
+        <input id="op-scan-input" class="input op-scan-input-lg" autocomplete="off" spellcheck="false"
+               placeholder="Quét hoặc nhập mã…" onkeydown="if(event.key==='Enter'){event.preventDefault();opScanSubmit(this);}">
+      </div>
+      <button class="btn btn-primary" id="op-scan-btn" onclick="opScanSubmit(document.getElementById('op-scan-input'))" style="white-space:nowrap">Quét</button>
+    </div>
+    <div class="op-scan-err" id="op-scan-err" style="display:none"></div>
+    <div class="op-quick" id="op-quick"><!-- JS --></div>
+  </div>
+
   <!-- KPI tổng quan ca chạy -->
   <div class="dash-grid" id="op-kpi" style="margin-bottom:14px"></div>
 
@@ -972,6 +1066,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;display:flex;align-items:center;gap:6px"><span id="op-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>Tiến độ ca</div>
       <div class="progress-bar" style="flex:1;min-width:160px;height:8px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
       <div class="text-mono text-sm" id="op-progress-text" style="white-space:nowrap">0 / 0 SKU</div>
+      <div id="op-speed" style="display:flex;align-items:center;gap:6px;margin-left:auto"><span style="font-size:11px;color:var(--text-subtle);white-space:nowrap">Tốc độ</span><div id="op-speed-btns" style="display:flex;gap:3px"></div></div>
     </div>
     <div id="op-sku-strip" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:12px"></div>
   </div>
@@ -990,9 +1085,6 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
 
       <!-- DETAIL view -->
       <div id="op-detail-view" style="display:none">
-        <div class="card" style="margin-bottom:14px" id="op-station-card">
-          <!-- rendered by JS: trạm + SKU đang xử lý -->
-        </div>
         <div class="card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <div class="card-title" style="margin-bottom:0">Bảng đèn cửa hàng — thời gian thực</div>
@@ -1827,7 +1919,7 @@ function showScreen(id) {
   if (id === 'dashboard')  renderDashboard();
   if (id === 'import')     renderImportScreen();
   if (id === 'autoassign') renderAssignScreen();
-  if (id === 'operation')  renderOperation();
+  if (id === 'operation')  opEnter();
   if (id === 'lot')        { refreshLotStatuses(); applyLotViewMode(); filterLot(); }
   if (id === 'layout')     renderLayoutScreen();
 }
@@ -1965,6 +2057,8 @@ const ICONS = {
   circle:'<circle cx="12" cy="12" r="9"/>',
   printer:'<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
   bulb:'<path d="M9 18h6M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>',
+  badge:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M7 16a2.5 2.5 0 0 1 4 0"/><line x1="14" y1="9" x2="18" y2="9"/><line x1="14" y1="13" x2="18" y2="13"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
 };
 function ico(name, size = 18, sw = 1.8) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
@@ -3017,31 +3111,73 @@ function doConfirmAssign() {
     setTimeout(() => {
       hideLoading();
       _batchStatuses[BATCH.id] = 'running';
-      showToast('✓ Đã bắt đầu ca — nhân viên đang quét tại trạm', 'success');
+      showToast('✓ Lô đã sẵn sàng — quét thẻ NV rồi quét SKU để bật đèn', 'success');
       buildOpQueue();
-      setTimeout(() => { showScreen('operation'); opStartRun(); }, 600);
+      setTimeout(() => { showScreen('operation'); }, 600);
     }, 900);
   }, 1200);
 }
 
-// ════════ GIÁM SÁT VẬN HÀNH (PUT-TO-LIGHT) — mô phỏng sát thực tế ════════
-// Nhân viên quét barcode ở trạm bằng thiết bị riêng; màn này để Quản Lý Vận Hành
-// GIÁM SÁT ca chạy. Cơ chế put-wall thật: quét 1 SKU → tất cả đèn của SKU sáng cùng
-// lúc → NV đi bỏ TỪNG đèn một (thời gian tuỳ số lượng) → xác nhận. Có thiếu hàng, đèn lỗi.
+// ════════ VẬN HÀNH PHÂN HÀNG (PUT-TO-LIGHT) — cổng quét NV + SKU ════════
+// Flow CHUẨN: NV quét THẺ NHÂN VIÊN để vào ca (Bước 1) → quét MÃ SKU (Bước 2)
+// → KHI ĐÓ đèn của tất cả cửa hàng cho SKU đó mới SÁNG → NV bỏ hàng từng đèn → xác nhận.
+// Vai trò Vận Hành = thao tác quét trực tiếp; Tổng Quản Lý = chỉ giám sát (auto mô phỏng).
 const STORE_BINS = BATCH.storeBins;
 const OP_TICK = 150;        // ms mỗi nhịp mô phỏng
 
+// Danh sách nhân viên trạm hợp lệ (quét thẻ để xác thực vào ca)
+const OP_WORKERS = [
+  { code: 'NV-2207', name: 'Trần Thị B', initials: 'TB' },
+  { code: 'NV-3104', name: 'Lê Văn C',   initials: 'LC' },
+];
+function opPrimaryWorker() { return OP_WORKERS.find(w => w.name === BATCH.operator) || OP_WORKERS[0]; }
+
 let _opQueue = [];
-let _opIndex = 0;
-let _opRunning = false;
+let _opIndex = 0;             // SKU đang bật đèn (chỉ có nghĩa khi stage='putting')
+let _opRunning = false;       // ca đang mở (timer chạy)
 let _opTimer = null;
-let _opElapsedMs = 0;
+let _opElapsedMs = 0;         // đồng hồ ca (wall-clock, để hiển thị thời lượng)
+let _opWorkMs = 0;            // CHỈ tính thời gian đang bỏ hàng (stage 'putting') → năng suất/ETA chuẩn
+let _opSpeedMul = 1.6;        // hệ số tốc độ mô phỏng (>1 = chậm hơn, dễ quan sát); mặc định khoan thai
+const OP_SPEEDS = [{ mul: 2.6, label: 'Chậm' }, { mul: 1.6, label: 'Thường' }, { mul: 0.7, label: 'Nhanh' }];
+function opSetSpeed(mul) { _opSpeedMul = mul; renderOperation(); }
+function renderOpSpeed() {
+  const box = document.getElementById('op-speed-btns');
+  if (!box) return;
+  box.innerHTML = OP_SPEEDS.map(s => `<button class="op-spd${s.mul === _opSpeedMul ? ' active' : ''}" onclick="opSetSpeed(${s.mul})">${s.label}</button>`).join('');
+}
 let _opExceptions = [];
 let _opFeed = [];
-let _opView = 'map';        // 'map' | 'list'
-let _opPhase = 'scan';      // 'scan' = đang quét SKU · 'put' = đang bỏ hàng
-let _opStepMs = 0;          // thời gian còn lại của bước hiện tại
-let _opActiveAddr = null;   // đèn NV đang bỏ
+let _opView = 'map';          // 'map' | 'list'
+let _opStage = 'idle';        // 'idle'=chờ đủ NV các khu · 'await-sku'=chờ quét SKU · 'putting'=đèn sáng, đang bỏ
+let _opStepMs = 0;            // đếm ngược cho auto-driver (chế độ giám sát)
+// Mỗi KHU do 1 nhân viên phụ trách. 1 NV có thể phụ trách NHIỀU khu (khi ca chỉ 1 người).
+// Số luồng bỏ hàng SONG SONG = SỐ NHÂN VIÊN (1 người không thể bỏ 2 đèn cùng lúc).
+// {id,name,color, worker, activeAddr, stepMs, workMs, units} — bơm trong buildOpQueue.
+let _opZones = [];
+function _opActiveAddrs() { return _opZones.map(z => z.activeAddr).filter(Boolean); }
+function _opAnyWorker() { return _opZones.some(z => z.worker); }                    // ≥1 NV đã vào ca
+function _opUnstaffedZones() { return _opZones.filter(z => !z.worker); }
+function _opCrew() {                                                                 // danh sách NV đang trong ca (distinct)
+  const seen = new Map();
+  _opZones.forEach(z => { if (z.worker && !seen.has(z.worker.code)) seen.set(z.worker.code, z.worker); });
+  return [...seen.values()];
+}
+function _opZonesOfWorker(code) { return _opZones.filter(z => z.worker && z.worker.code === code); }
+function _workerBusy(code) { return _opZones.some(z => z.worker && z.worker.code === code && z.activeAddr); }
+function _zoneOf(addr) { return _opZones.find(z => z.addrs.has(addr)); }
+let _opAuto = false;          // true = chế độ giám sát (manager) tự mô phỏng quét
+let _opErrMsg = null;         // thông báo lỗi quét tạm thời
+let _opErrTimer = null;
+
+// Khu (zone) của 1 địa chỉ đèn = layoutZone chứa addr đó
+function _opZoneInfoOfAddr(addr) {
+  for (const z of layoutZones)
+    for (const s of z.shelves)
+      for (const f of s.floors)
+        if (f.cells.includes(addr)) return { id: z.id, name: z.name, color: z.color };
+  return { id: 'ZX', name: 'Khu khác', color: 'var(--text-muted)' };
+}
 
 function buildOpQueue() {
   _opQueue = ASSIGN_DATA
@@ -3049,19 +3185,24 @@ function buildOpQueue() {
     .map(d => ({
       sku: d.sku, name: d.name,
       bins: STORE_BINS
-        .map((b, i) => ({ ...b, qty: d.alloc[i], confirmed: null, status: 'pending' }))
+        .map((b, i) => { const z = _opZoneInfoOfAddr(b.addr); return { ...b, qty: d.alloc[i], confirmed: null, status: 'pending', zoneId: z.id, zoneName: z.name }; })
         .filter(b => b.qty > 0)
     }));
-  _opIndex = 0; _opRunning = false; _opElapsedMs = 0;
+  // Các khu có mặt trong lô → mỗi khu 1 luồng bỏ hàng (1 NV)
+  const seen = new Map();
+  STORE_BINS.forEach(b => { const z = _opZoneInfoOfAddr(b.addr); if (!seen.has(z.id)) seen.set(z.id, { ...z, addrs: new Set() }); seen.get(z.id).addrs.add(b.addr); });
+  _opZones = [...seen.values()].map(z => ({ id: z.id, name: z.name, color: z.color, addrs: z.addrs, worker: null, activeAddr: null, stepMs: 0, workMs: 0, units: 0 }));
+
+  _opIndex = 0; _opRunning = false; _opElapsedMs = 0; _opWorkMs = 0;
   _opExceptions = []; _opFeed = [];
-  _opPhase = 'scan'; _opStepMs = 1000; _opActiveAddr = null;
+  _opStage = 'idle'; _opStepMs = 900; _opErrMsg = null;
   if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
 }
 
-function _opCurDone() {
-  const cur = _opQueue[_opIndex];
-  return cur && cur.bins.every(b => b.status === 'done' || b.status === 'short' || b.status === 'error');
-}
+// SKU đã xử lý xong = mọi đèn đã done/short/error
+function _skuResolved(q) { return q.bins.every(b => b.status === 'done' || b.status === 'short' || b.status === 'error'); }
+function _opDoneCount() { return _opQueue.filter(_skuResolved).length; }
+function _opPending() { return _opQueue.map((q, i) => ({ q, i })).filter(x => !_skuResolved(x.q)); }
 function _opUnitsDone() {
   let u = 0;
   _opQueue.forEach(q => q.bins.forEach(b => { if (b.confirmed != null) u += b.confirmed; }));
@@ -3088,7 +3229,7 @@ function renderOperation() {
   if (opBanner) opBanner.style.display = canControl ? 'none' : '';
 
   const sub = document.getElementById('op-subdesc');
-  if (sub) sub.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · NV trạm: ${BATCH.operator}`;
+  if (sub) { const st = _opZones.filter(z => z.worker).length; sub.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · ${_opZones.length} khu · NV: <span style="color:${st === _opZones.length ? 'var(--green)' : 'var(--yellow)'}">${st}/${_opZones.length} khu có người</span>`; }
 
   const pBtn = document.getElementById('op-pause-btn');
   if (pBtn) pBtn.innerHTML = _opRunning ? `${ico('pause', 15)} Tạm dừng ca` : `${ico('play', 15)} Tiếp tục ca`;
@@ -3096,6 +3237,7 @@ function renderOperation() {
   if (fBtn) fBtn.innerHTML = `${ico('stop', 15)} Kết thúc ca`;
 
   renderOpKpi();
+  renderOpSpeed();
   renderOpStrip();
   renderOpStation();
   renderOpBins();
@@ -3111,17 +3253,13 @@ function renderOperation() {
 }
 
 function renderOpKpi() {
-  const skuDone = _opIndex + (_opCurDone() ? 1 : 0);
-  const elapsed = _opElapsedMs / 1000;
+  const skuDone = _opDoneCount();
   const units = _opUnitsDone();
-  const rate = elapsed > 3 ? Math.round(units / elapsed * 3600) : 0;             // đơn vị/giờ
-  const remain = _opUnitsTotal() - units;
-  const etaSec = rate > 0 ? Math.round(remain / (rate / 3600)) : 0;
-  const eta = rate > 0 ? `${String(Math.floor(etaSec / 60)).padStart(2, '0')}:${String(etaSec % 60).padStart(2, '0')}` : '—';
+  const storesDone = _opQueue.reduce((a, q) => a + q.bins.filter(b => b.status === 'done' || b.status === 'short').length, 0);
   document.getElementById('op-kpi').innerHTML = `
-    ${statCard('operation', 'var(--accent)', 'var(--accent-dim)', `${skuDone}/${_opQueue.length}`, 'SKU đã xong', null, `${units.toLocaleString()}/${_opUnitsTotal().toLocaleString()} đơn vị`)}
-    ${statCard('trendUp', 'var(--green)', 'var(--green-dim)', rate ? rate.toLocaleString() : '—', 'Năng suất', null, 'đơn vị / giờ')}
-    ${statCard('clock', 'var(--purple)', 'var(--purple-dim)', eta, 'ETA còn lại', null, _opRunning ? 'theo nhịp hiện tại' : 'đang tạm dừng')}
+    ${statCard('operation', 'var(--accent)', 'var(--accent-dim)', `${skuDone}/${_opQueue.length}`, 'SKU đã xong', null, 'trong lô')}
+    ${statCard('box', 'var(--green)', 'var(--green-dim)', `${units.toLocaleString()}`, 'Đơn vị đã phân', null, `/ ${_opUnitsTotal().toLocaleString()} đơn vị`)}
+    ${statCard('store', 'var(--purple)', 'var(--purple-dim)', storesDone.toLocaleString(), 'Lượt cửa hàng đã bỏ', null, 'đã xác nhận')}
     ${statCard('alert', 'var(--red)', 'var(--red-dim)', _opExceptions.length, 'Sự cố', null, 'chưa xử lý')}
   `;
   const dot = document.getElementById('op-live-dot');
@@ -3135,36 +3273,114 @@ function renderOpStrip() {
   if (!strip) return;
   strip.innerHTML = _opQueue.map((q, i) => {
     let bg, color, br = 'var(--border)';
-    if (i < _opIndex)        { bg = 'var(--green-dim)';  color = 'var(--green)';  br = 'var(--green)'; }
-    else if (i === _opIndex) { bg = 'var(--accent-dim)'; color = 'var(--accent)'; br = 'var(--accent)'; }
-    else                     { bg = 'transparent';       color = 'var(--text-subtle)'; }
+    if (_skuResolved(q))                              { bg = 'var(--green-dim)';  color = 'var(--green)';  br = 'var(--green)'; }
+    else if (i === _opIndex && _opStage === 'putting'){ bg = 'var(--accent-dim)'; color = 'var(--accent)'; br = 'var(--accent)'; }
+    else                                              { bg = 'transparent';       color = 'var(--text-subtle)'; }
     return `<div title="${q.sku} · ${q.name}" style="min-width:30px;height:24px;padding:0 7px;border:1px solid ${br};border-radius:6px;background:${bg};color:${color};font-family:var(--font-mono);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">${q.sku.replace('SKU-', '')}</div>`;
   }).join('');
 }
 
+// Cổng quét: cập nhật các phần tử TĨNH (không dựng lại <input> để giữ focus khi gõ/quét)
 function renderOpStation() {
-  const cur = _opQueue[_opIndex];
-  const card = document.getElementById('op-station-card');
-  if (!cur) { card.innerHTML = ''; return; }
-  const doneBins = cur.bins.filter(b => b.status !== 'pending' && b.status !== 'on').length;
-  let statusTxt, statusColor;
-  if (!_opRunning) { statusTxt = 'Ca đang tạm dừng'; statusColor = 'var(--yellow)'; }
-  else if (_opPhase === 'scan') { statusTxt = 'Đang quét SKU tại trạm...'; statusColor = 'var(--accent)'; }
-  else {
-    const active = cur.bins.find(b => b.addr === _opActiveAddr);
-    statusTxt = active ? `NV đang bỏ ${active.qty} vào ${active.store}...` : `Đã xác nhận ${doneBins}/${cur.bins.length} cửa hàng`;
-    statusColor = 'var(--accent)';
+  const station = document.getElementById('op-station');
+  if (!station) return;
+  const slot  = document.getElementById('op-worker-slot');
+  const badge = document.getElementById('op-stage-badge');
+  const scIco = document.getElementById('op-scan-ico');
+  const zone  = document.getElementById('op-scan-zone');
+  const hint  = document.getElementById('op-scan-hint');
+  const input = document.getElementById('op-scan-input');
+  const btn   = document.getElementById('op-scan-btn');
+  const quick = document.getElementById('op-quick');
+  const errEl = document.getElementById('op-scan-err');
+
+  const paused = !_opRunning;
+  const stage  = paused ? 'paused' : _opStage;
+  station.className = 'card op-station stage-' + stage;
+
+  // ── roster nhân viên THEO KHU (mỗi khu 1 NV, làm song song) ──
+  const canChangeZone = !_opAuto && _opStage !== 'putting';
+  slot.innerHTML = _opZones.map(z => {
+    if (z.worker) {
+      const w = z.worker;
+      const active = z.activeAddr ? `<span style="color:var(--light-on)">● đang bỏ</span>` : `<span style="color:var(--text-subtle)">${z.units} đv</span>`;
+      return `<div class="op-zworker">
+        <div class="op-worker-ava on" style="background:${z.color}22;color:${z.color};border-color:${z.color}">${w.initials}</div>
+        <div style="min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap">${w.name}</div>
+        <div style="font-size:10.5px;color:var(--text-muted)"><b style="color:${z.color}">${z.name}</b> · ${active}${canChangeZone ? ` · <a onclick="opClearZone('${z.id}')" style="color:var(--accent);cursor:pointer">đổi</a>` : ''}</div></div></div>`;
+    }
+    const willCover = _opAnyWorker() ? 'NV hiện có sẽ kiêm' : 'chờ quét thẻ';
+    return `<div class="op-zworker">
+      <div class="op-worker-ava off">${ico('user', 20)}</div>
+      <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text-muted);white-space:nowrap">Chưa có NV</div>
+      <div style="font-size:10.5px;color:var(--text-subtle)"><b style="color:${z.color}">${z.name}</b> · ${willCover}</div></div></div>`;
+  }).join('');
+
+  // ── huy hiệu trạng thái ──
+  const nCrew = _opCrew().length;
+  const SB = {
+    'idle':      { c: 'var(--yellow)',    bg: 'var(--yellow-dim)',      t: 'Bước 1 · Quét thẻ nhân viên' },
+    'await-sku': { c: 'var(--accent)',    bg: 'var(--accent-dim)',      t: `Bước 2 · Quét SKU · ${nCrew} NV trong ca` },
+    'putting':   { c: 'var(--light-on)',  bg: 'rgba(245,163,0,.12)',    t: `Đèn đang sáng · ${_opActiveAddrs().length} NV đang bỏ` },
+    'paused':    { c: 'var(--text-muted)', bg: 'var(--surface2)',       t: 'Ca tạm dừng' },
+  }[stage];
+  badge.style.background = SB.bg; badge.style.color = SB.c;
+  badge.innerHTML = `<span class="op-stage-dot" style="background:${SB.c}"></span>${SB.t}`;
+
+  // ── BẢN TRÌNH DIỄN TỰ CHẠY → hiển thị thao tác đang diễn ra tại trạm ──
+  if (_opAuto) {
+    zone.style.display = 'none';
+    const cur = _opQueue[_opIndex];
+    let ic2, c2, bg2, line, sub2;
+    if (paused) { ic2 = 'pause'; c2 = 'var(--text-muted)'; bg2 = 'var(--surface3)'; line = 'Đã tạm dừng ca'; sub2 = 'Bấm “Tiếp tục ca” để chạy tiếp'; }
+    else if (_opStage === 'idle') { ic2 = 'badge'; c2 = 'var(--yellow)'; bg2 = 'var(--yellow-dim)'; line = 'Nhân viên đang quét thẻ vào ca…'; sub2 = 'Mỗi khu một nhân viên phụ trách'; }
+    else if (_opStage === 'await-sku') { ic2 = 'scan'; c2 = 'var(--accent)'; bg2 = 'var(--accent-dim)'; line = 'Đang quét mã SKU tại trạm…'; sub2 = 'Đèn các cửa hàng sẽ bật ngay khi quét xong'; }
+    else { ic2 = 'bulb'; c2 = 'var(--light-on)'; bg2 = 'rgba(245,163,0,.12)'; const onN = cur ? cur.bins.filter(b => b.status === 'on').length : 0; line = `Đèn đang sáng — đang bỏ hàng${cur ? ' · ' + cur.sku : ''}`; sub2 = cur ? `${cur.name} · còn ${onN} cửa hàng chờ bỏ` : ''; }
+    quick.innerHTML = `<div style="display:flex;align-items:center;gap:13px;width:100%">
+        <span class="op-scan-ico" style="background:${bg2};color:${c2}">${ico(ic2, 24, 2)}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:${c2}">${line}</div><div style="font-size:12px;color:var(--text-muted)">${sub2}</div></div>
+        ${(!paused) ? `<span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-subtle)"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:tpulse .8s ease infinite alternate"></span>LIVE</span>` : ''}
+      </div>`;
+    errEl.style.display = 'none';
+    return;
   }
-  card.innerHTML = `
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <span style="width:52px;height:52px;border-radius:13px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('scan', 26, 2)}</span>
-      <div style="flex:1;min-width:200px">
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:2px">Trạm ${BATCH.block} · NV ${BATCH.operator} (SKU ${_opIndex + 1}/${_opQueue.length})</div>
-        <div style="font-size:24px;font-weight:700">${cur.sku} · ${cur.name}</div>
-        <div style="font-size:13px;color:${statusColor}">${statusTxt}</div>
-      </div>
-      <div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">Máy quét BCR</div><div class="text-mono" style="font-size:12px;color:var(--text-subtle)">addr 9101</div></div>
-    </div>`;
+  zone.style.display = '';
+
+  // ── ô quét theo từng bước ──
+  let icoName, col, bg, hintTxt, ph, locked = false, qlabel = '', chips = '';
+  if (paused) {
+    icoName = 'pause'; col = 'var(--text-muted)'; bg = 'var(--surface3)';
+    hintTxt = 'Ca đang tạm dừng — bấm “Tiếp tục ca” để quét tiếp'; ph = '…'; locked = true;
+  } else if (_opStage === 'idle') {
+    icoName = 'badge'; col = 'var(--yellow)'; bg = 'var(--yellow-dim)';
+    hintTxt = 'BƯỚC 1 — Mỗi nhân viên quét thẻ của mình để vào ca';
+    ph = 'Quét thẻ nhân viên (vd: NV-2207)…';
+    const inCrew = new Set(_opCrew().map(w => w.code));
+    qlabel = 'Quét thẻ:';
+    chips = OP_WORKERS.filter(w => !inCrew.has(w.code)).map(w => `<button class="op-chip" onclick="opQuick('${w.code}')">${ico('badge', 13)} ${w.name} · ${w.code}</button>`).join('');
+  } else if (_opStage === 'await-sku') {
+    icoName = 'scan'; col = 'var(--accent)'; bg = 'var(--accent-dim)';
+    const free = _opUnstaffedZones().length;
+    hintTxt = `BƯỚC 2 — Quét mã SKU để bật đèn${free ? ` · hoặc quét thêm thẻ NV cho ${free} khu còn trống` : ''}`;
+    ph = 'Quét mã SKU (vd: SKU-100)…';
+    const pend = _opPending();
+    const inCrew = new Set(_opCrew().map(w => w.code));
+    const badgeChips = free ? OP_WORKERS.filter(w => !inCrew.has(w.code)).map(w => `<button class="op-chip" onclick="opQuick('${w.code}')">${ico('badge', 12)} +${w.name}</button>`).join('') : '';
+    const skuChips = pend.slice(0, 6).map((x, k) => `<button class="op-chip${k === 0 ? ' suggest' : ''}" onclick="opQuick('${x.q.sku}')">${x.q.sku}</button>`).join('');
+    qlabel = 'Quét nhanh:';
+    chips = badgeChips + skuChips;
+  } else { // putting
+    icoName = 'bulb'; col = 'var(--light-on)'; bg = 'rgba(245,163,0,.12)';
+    hintTxt = 'Đèn đang sáng — nhân viên đang bỏ hàng vào từng cửa hàng…'; ph = 'Hoàn tất SKU hiện tại rồi quét tiếp'; locked = true;
+  }
+  scIco.style.background = bg; scIco.style.color = col; scIco.innerHTML = ico(icoName, 24, 2);
+  hint.style.color = col; hint.textContent = hintTxt;
+  input.placeholder = ph; input.disabled = locked; btn.disabled = locked;
+  zone.classList.toggle('locked', locked);
+  quick.innerHTML = chips ? `<span class="op-quick-lbl">${qlabel}</span>${chips}` : '';
+
+  if (_opErrMsg) { errEl.style.display = ''; errEl.innerHTML = `${ico('alert', 14)} ${_opErrMsg}`; }
+  else errEl.style.display = 'none';
 }
 
 function renderOpBins() {
@@ -3174,15 +3390,20 @@ function renderOpBins() {
   if (!cur) { grid.innerHTML = ''; return; }
   const resolved = cur.bins.filter(b => b.status !== 'pending' && b.status !== 'on').length;
   summary.textContent = `${resolved}/${cur.bins.length} cửa hàng`;
+  const active = _opActiveAddrs();
   grid.innerHTML = cur.bins.map(b => {
-    const cls = 'op-bin ' + (b.status === 'short' ? 'error' : b.status) + (b.addr === _opActiveAddr ? ' op-active' : '');
+    const isActive = active.includes(b.addr);
+    const z = _zoneOf(b.addr);
+    const wk = z && z.worker ? z.worker.name : 'chưa có NV';
+    const cls = 'op-bin ' + (b.status === 'short' ? 'error' : b.status) + (isActive ? ' op-active' : '');
     let foot;
     if (b.status === 'done')        foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--green);font-weight:600;padding:6px 0">${ico('check2', 15, 2.4)} Đã bỏ ${b.confirmed}</div>`;
     else if (b.status === 'short')  foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--yellow);font-weight:600;padding:6px 0">${ico('alert', 14)} Thiếu — bỏ ${b.confirmed}/${b.qty}</div>`;
     else if (b.status === 'error')  foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">${ico('alert', 14)} Đèn lỗi</div>`;
-    else if (b.status === 'on')     foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--light-on);font-weight:600;padding:6px 0">${ico('bulb', 14)} ${b.addr === _opActiveAddr ? 'NV đang bỏ...' : 'Đèn sáng — chờ NV'}</div>`;
+    else if (b.status === 'on')     foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--light-on);font-weight:600;padding:6px 0">${ico('bulb', 14)} ${isActive ? wk + ' đang bỏ...' : 'Đèn sáng — chờ ' + wk}</div>`;
     else                            foot = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 0">Chờ quét SKU</div>`;
-    return `<div class="${cls}"><div class="op-dot"></div><div class="op-bin-store">${b.store}</div><div class="op-bin-loc">Đèn ${b.addr} · ${b.loc}</div><div class="op-bin-qty">${b.qty}</div>${foot}</div>`;
+    const ztag = z ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:${z.color};font-weight:700"><span style="width:7px;height:7px;border-radius:50%;background:${z.color}"></span>${z.name}</span>` : '';
+    return `<div class="${cls}"><div class="op-dot"></div><div style="display:flex;justify-content:space-between;align-items:center"><div class="op-bin-store">${b.store}</div>${ztag}</div><div class="op-bin-loc">Đèn ${b.addr} · ${b.loc}</div><div class="op-bin-qty">${b.qty}</div>${foot}</div>`;
   }).join('');
 }
 
@@ -3190,7 +3411,7 @@ function renderOpFeed() {
   const box = document.getElementById('op-feed');
   if (!box) return;
   const colorByType = { scan: 'var(--accent)', done: 'var(--green)', short: 'var(--yellow)', error: 'var(--red)', skuDone: 'var(--purple)', info: 'var(--text-muted)' };
-  if (!_opFeed.length) { box.innerHTML = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 0">Chưa có hoạt động — bấm "Tiếp tục ca" để bắt đầu</div>`; return; }
+  if (!_opFeed.length) { box.innerHTML = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 0">Chưa có hoạt động — quét thẻ NV rồi quét SKU để bắt đầu</div>`; return; }
   box.innerHTML = _opFeed.map(e => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;line-height:1.35">
     <span class="text-mono" style="color:var(--text-subtle);font-size:11px;flex-shrink:0">${e.t}</span>
     <span style="color:${colorByType[e.type] || 'var(--text)'};flex:1">${e.text}</span></div>`).join('');
@@ -3201,17 +3422,77 @@ function renderOpExceptions() {
   const cnt = document.getElementById('op-exc-count');
   if (cnt) { cnt.textContent = _opExceptions.length; cnt.className = 'badge ' + (_opExceptions.length ? 'badge-red' : 'badge-gray'); cnt.style.fontSize = '10px'; }
   if (!_opExceptions.length) { box.innerHTML = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 2px">Chưa có sự cố — ca chạy ổn định</div>`; return; }
-  box.innerHTML = _opExceptions.map((e, i) => `
-    <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--red-dim);background:var(--red-dim);border-radius:10px">
-      <span style="color:${e.type === 'short' ? 'var(--yellow)' : 'var(--red)'};display:flex;flex-shrink:0">${ico('alert', 16)}</span>
-      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:${e.type === 'short' ? 'var(--yellow)' : 'var(--red)'}">${e.title}</div><div style="font-size:11px;color:var(--text-muted)">${e.detail}</div></div>
-      ${canEdit('operation') ? `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="opResolveExc(${i})">Đã xử lý</button>` : ''}
-    </div>`).join('');
+  const canDo = canEdit('operation');
+  box.innerHTML = _opExceptions.map((e, i) => {
+    const col = e.type === 'short' ? 'var(--yellow)' : 'var(--red)';
+    let actions = '';
+    if (canDo) {
+      if (e.type === 'error') {
+        // đèn lỗi: thử bật lại (có thể vẫn lỗi) hoặc xác nhận thủ công bỏ qua đèn
+        actions = `<button class="btn btn-secondary btn-sm op-exc-btn" onclick="opExcRetry(${i})">${ico('replenishment', 12)} Bật lại đèn</button>
+                   <button class="btn btn-ghost btn-sm op-exc-btn" onclick="opExcManual(${i})">${ico('check2', 12)} Xác nhận tay</button>`;
+      } else {
+        // thiếu hàng: tạo phiếu bổ sung hoặc chấp nhận thiếu
+        actions = `<button class="btn btn-secondary btn-sm op-exc-btn" onclick="opExcReplenish(${i})">${ico('box', 12)} Tạo phiếu bổ sung</button>
+                   <button class="btn btn-ghost btn-sm op-exc-btn" onclick="opExcAccept(${i})">${ico('check2', 12)} Ghi nhận thiếu</button>`;
+      }
+    }
+    return `<div style="border:1px solid ${col};background:var(--red-dim);border-radius:10px;padding:9px 10px">
+      <div style="display:flex;align-items:flex-start;gap:9px">
+        <span style="color:${col};display:flex;flex-shrink:0;margin-top:1px">${ico('alert', 16)}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:${col}">${e.title}</div><div style="font-size:11px;color:var(--text-muted)">${e.detail}</div></div>
+      </div>
+      ${actions ? `<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">${actions}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── XỬ LÝ SỰ CỐ ──
+function _opFindBin(sku, addr) {
+  const q = _opQueue.find(x => x.sku === sku);
+  return q ? q.bins.find(b => b.addr === addr) : null;
+}
+function opExcRetry(i) {           // đèn lỗi → thử bật lại (mô phỏng ~65% thành công)
+  const e = _opExceptions[i]; if (!e) return;
+  const b = _opFindBin(e.sku, e.addr);
+  if (Math.random() < 0.65) {
+    if (b) { b.status = 'done'; b.confirmed = b.qty; }
+    _opExceptions.splice(i, 1);
+    _opFeedPush('done', `🔄 Đèn ${e.addr} bật lại OK — ${e.store} bỏ ${e.qty}`);
+    showToast('✓ Đèn đã hoạt động lại — đã bỏ hàng', 'success');
+  } else {
+    _opFeedPush('error', `✗ Đèn ${e.addr} vẫn lỗi sau khi thử lại — cần báo IT`);
+    showToast('⚠ Đèn vẫn lỗi — hãy báo IT hoặc xác nhận tay', 'error');
+  }
+  renderOperation();
+}
+function opExcManual(i) {           // bỏ qua đèn lỗi, NV xác nhận đã bỏ tay
+  const e = _opExceptions[i]; if (!e) return;
+  const b = _opFindBin(e.sku, e.addr);
+  if (b) { b.status = 'done'; b.confirmed = b.qty; }
+  _opExceptions.splice(i, 1);
+  _opFeedPush('done', `✍ Xác nhận thủ công ${e.store} · bỏ ${e.qty} (đèn ${e.addr} lỗi)`);
+  renderOperation();
+  showToast('✓ Đã xác nhận thủ công — báo IT thay đèn sau', 'success');
+}
+function opExcReplenish(i) {        // thiếu hàng → tạo yêu cầu bổ sung
+  const e = _opExceptions[i]; if (!e) return;
+  _opExceptions.splice(i, 1);
+  _opFeedPush('info', `📦 Tạo phiếu bổ sung ${e.missing} ${e.sku} cho ${e.store}`);
+  renderOperation();
+  showToast(`✓ Đã tạo phiếu bổ sung ${e.missing} đơn vị cho ${e.store}`, 'success');
+}
+function opExcAccept(i) {           // chấp nhận thiếu, phần còn lại chuyển lô sau
+  const e = _opExceptions[i]; if (!e) return;
+  _opExceptions.splice(i, 1);
+  _opFeedPush('info', `Ghi nhận thiếu ${e.missing} ${e.sku} · ${e.store} — chuyển lô sau`);
+  renderOperation();
+  showToast('✓ Đã ghi nhận thiếu hàng', 'info');
 }
 
 function renderOpProgress() {
   const total = _opQueue.length;
-  const done = _opIndex + (_opCurDone() ? 1 : 0);
+  const done = _opDoneCount();
   document.getElementById('op-progress-fill').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
   document.getElementById('op-progress-text').textContent = `${done} / ${total} SKU`;
 }
@@ -3223,41 +3504,58 @@ function renderOpMap() {
   const letterByAddr = {}, qtyByAddr = {}, statusByAddr = {};
   STORE_BINS.forEach((b, i) => letterByAddr[b.addr] = String.fromCharCode(65 + i));
   if (cur) cur.bins.forEach(b => { qtyByAddr[b.addr] = b.qty; statusByAddr[b.addr] = b.status; });
+  const activeAddrs = _opActiveAddrs();
 
+  const cubby = addr => {
+    const letter = letterByAddr[addr];
+    if (!letter) return `<div class="cubby off" title="Đèn ${addr} · ngăn hàng khác (ngoài lô)"></div>`;
+    const raw = statusByAddr[addr] || 'pending';
+    const active = activeAddrs.includes(addr) ? ' active' : '';
+    const qty = qtyByAddr[addr];
+    let ic = '';
+    if (raw === 'done')       ic = `<span class="cb-ic" style="color:var(--green)">${ico('check2', 11, 2.6)}</span>`;
+    else if (raw === 'error') ic = `<span class="cb-ic" style="color:var(--red)">${ico('alert', 11)}</span>`;
+    else if (raw === 'short') ic = `<span class="cb-ic" style="color:var(--yellow)">${ico('alert', 11)}</span>`;
+    else if (raw === 'on')    ic = `<span class="cb-ic" style="color:var(--light-on)">${ico('bulb', 11)}</span>`;
+    return `<div class="cubby ${raw}${active}" title="Đèn ${addr} · Cửa hàng ${letter} · ${qty ?? '—'} đơn vị"><div class="led"></div><div class="cb-store">${letter}</div><div class="cb-qty">${qty ?? ''}</div>${ic}</div>`;
+  };
   const zonesHTML = layoutZones.map(z => {
-    const shelves = z.shelves.map(s => {
-      const floors = s.floors.map(f => {
-        const cells = f.cells.map(addr => {
-          const letter = letterByAddr[addr];
-          if (letter) {
-            const raw = statusByAddr[addr] || 'pending';
-            const st = raw === 'short' ? 'done' : raw;
-            const active = addr === _opActiveAddr ? ' active' : '';
-            return `<div class="opmap-cell batch ${st}${active}" title="Đèn ${addr} · Cửa hàng ${letter} · bỏ ${qtyByAddr[addr] ?? '—'}"><span>${qtyByAddr[addr] ?? ''}</span><span class="opmap-s">${letter}</span></div>`;
-          }
-          return `<div class="opmap-cell off" title="Đèn ${addr} · ngoài lô"></div>`;
-        }).join('');
-        return `<div class="opmap-row"><span class="opmap-lbl">${f.label}</span>${cells}</div>`;
-      }).join('');
-      return `<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-subtle);font-family:var(--font-mono);margin-bottom:4px">${s.name}</div>${floors}</div>`;
+    const racks = z.shelves.map(s => {
+      const levels = s.floors.map(f =>
+        `<div class="rack-level"><div class="rack-lvl-lbl">${f.label}</div><div class="rack-bays">${f.cells.map(cubby).join('')}</div></div>`
+      ).join('');
+      const nBin = s.floors.reduce((a, fl) => a + fl.cells.length, 0);
+      return `<div class="rack-unit"><div class="rack-name"><i></i>${s.name} · ${nBin} ngăn</div><div class="rack">${levels}</div><div class="rack-feet"><span></span><span></span></div></div>`;
     }).join('');
-    return `<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><span style="width:9px;height:9px;border-radius:50%;background:${z.color}"></span><b style="font-size:13px">${z.name}</b><span class="text-muted text-sm">${z.controller ? '· ' + z.controller : ''}</span></div>${shelves}</div>`;
+    const zs = _opZones.find(x => x.id === z.id);
+    const wkTag = zs ? (zs.worker ? `<span class="text-sm" style="color:${z.color};font-weight:600">· 👤 ${zs.worker.name}${zs.activeAddr ? ' (đang bỏ)' : ''}</span>` : `<span class="text-sm" style="color:var(--yellow)">· chưa có NV</span>`) : (z.controller ? `<span class="text-muted text-sm">· ${z.controller}</span>` : '');
+    return `<div style="margin-bottom:22px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><span style="width:9px;height:9px;border-radius:50%;background:${z.color}"></span><b style="font-size:13px">${z.name}</b>${wkTag}</div><div class="rack-aisle">${racks}</div></div>`;
   }).join('');
 
-  const skuDoneCount = _opIndex + (_opCurDone() ? 1 : 0);
+  const putting = _opStage === 'putting' && cur;
   const doneBins = cur ? cur.bins.filter(b => b.status !== 'pending' && b.status !== 'on').length : 0;
   const totalBins = cur ? cur.bins.length : 0;
   const binPct = totalBins ? Math.round(doneBins / totalBins * 100) : 0;
-  const header = cur ? `
-    <div style="display:flex;align-items:center;gap:14px;background:var(--accent-dim);border:1px solid rgba(47,111,237,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;flex-wrap:wrap">
-      <span style="width:42px;height:42px;border-radius:11px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('operation', 22, 2)}</span>
+  const hCol = putting ? 'var(--light-on)' : 'var(--accent)';
+  const hBg  = putting ? 'rgba(245,163,0,.10)' : 'var(--accent-dim)';
+  const hBd  = putting ? 'rgba(245,163,0,.3)' : 'rgba(47,111,237,.25)';
+  const hLabel = putting ? `Đèn đang sáng · SKU ${_opDoneCount() + 1}/${_opQueue.length}`
+    : _opStage === 'await-sku' ? 'Chờ quét SKU — đèn đang tắt'
+    : 'Chờ nhân viên vào ca — đèn đang tắt';
+  const hTitle = putting ? `${cur.sku} · ${cur.name}`
+    : _opStage === 'await-sku' ? 'Quét mã SKU để bật đèn' : 'Quét thẻ NV để bắt đầu';
+  const hStatus = putting ? `Đã xác nhận ${doneBins}/${totalBins} cửa hàng`
+    : `${_opDoneCount()}/${_opQueue.length} SKU đã phân xong`;
+  const header = `
+    <div style="display:flex;align-items:center;gap:14px;background:${hBg};border:1px solid ${hBd};border-radius:10px;padding:12px 14px;margin-bottom:14px;flex-wrap:wrap">
+      <span style="width:42px;height:42px;border-radius:11px;background:${hCol};color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico(putting ? 'bulb' : 'scan', 22, 2)}</span>
       <div style="flex:1;min-width:180px">
-        <div style="font-size:11px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.4px">Đang thực hiện · SKU ${Math.min(skuDoneCount + 1, _opQueue.length)}/${_opQueue.length} trong lô</div>
-        <div style="font-size:18px;font-weight:700">${cur.sku} · ${cur.name}</div>
-        <div style="font-size:12px;color:var(--text-muted)">${_opPhase === 'scan' && _opRunning ? 'Đang quét tại trạm...' : `Đã xác nhận ${doneBins}/${totalBins} cửa hàng`}</div>
+        <div style="font-size:11px;color:${hCol};font-weight:600;text-transform:uppercase;letter-spacing:.4px">${hLabel}</div>
+        <div style="font-size:18px;font-weight:700">${hTitle}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${hStatus}</div>
       </div>
-      <div style="width:130px"><div class="progress-bar" style="height:7px"><div class="progress-fill" style="width:${binPct}%"></div></div><div class="text-mono" style="font-size:11px;color:var(--text-muted);text-align:right;margin-top:3px">${binPct}%</div></div>
-    </div>` : '';
+      <div style="width:130px"><div class="progress-bar" style="height:7px"><div class="progress-fill" style="width:${putting ? binPct : 0}%"></div></div><div class="text-mono" style="font-size:11px;color:var(--text-muted);text-align:right;margin-top:3px">${putting ? binPct : 0}%</div></div>
+    </div>`;
 
   panel.innerHTML = `<div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
@@ -3270,18 +3568,27 @@ function renderOpMap() {
       </div>
     </div>
     ${header}
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Số trong ô = lượng cần bỏ · chữ góc = cửa hàng (A–E). Viền xanh dày = đèn NV đang bỏ.</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Mỗi kệ nhìn ngang theo tầng (T3→T1) · ô = ngăn, chấm góc trái = module LED · số = lượng cần bỏ, chữ góc phải = cửa hàng (A–E) · viền xanh = đèn NV đang bỏ · ô gạch mờ = ngăn hàng khác.</div>
     ${zonesHTML}
   </div>`;
 }
 
-// ── ENGINE: cơ chế put-wall thật ──
+// ── VÀO MÀN / MỞ CA ──
+function opEnter() {
+  if (!_opQueue.length) buildOpQueue();
+  _opAuto = !canEdit('operation');                       // ops = thao tác tay; manager = giám sát (auto)
+  if (_opQueue.length && _opDoneCount() === _opQueue.length) { renderOpComplete(false); return; }
+  opStartRun();
+  _opFocusScan();
+}
+
 function opStartRun() {
-  if (_opRunning || !_opQueue.length) return;
-  _opRunning = true;
-  if (_opElapsedMs === 0) _opFeedPush('info', `Bắt đầu ca · lô ${BATCH.id} · ${BATCH.block}`);
-  if (_opTimer) clearInterval(_opTimer);
-  _opTimer = setInterval(opTick, OP_TICK);
+  if (!_opQueue.length) buildOpQueue();
+  if (!_opRunning) {
+    _opRunning = true;
+    if (_opElapsedMs === 0) _opFeedPush('info', `Trạm ${BATCH.block} mở ca · lô ${BATCH.id} · ${_opQueue.length} SKU`);
+  }
+  if (!_opTimer) _opTimer = setInterval(opTick, OP_TICK);
   renderOperation();
 }
 function opPauseRun() {
@@ -3290,71 +3597,196 @@ function opPauseRun() {
   renderOperation();
 }
 
-function _opStartNextPut() {
+// ── CỔNG QUÉT: thẻ NV → SKU → đèn sáng ──
+function opScanSubmit(inp) {
+  if (!inp) return;
+  const code = (inp.value || '').trim();
+  inp.value = '';
+  if (!code) return;
+  if (!_opRunning) { _opFlashErr('Ca đang tạm dừng — bấm “Tiếp tục ca” trước.'); return; }
+  if (_opStage === 'idle') opScanEmployee(code);
+  else if (_opStage === 'await-sku') { if (_looksLikeBadge(code)) opScanEmployee(code); else opScanSku(code); }  // 1 máy quét: tự phân biệt thẻ NV / SKU
+  else _opFlashErr('Đang bỏ hàng — hoàn tất SKU hiện tại trước khi quét tiếp.');
+  setTimeout(() => { const i = document.getElementById('op-scan-input'); if (i && !i.disabled) i.focus(); }, 20);
+}
+function _looksLikeBadge(code) { return /^NV-?\d{2,}$/i.test((code || '').replace(/\s/g, '')); }
+function opQuick(code) { const inp = document.getElementById('op-scan-input'); if (!inp || inp.disabled) return; inp.value = code; opScanSubmit(inp); }
+function _opFocusScan() { if (_opAuto) return; setTimeout(() => { const i = document.getElementById('op-scan-input'); if (i && !i.disabled) i.focus(); }, 30); }
+
+// Quét thẻ → NV vào ca, nhận khu chưa có người. CHỈ cần ≥1 NV là quét SKU được.
+function opScanEmployee(code) {
+  const c = code.toUpperCase().replace(/\s/g, '');
+  let w = OP_WORKERS.find(x => x.code.toUpperCase() === c || x.code.replace('NV-', '') === c.replace('NV-', ''));
+  if (!w && /^NV-?\d{2,}$/.test(c)) { const id = c.startsWith('NV-') ? c : ('NV-' + c.replace('NV', '')); w = { code: id, name: 'Nhân viên ' + id, initials: 'NV' }; }
+  if (!w) { _opFlashErr(`Thẻ “${code}” không hợp lệ — quét đúng thẻ nhân viên.`); _opFeedPush('error', `✗ Quét thẻ không hợp lệ: ${code}`); return; }
+  if (_opCrew().some(x => x.code === w.code)) { _opFlashErr(`${w.name} đã vào ca rồi.`); return; }
+  const zone = _opZones.find(z => !z.worker);
+  if (!zone) { _opFlashErr('Tất cả khu đã có người — không cần thêm NV.'); return; }
+  zone.worker = w; _opErrMsg = null;
+  _opFeedPush('info', `${w.name} (${w.code}) quét thẻ vào ca — nhận ${zone.name}`);
+  if (_opStage === 'idle') _opStage = 'await-sku';     // có người là sẵn sàng quét SKU (kể cả còn khu trống)
+  renderOperation();
+  _opFocusScan();
+}
+
+// Quét SKU → bật đèn TẤT CẢ cửa hàng; mỗi NV bỏ hàng (NV ít hơn khu → 1 NV kiêm nhiều khu, làm tuần tự)
+function opScanSku(code) {
+  if (!_opAnyWorker()) { _opFlashErr('Quét thẻ nhân viên trước khi quét SKU.'); return; }
+  let c = code.toUpperCase().replace(/\s/g, '');
+  if (/^\d+$/.test(c)) c = 'SKU-' + c;
+  if (/^SKU\d+$/.test(c)) c = 'SKU-' + c.slice(3);
+  const idx = _opQueue.findIndex(q => q.sku.toUpperCase() === c);
+  if (idx < 0) { _opFlashErr(`Mã “${code}” không thuộc lô ${BATCH.id}.`); _opFeedPush('error', `✗ Quét sai — ${code} ngoài lô`); return; }
+  if (_skuResolved(_opQueue[idx])) { _opFlashErr(`${_opQueue[idx].sku} đã phân xong rồi — quét SKU khác.`); return; }
+  // khu còn trống → giao cho NV hiện có (1 NV kiêm nhiều khu)
+  const crew = _opCrew();
+  _opUnstaffedZones().forEach((z, i) => { z.worker = crew[i % crew.length]; _opFeedPush('info', `${z.worker.name} kiêm thêm ${z.name}`); });
+  _opIndex = idx; _opErrMsg = null;
+  const cur = _opQueue[idx];
+  cur.bins.forEach(b => { if (b.status === 'pending') b.status = 'on'; });   // ← ĐÈN SÁNG mọi khu
+  _opStage = 'putting';
+  _opZones.forEach(z => { z.activeAddr = null; });
+  _opZones.forEach(z => _opStartZonePut(z));                                 // bắt đầu — mỗi NV chỉ 1 đèn 1 lúc
+  _opFeedPush('scan', `Quét ${cur.sku} · ${cur.name} — ${cur.bins.length} đèn sáng · ${crew.length} NV bỏ hàng`);
+  renderOperation();
+}
+
+// Bỏ NV khỏi 1 khu (đổi người / kết ca) → quay lại bước quét thẻ
+function opClearZone(id) {
+  if (_opStage === 'putting') { _opFlashErr('Đang bỏ hàng — không thể đổi NV lúc này.'); return; }
+  const z = _opZones.find(x => x.id === id); if (!z) return;
+  const w = z.worker;
+  if (w) _opFeedPush('info', `${w.name} rời ${z.name}`);
+  z.worker = null; z.activeAddr = null;
+  // nếu NV này không còn phụ trách khu nào & còn NV khác → vẫn ở await-sku; hết NV → idle
+  _opStage = _opAnyWorker() ? 'await-sku' : 'idle';
+  _opErrMsg = null;
+  renderOperation();
+  _opFocusScan();
+}
+
+// Chế độ giám sát (manager): tự phân NV — staff đủ các khu rồi mới quét SKU (để minh hoạ 2 NV song song)
+function _opAutoStaff() {
+  const zone = _opZones.find(z => !z.worker);
+  if (zone) {
+    const used = new Set(_opCrew().map(w => w.code));
+    const w = OP_WORKERS.find(x => !used.has(x.code)) || OP_WORKERS[_opZones.indexOf(zone) % OP_WORKERS.length];
+    zone.worker = w;
+    _opFeedPush('info', `${w.name} (${w.code}) quét thẻ — nhận ${zone.name}`);
+  }
+  if (_opUnstaffedZones().length === 0) { _opStage = 'await-sku'; _opStepMs = 700 * _opSpeedMul; }
+  else { _opStepMs = 650 * _opSpeedMul; }   // quét thẻ NV khu tiếp theo
+  renderOperation();
+}
+
+function _opFlashErr(msg) {
+  _opErrMsg = msg;
+  renderOpStation();
+  const z = document.getElementById('op-scan-zone');
+  if (z) { z.classList.remove('err'); void z.offsetWidth; z.classList.add('err'); }
+  showToast('⚠ ' + msg, 'error');
+  clearTimeout(_opErrTimer);
+  _opErrTimer = setTimeout(() => { _opErrMsg = null; const zz = document.getElementById('op-scan-zone'); if (zz) zz.classList.remove('err'); renderOpStation(); }, 2800);
+}
+
+// chọn đèn kế tiếp trong KHU. NV của khu chỉ bỏ 1 đèn 1 lúc → nếu NV đang bận khu khác thì khu này chờ.
+function _opStartZonePut(zone) {
   const cur = _opQueue[_opIndex];
-  const on = cur.bins.filter(b => b.status === 'on');
-  if (!on.length) { _opActiveAddr = null; return; }
-  const b = on[Math.floor(Math.random() * on.length)];   // đi tới đèn bất kỳ
-  _opActiveAddr = b.addr;
-  _opStepMs = 450 + b.qty * 22 + Math.random() * 350;     // thời gian bỏ tỉ lệ theo số lượng
+  if (!cur || !zone.worker) { zone.activeAddr = null; return; }
+  if (_workerBusy(zone.worker.code)) { zone.activeAddr = null; return; }   // NV đang bỏ đèn ở khu khác → đợi
+  const on = cur.bins.filter(b => b.status === 'on' && b.zoneId === zone.id);
+  if (!on.length) { zone.activeAddr = null; return; }
+  const b = on[Math.floor(Math.random() * on.length)];
+  zone.activeAddr = b.addr;
+  zone.stepMs = (750 + b.qty * 26 + Math.random() * 400) * _opSpeedMul;   // thời gian bỏ tỉ lệ theo số lượng × tốc độ
+}
+
+// Trình diễn tự chạy: sự cố được xử lý sau vài giây (đèn lỗi → bật lại OK; thiếu → tạo phiếu bổ sung)
+function _opResolveExcAt(i) {
+  const e = _opExceptions[i]; if (!e) return;
+  if (e.type === 'error') {
+    const b = _opFindBin(e.sku, e.addr);
+    if (b && b.status === 'error') { b.status = 'done'; b.confirmed = b.qty; const z = _zoneOf(e.addr); if (z) z.units += b.qty; }
+    _opFeedPush('done', `🔄 [${e.zone || ''}] Đèn ${e.addr} bật lại OK — ${e.store} bỏ ${e.qty}`);
+  } else {
+    _opFeedPush('info', `📦 Đã tạo phiếu bổ sung ${e.missing} ${e.sku} cho ${e.store}`);
+  }
+  _opExceptions.splice(i, 1);
+}
+function _opAutoResolveExc() {
+  if (!_opExceptions.length) return;
+  const delay = 3500 * _opSpeedMul;
+  const i = _opExceptions.findIndex(e => _opElapsedMs - (e.bornMs || 0) > delay);
+  if (i < 0) return;
+  _opResolveExcAt(i);
+  renderOperation();
 }
 
 function opTick() {
+  if (!_opRunning) return;
   _opElapsedMs += OP_TICK;
+  if (_opAuto) _opAutoResolveExc();
+
+  // ── stage IDLE: chờ đủ NV các khu ──
+  if (_opStage === 'idle') {
+    if (_opAuto) { _opStepMs -= OP_TICK; if (_opStepMs <= 0) { _opAutoStaff(); return; } }
+    renderOpKpi(); return;
+  }
+  // ── stage AWAIT-SKU: chờ quét SKU ──
+  if (_opStage === 'await-sku') {
+    if (_opAuto) {
+      _opStepMs -= OP_TICK;
+      if (_opStepMs <= 0) { const p = _opPending(); if (p.length) opScanSku(p[0].q.sku); else opFinishRun(false); return; }
+    }
+    renderOpKpi(); return;
+  }
+
+  // ── stage PUTTING: MỖI KHU là 1 luồng bỏ hàng SONG SONG ──
   const cur = _opQueue[_opIndex];
   if (!cur) { opFinishRun(false); return; }
-  _opStepMs -= OP_TICK;
-  let changed = false;   // chỉ render lại toàn bộ khi có thay đổi (tránh giật animation đèn)
+  _opWorkMs += OP_TICK;          // wall-clock thời gian đang bỏ (cho năng suất gộp)
+  let changed = false;
 
-  if (_opPhase === 'scan') {
-    if (_opStepMs <= 0) {
-      cur.bins.forEach(b => { if (b.status === 'pending') b.status = 'on'; });
-      _opFeedPush('scan', `Quét ${cur.sku} · ${cur.name} — ${cur.bins.length} đèn sáng`);
-      _opPhase = 'put';
-      _opStartNextPut();
-      changed = true;
-    }
-  } else {
-    // phase 'put'
-    if (_opActiveAddr === null) { _opStartNextPut(); if (_opActiveAddr !== null) changed = true; }
-    if (_opActiveAddr === null) {
-      const sh = cur.bins.filter(b => b.status === 'short').length;
-      const er = cur.bins.filter(b => b.status === 'error').length;
-      _opFeedPush('skuDone', `Hoàn tất ${cur.sku} — ${cur.bins.filter(b => b.status === 'done').length}/${cur.bins.length} cửa hàng${sh ? `, ${sh} thiếu` : ''}${er ? `, ${er} lỗi` : ''}`);
-      if (_opIndex < _opQueue.length - 1) { _opIndex++; _opPhase = 'scan'; _opStepMs = 700 + Math.random() * 700; renderOperation(); }
-      else opFinishRun(false);
-      return;
-    }
-    if (_opStepMs <= 0) {
-      const b = cur.bins.find(x => x.addr === _opActiveAddr);
+  for (const zone of _opZones) {
+    if (zone.activeAddr === null) { _opStartZonePut(zone); if (zone.activeAddr !== null) changed = true; }
+    if (zone.activeAddr === null) continue;                 // khu này đã xong phần của nó cho SKU hiện tại
+    zone.stepMs -= OP_TICK; zone.workMs += OP_TICK;
+    if (zone.stepMs <= 0) {
+      const b = cur.bins.find(x => x.addr === zone.activeAddr);
+      const wk = zone.worker ? zone.worker.name : zone.name;
       const r = Math.random();
       if (r < 0.04) {
         const miss = Math.max(1, Math.round(b.qty * (0.2 + Math.random() * 0.3)));
-        b.confirmed = b.qty - miss; b.status = 'short';
-        _opExceptions.push({ type: 'short', title: `Thiếu hàng nguồn · ${cur.sku}`, detail: `${b.store} (${b.loc}) — bỏ ${b.confirmed}/${b.qty}` });
-        _opFeedPush('short', `⚠ ${b.store} thiếu hàng — bỏ ${b.confirmed}/${b.qty}`);
+        b.confirmed = b.qty - miss; b.status = 'short'; zone.units += b.confirmed;
+        _opExceptions.push({ type: 'short', sku: cur.sku, addr: b.addr, store: b.store, loc: b.loc, qty: b.qty, missing: miss, zone: zone.name, bornMs: _opElapsedMs, title: `Thiếu hàng nguồn · ${cur.sku}`, detail: `${zone.name} · ${b.store} — bỏ ${b.confirmed}/${b.qty}, thiếu ${miss}` });
+        _opFeedPush('short', `⚠ [${zone.name}] ${b.store} thiếu — ${wk} bỏ ${b.confirmed}/${b.qty}`);
       } else if (r < 0.06) {
         b.status = 'error'; b.confirmed = 0;
-        _opExceptions.push({ type: 'error', title: `Đèn ${b.addr} không phản hồi`, detail: `${cur.sku} · ${b.store} · ${b.loc}` });
-        _opFeedPush('error', `✗ Đèn ${b.addr} lỗi — ${b.store}, báo IT`);
+        _opExceptions.push({ type: 'error', sku: cur.sku, addr: b.addr, store: b.store, loc: b.loc, qty: b.qty, zone: zone.name, bornMs: _opElapsedMs, title: `Đèn ${b.addr} không phản hồi`, detail: `${zone.name} · ${cur.sku} · ${b.store}` });
+        _opFeedPush('error', `✗ [${zone.name}] Đèn ${b.addr} lỗi — ${b.store}, báo IT`);
       } else {
-        b.confirmed = b.qty; b.status = 'done';
-        _opFeedPush('done', `✓ ${b.store} · bỏ ${b.qty}`);
+        b.confirmed = b.qty; b.status = 'done'; zone.units += b.qty;
+        _opFeedPush('done', `✓ [${zone.name}] ${wk} · ${b.store} bỏ ${b.qty}`);
       }
-      _opActiveAddr = null;
+      zone.activeAddr = null;
       changed = true;
     }
   }
 
+  // SKU xong khi MỌI đèn (tất cả khu) đã xử lý
+  if (_skuResolved(cur)) {
+    const sh = cur.bins.filter(b => b.status === 'short').length;
+    const er = cur.bins.filter(b => b.status === 'error').length;
+    _opFeedPush('skuDone', `Hoàn tất ${cur.sku} — ${cur.bins.filter(b => b.status === 'done').length}/${cur.bins.length} cửa hàng${sh ? `, ${sh} thiếu` : ''}${er ? `, ${er} lỗi` : ''}`);
+    _opZones.forEach(z => z.activeAddr = null);
+    const pend = _opPending();
+    if (pend.length) { _opStage = 'await-sku'; _opStepMs = 700 + Math.random() * 800; renderOperation(); _opFocusScan(); }
+    else opFinishRun(false);
+    return;
+  }
+
   if (changed) renderOperation();
   else { renderOpKpi(); renderOpProgress(); }   // nhịp chờ: chỉ cập nhật số liệu, không dựng lại đèn
-}
-
-function opResolveExc(i) {
-  _opExceptions.splice(i, 1);
-  _opFeedPush('info', 'Đã ghi nhận xử lý 1 sự cố');
-  renderOperation();
-  showToast('✓ Đã ghi nhận xử lý sự cố', 'success');
 }
 
 function setOpView(v) { _opView = v; renderOperation(); }
@@ -3370,6 +3802,7 @@ function opFinishEarly() {
 function opFinishRun(early) {
   _opRunning = false;
   if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
+  if (_opAuto && !early) { while (_opExceptions.length) _opResolveExcAt(0); }   // dọn nốt sự cố cho màn hoàn tất sạch
   renderOpComplete(early);
 }
 
@@ -3378,8 +3811,8 @@ function renderOpComplete(early) {
   const el = document.getElementById('op-complete');
   el.style.display = '';
   let done = 0, shorts = 0, errs = 0, unitsPut = 0;
-  const skuDone = _opIndex + (_opCurDone() ? 1 : 0);
-  _opQueue.slice(0, skuDone).forEach(q => q.bins.forEach(b => {
+  const skuDone = _opDoneCount();
+  _opQueue.filter(_skuResolved).forEach(q => q.bins.forEach(b => {
     if (b.status === 'done') { done++; unitsPut += b.confirmed; }
     if (b.status === 'short') { shorts++; unitsPut += (b.confirmed || 0); }
     if (b.status === 'error') errs++;
@@ -3395,6 +3828,22 @@ function renderOpComplete(early) {
         <div class="stat-card"><div class="stat-label">Đơn vị đã phân</div><div class="stat-value">${unitsPut.toLocaleString()}</div></div>
         <div class="stat-card"><div class="stat-label">Thiếu hàng</div><div class="stat-value" style="color:var(--yellow)">${shorts}</div></div>
         <div class="stat-card"><div class="stat-label">Đèn lỗi</div><div class="stat-value" style="color:var(--red)">${errs}</div></div>
+      </div>
+      <div style="width:100%;max-width:700px;margin-top:4px">
+        <div style="font-size:12px;color:var(--text-muted);text-align:left;margin-bottom:6px">Sản lượng theo nhân viên:</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          ${_opCrew().map(w => {
+            const zs = _opZonesOfWorker(w.code);
+            const units = zs.reduce((a, z) => a + z.units, 0);
+            const zids = new Set(zs.map(z => z.id));
+            const stores = _opQueue.reduce((a, q) => a + q.bins.filter(b => (b.status === 'done' || b.status === 'short') && zids.has(b.zoneId)).length, 0);
+            const col = zs[0] ? zs[0].color : 'var(--accent)';
+            return `<div style="flex:1;min-width:180px;border:1px solid var(--border);border-left:3px solid ${col};border-radius:8px;padding:9px 12px;text-align:left">
+              <div style="font-size:13px;font-weight:700">${w.name} <span style="font-size:11px;color:var(--text-muted);font-weight:500">${w.code}</span></div>
+              <div style="font-size:11px;color:${col};font-weight:600">${zs.map(z => z.name).join(' + ')}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${units.toLocaleString()} đơn vị · ${stores} lượt cửa hàng</div></div>`;
+          }).join('')}
+        </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center">
         <button class="btn btn-secondary" onclick="showScreen('lot')">${ico('lot', 15)} Về danh sách Batch</button>
