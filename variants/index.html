@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Put-to-Light — So sánh 3 concept UI/UX</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0e13; --surface: #12161e; --surface2: #181e29; --border: #242d3d;
+  --text: #e9eef7; --muted: #91a0b5; --subtle: #5b6981;
+  --amber: #ffb01f; --blue: #4d8df6; --green: #41bf58; --purple: #7c6cff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: radial-gradient(1000px 600px at 70% -10%, rgba(255,176,31,.06), transparent 55%), var(--bg);
+  color: var(--text); font-family: 'IBM Plex Sans Thai', sans-serif; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; padding: 56px 24px;
+}
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 3px; color: var(--amber); text-transform: uppercase; margin-bottom: 14px; }
+h1 { font-size: 32px; font-weight: 700; margin-bottom: 10px; text-align: center; }
+.sub { font-size: 14px; color: var(--muted); max-width: 640px; text-align: center; line-height: 1.6; margin-bottom: 44px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 340px)); gap: 18px; justify-content: center; width: 100%; max-width: 1140px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+  display: flex; flex-direction: column; gap: 12px; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.card:hover { transform: translateY(-4px); border-color: var(--accent, var(--amber)); box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+.tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; font-weight: 600; padding: 4px 10px; border-radius: 6px; width: fit-content; }
+.card h2 { font-size: 19px; font-weight: 700; }
+.card p { font-size: 13px; color: var(--muted); line-height: 1.6; flex: 1; }
+.fit { font-size: 11.5px; color: var(--subtle); padding-top: 10px; border-top: 1px dashed var(--border); }
+.fit b { color: var(--muted); }
+a.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+  padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; color: #0b0e13;
+  background: var(--accent, var(--amber)); transition: filter .15s;
+}
+a.btn:hover { filter: brightness(1.12); }
+.preview { height: 110px; border-radius: 10px; border: 1px solid var(--border); position: relative; overflow: hidden; flex-shrink: 0; }
+.foot { margin-top: 46px; font-size: 12px; color: var(--subtle); text-align: center; line-height: 1.8; }
+.foot a { color: var(--blue); text-decoration: none; }
+/* mini-mockup từng concept (CSS thuần — gợi hình bố cục) */
+.pv-mc { background: #07080b; }
+.pv-mc .map { position: absolute; inset: 18px 70px 18px 70px; border: 1px solid #2a3344; border-radius: 6px; background: repeating-linear-gradient(0deg, transparent 0 7px, rgba(255,255,255,.025) 7px 8px); }
+.pv-mc .led { position: absolute; width: 9px; height: 9px; border-radius: 2px; background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+.pv-mc .hud { position: absolute; background: rgba(20,25,34,.85); border: 1px solid #2a3344; border-radius: 4px; }
+.pv-wz { background: #faf7f2; }
+.pv-wz .bar { position: absolute; top: 14px; left: 24px; right: 24px; height: 4px; border-radius: 2px; background: #e8e0d2; }
+.pv-wz .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 55%; background: #c87d0e; border-radius: 2px; }
+.pv-wz .ttl { position: absolute; top: 30px; left: 24px; right: 24px; height: 13px; border-radius: 3px; background: #2a241c; }
+.pv-wz .cell { position: absolute; bottom: 22px; width: 38px; height: 40px; border-radius: 6px; background: #fff; border: 2px solid #eadfca; }
+.pv-wz .cell.on { border-color: #c87d0e; background: #fdf3e0; }
+.pv-bh { background: #0f1217; }
+.pv-bh .row { position: absolute; left: 18px; right: 18px; height: 16px; border-radius: 4px; background: #161b22; border: 1px solid #262d38; }
+.pv-bh .dot { position: absolute; left: 8px; top: 5px; width: 6px; height: 6px; border-radius: 50%; }
+.pv-cur { background: #0b0e13; }
+.pv-cur .side { position: absolute; left: 0; top: 0; bottom: 0; width: 38px; background: #12161e; border-right: 1px solid #242d3d; }
+.pv-cur .blk { position: absolute; border-radius: 4px; background: #181e29; border: 1px solid #242d3d; }
+</style>
+</head>
+<body>
+  <div class="kicker">Put-to-Light · UI/UX Concepts</div>
+  <h1>3 hướng thiết kế — chọn một để hoàn thiện</h1>
+  <p class="sub">Cùng một hệ thống phân hàng theo đèn, cùng một quy trình (nhận dữ liệu → chốt kế hoạch → mở ca → quét &amp; bỏ hàng → biên bản) — ba cách thể hiện hoàn toàn khác nhau. Mỗi concept đều bấm thử được và có nút <b style="color:var(--text)">tự chạy demo</b>.</p>
+
+  <div class="grid">
+    <div class="card" style="--accent:#ffb01f">
+      <div class="preview pv-mc">
+        <div class="map"></div>
+        <div class="led" style="top:38px;left:108px"></div>
+        <div class="led" style="top:62px;left:158px;opacity:.7"></div>
+        <div class="led" style="top:50px;left:208px;opacity:.5"></div>
+        <div class="hud" style="top:8px;left:10px;right:10px;height:10px"></div>
+        <div class="hud" style="bottom:8px;left:10px;width:52px;height:30px"></div>
+        <div class="hud" style="bottom:8px;right:10px;width:52px;height:44px"></div>
+      </div>
+      <span class="tag" style="background:rgba(255,176,31,.14);color:var(--amber)">CONCEPT A</span>
+      <h2>Mission Control</h2>
+      <p>Sơ đồ kho toàn màn hình làm sân khấu, mọi chỉ số là panel HUD nổi — cảm giác phòng điều khiển nhà máy. Ấn tượng thị giác mạnh nhất.</p>
+      <div class="fit"><b>Hợp khi:</b> demo gây ấn tượng, màn hình lớn treo tường giám sát ca.</div>
+      <a class="btn" href="./mission-control.html">Mở concept A →</a>
+    </div>
+
+    <div class="card" style="--accent:#c87d0e">
+      <div class="preview pv-wz">
+        <div class="bar"><i></i></div>
+        <div class="ttl" style="width:55%"></div>
+        <div class="cell on" style="left:24px"></div>
+        <div class="cell on" style="left:70px"></div>
+        <div class="cell" style="left:116px"></div>
+        <div class="cell" style="left:162px"></div>
+        <div class="cell" style="left:208px"></div>
+      </div>
+      <span class="tag" style="background:rgba(200,125,14,.14);color:#e09a2d">CONCEPT B</span>
+      <h2>Một đường thẳng</h2>
+      <p>Cả quy trình là một wizard 5 bước toàn màn hình — mỗi bước đúng một việc, một nút tiếp tục. Người chưa từng dùng phần mềm kho hiểu ngay trong 30 giây.</p>
+      <div class="fit"><b>Hợp khi:</b> ưu tiên đào tạo nhanh, thao tác trên tablet tại trạm.</div>
+      <a class="btn" href="./wizard.html">Mở concept B →</a>
+    </div>
+
+    <div class="card" style="--accent:#7c6cff">
+      <div class="preview pv-bh">
+        <div class="row" style="top:14px"><span class="dot" style="background:#41bf58"></span></div>
+        <div class="row" style="top:36px"><span class="dot" style="background:#ffb01f"></span></div>
+        <div class="row" style="top:58px"><span class="dot" style="background:#7c6cff"></span></div>
+        <div class="row" style="top:80px"><span class="dot" style="background:#f0564a"></span></div>
+      </div>
+      <span class="tag" style="background:rgba(124,108,255,.14);color:var(--purple)">CONCEPT C</span>
+      <h2>Hub theo lô</h2>
+      <p>Trang chủ là hộp thư các lô hàng; mở một lô là vào workspace riêng với các giai đoạn dạng tab. Phong cách SaaS hiện đại, mạnh khi chạy nhiều lô song song.</p>
+      <div class="fit"><b>Hợp khi:</b> kho lớn nhiều lô/ngày, nhiều người cùng phối hợp.</div>
+      <a class="btn" href="./batch-hub.html">Mở concept C →</a>
+    </div>
+  </div>
+
+  <div class="foot">
+    Bản hiện tại (control-room đầy đủ chức năng): <a href="../index.html">mở app chính →</a><br>
+    Wireframe demo — dữ liệu mô phỏng · Rockship
+  </div>
+</body>
+</html>
