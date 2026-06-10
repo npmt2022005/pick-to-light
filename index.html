@@ -7,38 +7,49 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #eef1f6;
-  --surface: #ffffff;
-  --surface2: #f4f6fa;
-  --surface3: #e8ecf3;
-  --border: #dde3ec;
-  --text: #1b2433;
-  --text-muted: #5b6675;
-  --text-subtle: #98a3b3;
-  --accent: #2f6fed;
-  --accent-dim: rgba(47,111,237,.10);
-  --green: #16a34a;
-  --green-dim: rgba(22,163,74,.12);
-  --yellow: #c77a1b;
-  --yellow-dim: rgba(199,122,27,.14);
-  --red: #e1493f;
-  --red-dim: rgba(225,73,63,.10);
-  --purple: #7c5cff;
-  --purple-dim: rgba(124,92,255,.12);
-  --light-on: #f5a300;
+  /* ── CONTROL-ROOM DARK — graphite nền tối, amber = màu đèn LED (chữ ký của sản phẩm) ── */
+  --bg: #0b0e13;
+  --surface: #12161e;
+  --surface2: #181e29;
+  --surface3: #222b3a;
+  --border: #242d3d;
+  --text: #e9eef7;
+  --text-muted: #91a0b5;
+  --text-subtle: #5b6981;
+  --accent: #4d8df6;
+  --accent-dim: rgba(77,141,246,.13);
+  --green: #41bf58;
+  --green-dim: rgba(65,191,88,.13);
+  --yellow: #d9a13c;
+  --yellow-dim: rgba(217,161,60,.13);
+  --red: #f0564a;
+  --red-dim: rgba(240,86,74,.12);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,.13);
+  --light-on: #ffb01f;
+  --light-on-dim: rgba(255,176,31,.12);
   --on-accent: #ffffff;
-  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
-  --shadow-md: 0 6px 16px rgba(16,24,40,.10);
-  --shadow-lg: 0 12px 32px rgba(16,24,40,.16);
+  --shadow: 0 1px 2px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.28);
+  --shadow-md: 0 6px 16px rgba(0,0,0,.35);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.5);
   --font-mono: 'IBM Plex Mono', monospace;
   --font-ui: 'IBM Plex Sans Thai', sans-serif;
+  /* type scale — 6 cỡ duy nhất trong toàn app */
+  --fs-xs: 10px; --fs-sm: 11px; --fs-base: 12px; --fs-md: 13px; --fs-lg: 15px; --fs-xl: 18px; --fs-2xl: 22px;
   --radius: 8px;
   --sidebar-w: 224px;
   --topbar-h: 56px;
   --statusbar-h: 28px;
+  --demobar-h: 44px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: 14px; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+body {
+  background:
+    radial-gradient(1100px 700px at 75% -12%, rgba(77,141,246,.07) 0%, transparent 55%),
+    radial-gradient(900px 600px at -10% 110%, rgba(255,176,31,.05) 0%, transparent 50%),
+    var(--bg);
+  color: var(--text); font-family: var(--font-ui); font-size: 14px; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;
+}
 svg { display: block; }
 
 /* ── TOPBAR ── */
@@ -50,11 +61,11 @@ svg { display: block; }
 }
 .logo { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 2px; }
 .brand { display: flex; align-items: center; gap: 9px; }
-.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), #5b8cf0); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(47,111,237,.35); }
+.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #ffb01f, #e08900); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(255,176,31,.35); }
 .brand-name { font-weight: 700; font-size: 15px; letter-spacing: -.2px; color: var(--text); }
 .topbar-center { font-size: 12px; font-weight: 500; color: var(--text); }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #5b8cf0); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(47,111,237,.3); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ffb01f, #e08900); display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; font-weight: 600; box-shadow: 0 1px 3px rgba(47,111,237,.3); }
 .user-info { text-align: right; }
 .user-name { font-size: 13px; font-weight: 600; }
 .user-role { font-size: 11px; color: var(--text-muted); }
@@ -174,7 +185,7 @@ tr:last-child td { border-bottom: none; }
 .login-wrap { min-height: calc(100vh - var(--topbar-h)); display: flex; align-items: center; justify-content: center; }
 .login-card { width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 32px; box-shadow: var(--shadow-lg); }
 .login-logo { text-align: center; margin-bottom: 24px; }
-.login-brand-mark { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #5b8cf0); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 6px 16px rgba(47,111,237,.35); }
+.login-brand-mark { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #ffb01f, #e08900); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; box-shadow: 0 6px 20px rgba(255,176,31,.3); }
 .login-logo-text { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.4px; }
 .login-logo-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .form-group { margin-bottom: 14px; }
@@ -325,6 +336,14 @@ tr:last-child td { border-bottom: none; }
 .wf-step.active { border-color:var(--accent); background:var(--accent-dim); color:var(--accent); font-weight:600; }
 .wf-step.active .wf-num { background:var(--accent); color:var(--on-accent); }
 .wf-step.clickable:hover { border-color:var(--accent); }
+.wf-step.locked { opacity:.45; border-style:dashed; cursor:not-allowed; }
+.wf-step .wf-txt { display:flex; flex-direction:column; line-height:1.2; text-align:left; }
+.wf-step .wf-sub { font-size:9px; color:var(--text-subtle); font-weight:500; }
+.wf-step.active .wf-sub { color:var(--accent); opacity:.8; }
+.wf-cta { margin-left:auto; }
+/* phần duyệt gán mờ đi khi chưa nhận dữ liệu API */
+.assign-gated { transition: opacity .25s ease, filter .25s ease; }
+.assign-gated.off { opacity: .22; filter: saturate(.4); pointer-events: none; user-select: none; }
 .wf-arrow { color:var(--text-subtle); font-size:14px; }
 
 /* ── DASHBOARD ── */
@@ -367,22 +386,22 @@ tr:last-child td { border-bottom: none; }
 .op-station.stage-idle      { border-color: var(--yellow); box-shadow: 0 0 0 1px rgba(210,153,34,.25); }
 .op-station.stage-await     { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(47,111,237,.25); }
 .op-station.stage-putting   { border-color: var(--light-on); box-shadow: 0 0 0 1px rgba(245,163,0,.25); }
+.op-station.stage-wrap-up   { border-color: var(--green); box-shadow: 0 0 0 1px rgba(63,185,80,.25); }
 .op-station.stage-paused    { border-color: var(--border); }
-.op-station-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-.op-worker { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
-#op-worker-slot { gap: 10px 20px; }
-.op-zworker { display: flex; align-items: center; gap: 9px; padding: 4px 14px 4px 0; border-right: 1px solid var(--border); }
-.op-zworker:last-child { border-right: none; }
-.op-worker-ava { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+.op-station-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 11px; }
+/* roster NV theo khu — danh sách dọc gọn trong rail */
+.op-worker { display: flex; flex-direction: column; gap: 4px; margin-top: 11px; max-height: 150px; overflow-y: auto; }
+.op-zworker { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); }
+.op-worker-ava { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
 .op-worker-ava.on  { background: var(--green-dim); color: var(--green); border: 1.5px solid var(--green); }
 .op-worker-ava.off { background: var(--surface2); color: var(--text-subtle); border: 1.5px dashed var(--border); }
 .op-stage-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
 .op-stage-dot { width: 8px; height: 8px; border-radius: 50%; }
-.op-scan-zone { display: flex; align-items: center; gap: 12px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; transition: all .15s; }
+.op-scan-zone { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; transition: all .15s; }
 .op-scan-zone.locked { opacity: .55; }
 .op-scan-zone.err { border-color: var(--red); animation: opShake .32s; }
 @keyframes opShake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
-.op-scan-ico { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.op-scan-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .op-scan-hint { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
 .op-quick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 11px; }
 .op-quick-lbl { font-size: 11px; color: var(--text-subtle); }
@@ -396,6 +415,66 @@ tr:last-child td { border-bottom: none; }
 .op-spd { font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all .12s; }
 .op-spd:hover { border-color: var(--accent); color: var(--accent); }
 .op-spd.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+/* ── CHUẨN BỊ CA (pre-shift checklist) ── */
+.prep-step { display: flex; gap: 14px; align-items: flex-start; }
+.prep-num { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; background: var(--surface3); color: var(--text-muted); border: 1.5px solid var(--border); }
+.prep-num.run  { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.prep-num.done { background: var(--green); color: var(--on-accent); border-color: var(--green); }
+.prep-info { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
+.prep-tag { font-family: var(--font-mono); font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted); }
+.prep-log { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+.prep-log > div { font-size: 12px; display: flex; gap: 7px; align-items: flex-start; animation: prepIn .25s ease; }
+@keyframes prepIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+/* ── OP MAP: thẻ tổng quan khu (cấp 1) — auto-fill, scale với mọi số khu ── */
+.opz-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.opz-card { border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; background: var(--surface2); transition: border-color .15s, box-shadow .15s; }
+.opz-card:hover { border-color: var(--accent); }
+.opz-card.sel { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(47,111,237,.25); background: var(--accent-dim); }
+.opz-card.lit { border-color: var(--light-on); }
+.opz-card.lit.sel { border-color: var(--light-on); box-shadow: 0 0 0 1px rgba(245,163,0,.3); }
+
+/* ── CONTROL-ROOM LAYOUT (màn vận hành) ── */
+#screen-operation { padding-bottom: calc(var(--demobar-h) + 6px); }
+.ops-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; margin-bottom: 12px; }
+.ops-bar-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ops-stats { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ops-stat { display: flex; align-items: baseline; gap: 5px; padding: 3px 9px; border-radius: 7px; background: var(--surface2); border: 1px solid var(--border); white-space: nowrap; }
+.ops-stat b { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+.ops-stat span { font-size: 10px; color: var(--text-muted); }
+.ops-skustrip { display: flex; gap: 4px; flex-wrap: nowrap; overflow-x: auto; margin-top: 8px; padding-bottom: 2px; }
+.ops-skustrip::-webkit-scrollbar { height: 5px; }
+.ops-skustrip::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+.ops-skustrip > div { flex-shrink: 0; }
+.ops-grid { display: grid; grid-template-columns: minmax(0, 1fr) 332px; gap: 12px; align-items: start; }
+.ops-main { max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - var(--demobar-h) - 196px); overflow-y: auto; min-width: 0; }
+.ops-rail { display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - var(--demobar-h) - 196px); }
+.ops-feedcard { flex: 1; min-height: 80px; display: flex; flex-direction: column; }
+@media (max-width: 1150px) { .ops-grid { grid-template-columns: 1fr; } .ops-main, .ops-rail { max-height: none; } }
+
+/* ── DEMO BAR — điều khiển mô phỏng, tách khỏi UI sản phẩm ── */
+.demo-bar { position: fixed; left: var(--sidebar-w); right: 0; bottom: var(--statusbar-h); height: var(--demobar-h); z-index: 140; display: flex; align-items: center; gap: 18px; padding: 0 16px; background: rgba(11,14,19,.94); backdrop-filter: blur(6px); border-top: 1px dashed var(--surface3); }
+.demo-tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #1a1303; background: var(--yellow); padding: 3px 8px; border-radius: 4px; font-weight: 700; flex-shrink: 0; }
+.demo-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.demo-lbl { font-size: 10px; color: var(--text-subtle); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+@media (max-width: 760px) { .demo-bar { left: 0; } }
+
+/* ── MÀN HÌNH TRẠM (persona nhân viên) ── */
+.sm-wrap { display: flex; flex-direction: column; gap: 14px; max-width: 980px; margin: 0 auto; }
+.sm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sm-stage { display: inline-flex; align-items: center; gap: 9px; padding: 9px 16px; border-radius: 24px; font-size: 14px; font-weight: 700; }
+.sm-scan { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+.sm-scan input { flex: 1; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: var(--font-mono); font-size: 22px; padding: 14px 16px; outline: none; min-width: 0; }
+.sm-scan input:focus { border-color: var(--accent); }
+.sm-bins { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.sm-bin { border: 2px solid var(--border); border-radius: 12px; padding: 14px; background: var(--surface); text-align: center; }
+.sm-bin.on { border-color: var(--light-on); background: var(--light-on-dim); box-shadow: 0 0 18px rgba(255,176,31,.18); cursor: pointer; }
+.sm-bin.on:active { transform: scale(.97); }
+.sm-bin.done { border-color: var(--green); opacity: .6; }
+.sm-bin.short { border-color: var(--yellow); opacity: .75; }
+.sm-bin.error { border-color: var(--red); opacity: .75; }
+.sm-bin .sm-qty { font-family: var(--font-mono); font-size: 46px; font-weight: 700; line-height: 1.1; }
+.sm-bin.on .sm-qty { color: var(--light-on); }
+.sm-bin.done .sm-qty { color: var(--green); }
 /* pending (chưa tới lượt) */
 .op-bin.pending { opacity: .5; }
 /* on (đèn sáng, chờ NV xác nhận) */
@@ -425,7 +504,7 @@ tr:last-child td { border-bottom: none; }
 /* Co giãn: mỗi kệ tự cuộn ngang khi nhiều ngăn → KHÔNG vỡ trang, KHÔNG cắt ô */
 .rack-aisle { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
 .rack-unit { width: fit-content; max-width: 100%; min-width: 0; }
-.rack-name { font-size: 10.5px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+.rack-name { font-size:11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 600; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
 .rack-name i { width: 13px; height: 13px; background: linear-gradient(135deg,#9aa4b6,#6b7688); border-radius: 2px; display: inline-block; }
 .rack { width: fit-content; max-width: 100%; border: 2px solid #5b6678; border-top-width: 5px; border-radius: 4px 4px 0 0; box-shadow: var(--shadow-md); overflow-x: auto; overflow-y: hidden; }
 .rack::-webkit-scrollbar { height: 8px; }
@@ -571,11 +650,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   </div>
 
   <div class="sidebar-section nav-sec" data-sec="flow">Quy trình phân hàng</div>
-  <div class="nav-item" onclick="showScreen('import')" id="nav-import" data-screen="import">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> Nhận dữ liệu API
-  </div>
   <div class="nav-item" onclick="showScreen('autoassign')" id="nav-autoassign" data-screen="autoassign">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M20 9h2M20 14h2M2 9h2M2 14h2"/></svg></span> Kết quả gán tự động
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M20 9h2M20 14h2M2 9h2M2 14h2"/></svg></span> Chuẩn bị lô hàng
   </div>
   <div class="nav-item" onclick="showScreen('operation')" id="nav-operation" data-screen="operation">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span> Vận hành phân hàng
@@ -632,9 +708,9 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
 
       <div class="label" style="margin-bottom:8px">Chọn vai trò</div>
       <div class="role-selector" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:8px">
-        <div class="role-opt selected" data-role="ops"><span class="role-icon">🏭</span>Quản Lý Vận Hành</div>
-        <div class="role-opt" data-role="it"><span class="role-icon">🔧</span>IT / Kỹ Thuật</div>
-        <div class="role-opt" data-role="manager"><span class="role-icon">📊</span>Tổng Quản Lý</div>
+        <div class="role-opt selected" data-role="ops"><span class="role-icon"></span>Quản Lý Vận Hành</div>
+        <div class="role-opt" data-role="it"><span class="role-icon"></span>IT / Kỹ Thuật</div>
+        <div class="role-opt" data-role="manager"><span class="role-icon"></span>Tổng Quản Lý</div>
       </div>
       <div id="role-desc" style="font-size:11px;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;margin-bottom:16px;min-height:34px"></div>
 
@@ -692,7 +768,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
           <option>30 ngày gần nhất</option>
           <option>Quý này</option>
         </select>
-        <button class="btn btn-secondary">📤 Xuất Excel</button>
+        <button class="btn btn-secondary">Xuất Excel</button>
       </div>
     </div>
   </div>
@@ -727,9 +803,9 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       <div class="divider"></div>
       <div class="card-title">Top nhân viên</div>
       <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-        <div style="display:flex;justify-content:space-between"><span>🥇 Trần Thị B</span><span class="text-mono" style="color:var(--green)">8,420</span></div>
-        <div style="display:flex;justify-content:space-between"><span>🥈 Lê Văn C</span><span class="text-mono">7,180</span></div>
-        <div style="display:flex;justify-content:space-between"><span>🥉 Phạm D</span><span class="text-mono">6,540</span></div>
+        <div style="display:flex;justify-content:space-between"><span>#1 Trần Thị B</span><span class="text-mono" style="color:var(--green)">8,420</span></div>
+        <div style="display:flex;justify-content:space-between"><span>#2 Lê Văn C</span><span class="text-mono">7,180</span></div>
+        <div style="display:flex;justify-content:space-between"><span>#3 Phạm D</span><span class="text-mono">6,540</span></div>
       </div>
     </div>
   </div>
@@ -761,12 +837,12 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <div class="page-desc">Theo dõi các đợt phân hàng và trạng thái từng LOT</div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-secondary">📤 Export CSV</button>
+        <button class="btn btn-secondary">Export CSV</button>
         <button class="btn btn-primary" id="btn-create-lot">+ Tạo LOT mới</button>
       </div>
     </div>
     <div id="lot-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
-      👁 Chế độ xem (Tổng Quản Lý) — bạn có thể theo dõi nhưng không thao tác trực tiếp lên LOT/Batch
+      Chế độ xem (Tổng Quản Lý) — bạn có thể theo dõi nhưng không thao tác trực tiếp lên LOT/Batch
     </div>
   </div>
 
@@ -790,7 +866,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       <option>Khu vực A</option>
       <option>Khu vực B</option>
     </select>
-    <input class="input" type="text" placeholder="🔍 Tìm Batch No, LOT..." style="width:220px" id="lot-search" oninput="filterLot()">
+    <input class="input" type="text" placeholder="Tìm Batch No, LOT..." style="width:220px" id="lot-search" oninput="filterLot()">
     <span id="lot-filter-count" style="font-size:12px;color:var(--text-muted)"></span>
   </div>
 
@@ -824,8 +900,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             </td>
             <td><span class="badge badge-green">Hoàn tất</span></td>
             <td style="text-align:right">
-              <button class="btn btn-ghost btn-sm" onclick="showScreen('operation')">👁 Xem</button>
-              <button class="btn btn-ghost btn-sm" onclick="showScreen('reports')">📊 Báo cáo</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('operation')">Xem</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('reports')">Báo cáo</button>
             </td>
           </tr>
           <tr id="lot-row-BATCH-002">
@@ -842,8 +918,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             </td>
             <td id="lot-status-BATCH-002"><span class="badge badge-yellow">Đang xử lý</span></td>
             <td style="text-align:right" id="lot-actions-BATCH-002">
-              <button class="btn btn-ghost btn-sm">👁 Xem</button>
-              <button class="btn btn-primary btn-sm" onclick="showScreen('autoassign')">🤖 Gán tự động</button>
+              <button class="btn btn-ghost btn-sm">Xem</button>
+              <button class="btn btn-primary btn-sm" onclick="showScreen('autoassign')">Gán tự động</button>
             </td>
           </tr>
           <tr>
@@ -860,7 +936,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             </td>
             <td><span class="badge badge-yellow">Đang xử lý</span></td>
             <td style="text-align:right">
-              <button class="btn btn-ghost btn-sm" onclick="showScreen('autoassign')">👁 Xem</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('autoassign')">Xem</button>
               <button class="btn btn-primary btn-sm" onclick="showScreen('operation')">▶ Tiếp tục</button>
             </td>
           </tr>
@@ -878,7 +954,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             </td>
             <td><span class="badge badge-red">Sự cố</span></td>
             <td style="text-align:right">
-              <button class="btn btn-ghost btn-sm" onclick="showScreen('autoassign')">👁 Xem</button>
+              <button class="btn btn-ghost btn-sm" onclick="showScreen('autoassign')">Xem</button>
               <button class="btn btn-danger btn-sm" onclick="showScreen('autoassign')">⚠ Xử lý</button>
             </td>
           </tr>
@@ -891,46 +967,12 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             <td style="min-width:130px"><span class="text-muted text-sm">Chờ nhận data</span></td>
             <td><span class="badge badge-gray">Chờ xử lý</span></td>
             <td style="text-align:right">
-              <button class="btn btn-primary btn-sm" onclick="showScreen('import')">📥 Nhận data</button>
+              <button class="btn btn-primary btn-sm" onclick="showScreen('import')">Nhận data</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     SCREEN 3: API DATA IMPORT
-══════════════════════════════════════ -->
-<div class="screen" id="screen-import">
-  <div class="page-header">
-    <div class="page-title">Nhận dữ liệu từ API</div>
-    <div class="page-desc">Lô này cần <strong>2 nguồn</strong>: hàng tiếp nhận (tồn kho) và kế hoạch phân phối (cửa hàng). Kéo cả hai rồi xác nhận để hệ thống đối chiếu.</div>
-  </div>
-
-  <!-- Nguồn dữ liệu -->
-  <div class="card" style="margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-      <div class="card-title" style="margin-bottom:0">Nguồn dữ liệu · Lô <span id="import-batch-id" class="text-mono" style="color:var(--accent);text-transform:none">—</span></div>
-      <span id="import-source-progress" style="font-size:12px;color:var(--text-muted)"></span>
-    </div>
-    <div id="import-sources" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
-  </div>
-
-  <!-- Đối chiếu -->
-  <div class="card" style="margin-bottom:16px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div class="card-title" style="margin-bottom:0">Đối chiếu tồn kho × kế hoạch</div>
-      <div style="display:flex;gap:6px;align-items:center" id="import-recon-badges"></div>
-    </div>
-    <div id="import-recon-body"></div>
-  </div>
-
-  <!-- Footer -->
-  <div style="display:flex;justify-content:flex-end;gap:8px">
-    <button class="btn btn-secondary" onclick="showScreen('lot')">Hủy</button>
-    <button class="btn btn-primary" id="import-confirm-btn" onclick="confirmImport()" disabled style="opacity:.5">Xác nhận &amp; Tính phân phối</button>
   </div>
 </div>
 
@@ -941,8 +983,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   <div class="page-header">
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div>
-        <div class="page-title">Kết quả gán tự động</div>
-        <div class="page-desc">Lô <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> — hệ thống đã chia số lượng vào từng cửa hàng theo tồn kho × kế hoạch</div>
+        <div class="page-title">Chuẩn bị lô hàng</div>
+        <div class="page-desc" id="assign-subdesc">Nhận dữ liệu từ 2 API → duyệt kết quả gán → chốt kế hoạch</div>
       </div>
       <div style="display:flex;gap:8px" id="assign-actions">
         <button class="btn btn-secondary" onclick="openRecalcModal()">Tính lại</button>
@@ -951,15 +993,20 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       </div>
     </div>
     <div id="assign-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
-      👁 Chế độ xem (Tổng Quản Lý) — chỉ Quản Lý Vận Hành mới được xác nhận / từ chối / tính lại
+      Chế độ xem (Tổng Quản Lý) — chỉ Quản Lý Vận Hành mới được xác nhận / từ chối / tính lại
     </div>
+    <!-- SYNC STRIP — trạng thái 2 nguồn API (đồng bộ tự động, con người chỉ duyệt) -->
+    <div id="assign-sync-strip" style="margin-top:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:12px"></div>
   </div>
 
+  <!-- Hint khi chưa nhận dữ liệu -->
+  <div id="assign-fetch-hint" style="display:none;align-items:center;gap:10px;justify-content:center;padding:14px;margin-bottom:16px;border:1.5px dashed rgba(217,161,60,.45);border-radius:var(--radius);background:var(--yellow-dim);font-size:13px;color:var(--yellow);font-weight:600"></div>
+
   <!-- Stats -->
-  <div class="stat-grid stat-grid-4" style="margin-bottom:16px" id="assign-stats"></div>
+  <div class="stat-grid stat-grid-4 assign-gated" style="margin-bottom:16px" id="assign-stats"></div>
 
   <!-- Surplus note panel -->
-  <div id="assign-surplus-panel" style="margin-bottom:16px;display:none">
+  <div id="assign-surplus-panel" class="assign-gated" style="margin-bottom:16px;display:none">
     <div style="background:var(--yellow-dim);border:1px solid rgba(210,153,34,.35);border-radius:var(--radius);padding:12px 16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--yellow)">
@@ -976,7 +1023,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   </div>
 
   <!-- Filter bar -->
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+  <div class="assign-gated" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
     <span id="assign-edit-hint" style="font-size:12px;color:var(--text-muted)">Có thể chỉnh số ở cột cửa hàng trước khi xác nhận</span>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span style="font-size:12px;color:var(--text-muted)">Lọc:</span>
@@ -989,28 +1036,10 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   </div>
 
   <!-- Table -->
-  <div class="card" style="padding:0">
+  <div class="card assign-gated" style="padding:0">
     <div class="table-wrap" style="max-height:calc(100vh - 360px);overflow-y:auto">
       <table id="assign-table">
-        <thead style="position:sticky;top:0;background:var(--surface2);z-index:10">
-          <tr>
-            <th style="min-width:160px">SKU / Tên hàng</th>
-            <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
-            <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
-            <th colspan="5" style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)">Phân vào cửa hàng <span style="font-weight:400;color:var(--text-subtle);font-size:10px;text-transform:none">(chỉnh được)</span></th>
-            <th style="text-align:right">Sẽ phân</th>
-            <th>Trạng thái</th>
-          </tr>
-          <tr>
-            <th></th><th></th><th></th>
-            <th style="text-align:right;font-size:10px">A</th>
-            <th style="text-align:right;font-size:10px">B</th>
-            <th style="text-align:right;font-size:10px">C</th>
-            <th style="text-align:right;font-size:10px">D</th>
-            <th style="text-align:right;font-size:10px;border-right:1px solid var(--border)">E</th>
-            <th></th><th></th>
-          </tr>
-        </thead>
+        <thead id="assign-thead" style="position:sticky;top:0;background:var(--surface2);z-index:10"><!-- rendered by JS — số cột cửa hàng động theo lô --></thead>
         <tbody id="assign-tbody"></tbody>
       </table>
     </div>
@@ -1027,93 +1056,94 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <div class="page-title">Vận hành phân hàng</div>
         <div class="page-desc" id="op-subdesc">—</div>
       </div>
-      <div style="display:flex;gap:8px" id="op-controls">
-        <button class="btn btn-secondary" id="op-pause-btn" onclick="opTogglePause()"></button>
-        <button class="btn btn-danger" id="op-finish-btn" onclick="opFinishEarly()"></button>
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <button class="btn btn-secondary" id="op-station-mode-btn" onclick="toggleStationMode(true)" title="Giao diện nhân viên tại trạm — chữ to, một hành động">Màn hình trạm</button>
+        <div style="display:flex;gap:8px" id="op-controls">
+          <button class="btn btn-secondary" id="op-pause-btn" onclick="opTogglePause()"></button>
+          <button class="btn btn-danger" id="op-finish-btn" onclick="opFinishEarly()"></button>
+        </div>
       </div>
     </div>
     <div id="op-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(47,111,237,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
-      👁 Chế độ xem (Tổng Quản Lý) — theo dõi ca chạy; chỉ <strong>Quản Lý Vận Hành</strong> mới tạm dừng / kết thúc ca
+      Chế độ xem (Tổng Quản Lý) — theo dõi ca chạy; chỉ <strong>Quản Lý Vận Hành</strong> mới tạm dừng / kết thúc ca
     </div>
   </div>
+
+  <!-- KHÓA — kế hoạch chưa chốt thì chưa vào được vận hành (pipeline bước 1→2 trước) -->
+  <div id="op-locked" style="display:none"><!-- rendered by JS --></div>
+
+  <!-- CHUẨN BỊ CA — checklist bắt buộc trước khi mở ca (load layout, kiểm tra thiết bị, double-check dữ liệu) -->
+  <div id="op-prep" style="display:none"><!-- rendered by JS --></div>
 
   <div id="op-live">
-  <!-- TRẠM PHÂN HÀNG — cổng quét: NV quét thẻ → quét SKU → đèn mới sáng -->
-  <div class="card op-station stage-idle" id="op-station" style="margin-bottom:14px">
-    <div class="op-station-head">
-      <div class="op-worker" id="op-worker-slot"><!-- JS --></div>
-      <div class="op-stage-badge" id="op-stage-badge"><!-- JS --></div>
-    </div>
-    <div class="op-scan-zone" id="op-scan-zone">
-      <div class="op-scan-ico" id="op-scan-ico"></div>
-      <div style="flex:1;min-width:0">
-        <div class="op-scan-hint" id="op-scan-hint">—</div>
-        <input id="op-scan-input" class="input op-scan-input-lg" autocomplete="off" spellcheck="false"
-               placeholder="Quét hoặc nhập mã…" onkeydown="if(event.key==='Enter'){event.preventDefault();opScanSubmit(this);}">
+
+  <!-- OPS BAR — thanh trạng thái ca: mọi chỉ số sống trên 1 dòng, không chiếm màn hình -->
+  <div class="ops-bar">
+    <div class="ops-bar-row">
+      <span id="op-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></span>
+      <div class="ops-stats" id="op-kpi"><!-- JS: stat chips --></div>
+      <div class="progress-bar" style="flex:1;min-width:120px;height:6px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
+      <div class="text-mono" id="op-progress-text" style="white-space:nowrap;font-size:11px;color:var(--text-muted)">0 / 0 SKU</div>
+      <div class="view-toggle" style="margin:0">
+        <button class="view-btn active" id="opv-map" onclick="setOpView('map')">Sơ đồ kho</button>
+        <button class="view-btn" id="opv-list" onclick="setOpView('list')">Theo SKU</button>
       </div>
-      <button class="btn btn-primary" id="op-scan-btn" onclick="opScanSubmit(document.getElementById('op-scan-input'))" style="white-space:nowrap">Quét</button>
     </div>
-    <div class="op-scan-err" id="op-scan-err" style="display:none"></div>
-    <div class="op-quick" id="op-quick"><!-- JS --></div>
+    <div id="op-sku-strip" class="ops-skustrip"></div>
   </div>
 
-  <!-- KPI tổng quan ca chạy -->
-  <div class="dash-grid" id="op-kpi" style="margin-bottom:14px"></div>
-
-  <!-- progress bar -->
-  <div class="card" style="margin-bottom:14px;padding:12px 16px">
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;display:flex;align-items:center;gap:6px"><span id="op-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>Tiến độ ca</div>
-      <div class="progress-bar" style="flex:1;min-width:160px;height:8px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
-      <div class="text-mono text-sm" id="op-progress-text" style="white-space:nowrap">0 / 0 SKU</div>
-      <div id="op-speed" style="display:flex;align-items:center;gap:6px;margin-left:auto"><span style="font-size:11px;color:var(--text-subtle);white-space:nowrap">Tốc độ</span><div id="op-speed-btns" style="display:flex;gap:3px"></div></div>
-    </div>
-    <div id="op-sku-strip" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:12px"></div>
-  </div>
-
-  <!-- view toggle: sơ đồ kho / theo SKU -->
-  <div class="view-toggle" style="margin-bottom:14px">
-    <button class="view-btn active" id="opv-map" onclick="setOpView('map')">🗺 Sơ đồ kho</button>
-    <button class="view-btn" id="opv-list" onclick="setOpView('list')">📋 Theo SKU</button>
-  </div>
-
-  <div class="row" style="gap:16px;align-items:flex-start">
-    <!-- LEFT: sơ đồ kho HOẶC chi tiết SKU -->
-    <div style="flex:2">
-      <!-- MAP view -->
+  <!-- CONTROL-ROOM GRID: trái = sơ đồ kho (chủ đạo) · phải = trạm quét / sự cố / nhật ký -->
+  <div class="ops-grid">
+    <div class="ops-main">
       <div id="op-map-view"><!-- rendered by JS --></div>
-
-      <!-- DETAIL view -->
       <div id="op-detail-view" style="display:none">
         <div class="card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <div class="card-title" style="margin-bottom:0">Bảng đèn cửa hàng — thời gian thực</div>
             <div id="op-bins-summary" style="font-size:11px;color:var(--text-muted)"></div>
           </div>
-          <div id="op-bins-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+          <div id="op-bins-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px">
             <!-- rendered by JS -->
           </div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: nhật ký live + sự cố -->
-    <div style="width:320px">
-      <div class="card" style="margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="card-title" style="margin-bottom:0">Nhật ký thời gian thực</div>
-          <span id="op-feed-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)"></span>
+    <div class="ops-rail">
+      <!-- TRẠM QUÉT — cổng vào của flow: thẻ NV → SKU → đèn sáng -->
+      <div class="card op-station stage-idle" id="op-station">
+        <div class="op-station-head">
+          <div class="op-stage-badge" id="op-stage-badge"><!-- JS --></div>
         </div>
-        <div id="op-feed" style="display:flex;flex-direction:column;max-height:320px;overflow-y:auto">
-          <!-- rendered by JS -->
+        <div class="op-scan-zone" id="op-scan-zone">
+          <div class="op-scan-ico" id="op-scan-ico"></div>
+          <div style="flex:1;min-width:0">
+            <div class="op-scan-hint" id="op-scan-hint">—</div>
+            <input id="op-scan-input" class="input" autocomplete="off" spellcheck="false" style="font-size:13px"
+                   placeholder="Quét hoặc nhập mã…" onkeydown="if(event.key==='Enter'){event.preventDefault();opScanSubmit(this);}">
+          </div>
+          <button class="btn btn-primary btn-sm" id="op-scan-btn" onclick="opScanSubmit(document.getElementById('op-scan-input'))" style="white-space:nowrap">Quét</button>
         </div>
+        <div class="op-scan-err" id="op-scan-err" style="display:none"></div>
+        <div class="op-worker" id="op-worker-slot"><!-- JS: NV theo khu --></div>
       </div>
+
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="card-title" style="margin-bottom:0">Sự cố cần xử lý</div>
           <span id="op-exc-count" class="badge badge-gray" style="font-size:10px">0</span>
         </div>
-        <div id="op-exceptions" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto">
+        <div id="op-exceptions" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <div class="card ops-feedcard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="card-title" style="margin-bottom:0">Nhật ký thời gian thực</div>
+          <span id="op-feed-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)"></span>
+        </div>
+        <div id="op-feed" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto">
           <!-- rendered by JS -->
         </div>
       </div>
@@ -1123,6 +1153,23 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
 
   <!-- completion state -->
   <div id="op-complete" style="display:none"></div>
+
+  <!-- MÀN HÌNH TRẠM — persona NHÂN VIÊN: chữ to, một hành động, dùng tại trạm quét -->
+  <div id="op-station-mode" style="display:none"><!-- rendered by JS --></div>
+</div>
+
+<!-- DEMO BAR — điều khiển MÔ PHỎNG, tách hẳn khỏi UI sản phẩm (chỉ hiện ở màn vận hành) -->
+<div id="op-demo-bar" class="demo-bar" style="display:none">
+  <span class="demo-tag">Mô phỏng</span>
+  <div class="demo-group"><span class="demo-lbl">Tốc độ</span><div id="op-speed-btns" style="display:flex;gap:3px"></div></div>
+  <div class="demo-group"><span class="demo-lbl">Quy mô kho</span>
+    <select class="input select" id="op-scale-sel" onchange="setDemoScale(this.value)" style="width:auto;font-size:11px;padding:4px 8px">
+      <option value="s">Nhỏ · 2 khu · 5 CH · 12 SKU</option>
+      <option value="m">Vừa · 4 khu · 12 CH · 24 SKU</option>
+      <option value="l">Lớn · 6 khu · 24 CH · 48 SKU</option>
+    </select>
+  </div>
+  <div class="demo-group" style="flex:1;min-width:0;overflow:hidden"><span class="demo-lbl">Quét nhanh</span><div class="op-quick" id="op-quick" style="margin-top:0;flex-wrap:nowrap;overflow-x:auto"></div></div>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -1139,18 +1186,18 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <select class="input select" id="zone-area-select" onchange="switchLayoutZone(this.value)" style="width:160px"></select>
         <button class="btn btn-secondary" id="btn-undo" onclick="undoDrag()" disabled title="Hoàn tác kéo thả (Ctrl+Z)" style="opacity:.4">↩ Hoàn tác</button>
         <button class="btn btn-secondary" onclick="openAddZoneModal()">+ Thêm khu vực</button>
-        <button class="btn btn-primary" onclick="saveLayout()">💾 Lưu layout</button>
+        <button class="btn btn-primary" onclick="saveLayout()">Lưu layout</button>
       </div>
     </div>
     <div id="layout-role-banner" style="margin-top:10px;background:var(--yellow-dim);border:1px solid rgba(210,153,34,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--yellow)">
-      🔒 Chế độ xem — Chỉ <strong>IT / Kỹ Thuật</strong> mới có quyền: kéo thả đèn, thêm/xóa kệ &amp; tầng, chỉnh sửa ngăn
+      Chế độ xem — Chỉ <strong>IT / Kỹ Thuật</strong> mới có quyền: kéo thả đèn, thêm/xóa kệ &amp; tầng, chỉnh sửa ngăn
     </div>
   </div>
 
   <div class="view-toggle">
-    <button class="view-btn active" id="vbtn-overview" onclick="showLayoutView('overview')">🗺 Tổng quan</button>
-    <button class="view-btn" id="vbtn-detail"   onclick="showLayoutView('detail')">✏️ Chi tiết</button>
-    <button class="view-btn" id="vbtn-test"     onclick="showLayoutView('test')">🔬 Test đèn</button>
+    <button class="view-btn active" id="vbtn-overview" onclick="showLayoutView('overview')">Tổng quan</button>
+    <button class="view-btn" id="vbtn-detail"   onclick="showLayoutView('detail')">Chi tiết</button>
+    <button class="view-btn" id="vbtn-test"     onclick="showLayoutView('test')">Test đèn</button>
   </div>
 
   <div id="layout-overview-panel"><!-- rendered by JS --></div>
@@ -1226,7 +1273,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
           <button class="btn btn-primary" onclick="startReplen()">▶ Bắt đầu</button>
         </div>
         <div class="tooltip-note" style="margin-bottom:0">
-          💡 Đèn tại ngăn cần bổ sung sẽ sáng lên và phát tiếng còi. Bổ sung xong thì <strong>bấm vào ngăn</strong> (mô phỏng nút CONFIRM trên đèn).
+          Đèn tại ngăn cần bổ sung sẽ sáng lên và phát tiếng còi. Bổ sung xong thì <strong>bấm vào ngăn</strong> (mô phỏng nút CONFIRM trên đèn).
         </div>
       </div>
 
@@ -1238,7 +1285,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             <div class="light-item-info">
               <div class="light-item-code">SKU-100 · Địa chỉ 0001</div>
               <div class="light-item-name">Áo thun trắng M</div>
-              <div class="light-item-loc">📍 Khu A · Kệ 1 · T2 · N01</div>
+              <div class="light-item-loc">Khu A · Kệ 1 · T2 · N01</div>
             </div>
           </div>
           <div class="light-item" style="border-color:var(--light-on);background:rgba(245,163,0,.06);cursor:pointer" onclick="replenDone(this)">
@@ -1246,7 +1293,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             <div class="light-item-info">
               <div class="light-item-code">SKU-100 · Địa chỉ 0005</div>
               <div class="light-item-name">Áo thun trắng M</div>
-              <div class="light-item-loc">📍 Khu A · Kệ 1 · T3 · N05</div>
+              <div class="light-item-loc">Khu A · Kệ 1 · T3 · N05</div>
             </div>
           </div>
           <div class="light-item" style="border-color:var(--green);background:var(--green-dim)">
@@ -1262,7 +1309,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             <div class="light-item-info">
               <div class="light-item-code">SKU-100 · Địa chỉ 0009</div>
               <div class="light-item-name">Áo thun trắng M</div>
-              <div class="light-item-loc">📍 Khu A · Kệ 2 · T1 · N01</div>
+              <div class="light-item-loc">Khu A · Kệ 2 · T1 · N01</div>
             </div>
           </div>
         </div>
@@ -1326,7 +1373,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
             <div style="display:flex;gap:8px;margin-top:20px">
               <button class="btn btn-danger" onclick="stopLightTest()">⏹ Dừng</button>
               <button class="btn btn-primary" onclick="runLightTestDemo()">▶ Chạy test</button>
-              <button class="btn btn-secondary">🔧 Maintenance</button>
+              <button class="btn btn-secondary">Maintenance</button>
             </div>
           </div>
         </div>
@@ -1393,7 +1440,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
           </div>
         </div>
         <div style="margin-top:10px">
-          <button class="btn btn-secondary btn-sm" style="width:100%">📋 Xuất log lỗi</button>
+          <button class="btn btn-secondary btn-sm" style="width:100%">Xuất log lỗi</button>
         </div>
       </div>
       <div class="card">
@@ -1401,7 +1448,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <div style="display:flex;flex-direction:column;gap:8px">
           <button class="btn btn-primary" disabled>▶ Bắt đầu vận hành</button>
           <div style="font-size:11px;color:var(--red);text-align:center">Còn 3 lỗi chưa xử lý</div>
-          <button class="btn btn-secondary" onclick="runLightTestDemo()">🔄 Chạy lại test</button>
+          <button class="btn btn-secondary" onclick="runLightTestDemo()">Chạy lại test</button>
           <button class="btn btn-ghost btn-sm">Bỏ qua lỗi và tiếp tục →</button>
         </div>
       </div>
@@ -1419,10 +1466,10 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   </div>
 
   <div class="settings-tabs">
-    <div class="settings-tab active" onclick="showTab('tab-controller')">🔌 Controller</div>
-    <div class="settings-tab" onclick="showTab('tab-block')">📦 Block</div>
-    <div class="settings-tab" onclick="showTab('tab-den')">💡 Đèn</div>
-    <div class="settings-tab" onclick="showTab('tab-user')">👤 Người dùng</div>
+    <div class="settings-tab active" onclick="showTab('tab-controller')">Controller</div>
+    <div class="settings-tab" onclick="showTab('tab-block')">Block</div>
+    <div class="settings-tab" onclick="showTab('tab-den')">Đèn</div>
+    <div class="settings-tab" onclick="showTab('tab-user')">Người dùng</div>
   </div>
 
   <!-- Controller Tab -->
@@ -1442,7 +1489,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Khu vực A</td>
               <td class="text-mono">64</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">CTRL-002</td>
@@ -1451,7 +1498,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Khu vực B</td>
               <td class="text-mono">48</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">CTRL-003</td>
@@ -1460,7 +1507,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Khu vực C</td>
               <td class="text-mono">32</td>
               <td><span class="badge badge-red">● Offline</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
           </tbody>
         </table>
@@ -1486,7 +1533,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td><span class="badge badge-gray">Tắt</span></td>
               <td><span class="badge badge-blue">Bật</span></td>
               <td class="text-mono">32</td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button></td>
             </tr>
             <tr>
               <td class="text-mono">Block 2</td>
@@ -1496,7 +1543,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td><span class="badge badge-blue">Bật</span></td>
               <td><span class="badge badge-gray">Tắt</span></td>
               <td class="text-mono">24</td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button></td>
             </tr>
           </tbody>
         </table>
@@ -1510,7 +1557,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       <div class="filter-bar" style="margin-bottom:0">
         <select class="input select" style="width:140px" onchange="filterTableText(this, document.getElementById('den-tbody'))"><option>Tất cả khu vực</option><option>Khu vực A</option><option>Khu vực B</option></select>
         <select class="input select" style="width:140px" onchange="filterTableText(this, document.getElementById('den-tbody'))"><option>Tất cả trạng thái</option><option>Online</option><option>Offline</option></select>
-        <input class="input" placeholder="🔍 Tìm địa chỉ..." style="width:180px" oninput="filterTableText(this, document.getElementById('den-tbody'))">
+        <input class="input" placeholder="Tìm địa chỉ..." style="width:180px" oninput="filterTableText(this, document.getElementById('den-tbody'))">
       </div>
       <button class="btn btn-primary">+ Thêm đèn</button>
     </div>
@@ -1526,7 +1573,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Block 1</td>
               <td class="text-mono">CTRL-001</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">0002</td>
@@ -1535,7 +1582,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Block 1</td>
               <td class="text-mono">CTRL-001</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">0004</td>
@@ -1544,7 +1591,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Block 1</td>
               <td class="text-mono">CTRL-001</td>
               <td><span class="badge badge-red">● Lỗi kết nối</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">1999</td>
@@ -1553,7 +1600,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Block 1</td>
               <td class="text-mono">CTRL-001</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">9101</td>
@@ -1562,7 +1609,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Block 1</td>
               <td class="text-mono">CTRL-001</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td class="text-mono">8001</td>
@@ -1571,7 +1618,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td>Block 1</td>
               <td class="text-mono">CTRL-001</td>
               <td><span class="badge badge-green">● Online</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
           </tbody>
         </table>
@@ -1595,7 +1642,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td><span class="badge badge-blue">Quản Lý</span></td>
               <td class="text-mono">NS-001</td>
               <td><span class="badge badge-green">Hoạt động</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td>Trần Thị B</td>
@@ -1603,7 +1650,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td><span class="badge badge-purple">Nhân Viên VH</span></td>
               <td class="text-mono">NS-002</td>
               <td><span class="badge badge-green">Hoạt động</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td>Lê Văn C</td>
@@ -1611,7 +1658,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td><span class="badge badge-purple">Nhân Viên VH</span></td>
               <td class="text-mono">NS-003</td>
               <td><span class="badge badge-green">Hoạt động</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
             <tr>
               <td>Phạm D</td>
@@ -1619,7 +1666,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
               <td><span class="badge badge-gray">IT</span></td>
               <td class="text-mono">NS-004</td>
               <td><span class="badge badge-red">Vô hiệu hóa</span></td>
-              <td style="text-align:right"><button class="btn btn-ghost btn-sm">✏ Sửa</button><button class="btn btn-danger btn-sm">🗑</button></td>
+              <td style="text-align:right"><button class="btn btn-ghost btn-sm">Sửa</button><button class="btn btn-danger btn-sm">Xóa</button></td>
             </tr>
           </tbody>
         </table>
@@ -1647,19 +1694,19 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
     </div>
     <div class="modal-body">
       <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">
-        <div style="font-size:28px;line-height:1">🔄</div>
+        <div style="font-size:28px;line-height:1"></div>
         <div>
           <div style="font-size:14px;font-weight:500;margin-bottom:6px">Tính lại kết quả phân phối?</div>
           <div style="font-size:13px;color:var(--text-muted)">Hệ thống sẽ chạy lại thuật toán từ dữ liệu API gốc. Mọi chỉnh sửa thủ công trong bảng sẽ bị xóa.</div>
         </div>
       </div>
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-muted)">
-        📌 Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> &nbsp;·&nbsp; 100 SKU
+        Batch: <span class="text-mono" style="color:var(--accent)">BATCH-20260518-002</span> &nbsp;·&nbsp; 100 SKU
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeRecalcModal()">Hủy</button>
-      <button class="btn btn-primary" onclick="doRecalc()">🔄 Xác nhận tính lại</button>
+      <button class="btn btn-primary" onclick="doRecalc()">Xác nhận tính lại</button>
     </div>
   </div>
 </div>
@@ -1814,7 +1861,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
     <div class="modal-body" id="form-modal-body"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeFormModal()">Hủy</button>
-      <button class="btn btn-primary" id="form-modal-save">💾 Lưu</button>
+      <button class="btn btn-primary" id="form-modal-save">Lưu</button>
     </div>
   </div>
 </div>
@@ -1824,23 +1871,22 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
 
 <script>
 const screens = {
-  'login':'Đăng nhập','dashboard':'Dashboard','lot':'Quản lý LOT / Batch','import':'Nhận dữ liệu API',
-  'autoassign':'Kết quả gán tự động','operation':'Vận hành phân hàng','replenishment':'Bổ sung hàng','reports':'Báo cáo & thống kê',
+  'login':'Đăng nhập','dashboard':'Dashboard','lot':'Quản lý LOT / Batch','import':'Chuẩn bị lô hàng',
+  'autoassign':'Chuẩn bị lô hàng','operation':'Vận hành phân hàng','replenishment':'Bổ sung hàng','reports':'Báo cáo & thống kê',
   'layout':'Tạo Layout kho','lighttest':'Light Module Test','settings':'Cấu hình thiết bị'
 };
 
 // ════════ ROLE / PERMISSION CORE ════════
 const ROLE_INFO = {
-  manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '📊', person: 'Phạm Thị Hà',   initials: 'PH', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
-  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '🏭', person: 'Nguyễn Văn An',  initials: 'NA', desc: 'Chuẩn bị & điều phối lô hàng: nhận dữ liệu API, xác nhận gán tự động, giám sát & điều khiển ca phân hàng, xem báo cáo.' },
-  it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '🔧', person: 'Lê Văn Cường',   initials: 'LC', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
+  manager: { name: 'Tổng Quản Lý',      short: 'Quản Lý',   icon: '', person: 'Phạm Thị Hà',   initials: 'PH', desc: 'Giám sát toàn hệ thống: xem dashboard KPI, theo dõi LOT/Batch, kết quả phân hàng và báo cáo. Không thao tác vận hành trực tiếp.' },
+  ops:     { name: 'Quản Lý Vận Hành',  short: 'Vận Hành',  icon: '', person: 'Nguyễn Văn An',  initials: 'NA', desc: 'Chuẩn bị & điều phối lô hàng: nhận dữ liệu API, xác nhận gán tự động, giám sát & điều khiển ca phân hàng, xem báo cáo.' },
+  it:      { name: 'IT / Kỹ Thuật',     short: 'IT',        icon: '', person: 'Lê Văn Cường',   initials: 'LC', desc: 'Cài đặt & bảo trì hệ thống: tạo layout kho, gán đèn, test light module và cấu hình thiết bị (controller, block, đèn, user).' },
 };
 
 // Màn hình mỗi role được TRUY CẬP
 const ACCESS = {
   dashboard:     ['manager','ops','it'],
   lot:           ['manager','ops'],
-  import:        ['ops'],
   autoassign:    ['manager','ops'],
   operation:     ['manager','ops'],   // ops điều khiển & giám sát; manager chỉ xem
   replenishment: ['ops'],
@@ -1861,9 +1907,8 @@ const EDIT = {
 // Quy trình tuần tự theo role — dùng cho stepper + hướng dẫn trên dashboard
 const FLOWS = {
   ops: [
-    { screen:'import',     label:'Nhận dữ liệu',     hint:'Kéo 2 API về kho' },
-    { screen:'autoassign', label:'Gán tự động',      hint:'Kiểm tra & xác nhận' },
-    { screen:'operation',  label:'Giám sát vận hành',hint:'Theo dõi ca chạy thực tế' },
+    { screen:'autoassign', label:'Chuẩn bị lô hàng', hint:'Duyệt gán & chốt kế hoạch' },
+    { screen:'operation',  label:'Giám sát vận hành',hint:'Chuẩn bị ca → chạy ca → đóng ca' },
   ],
   it: [
     { screen:'settings',   label:'Cấu hình thiết bị',hint:'Controller, block, đèn' },
@@ -1872,26 +1917,87 @@ const FLOWS = {
   ],
 };
 
+// ════════ BATCH PIPELINE — một nguồn sự thật cho hành trình lô hàng ════════
+// 5 bước sống theo TRẠNG THÁI THẬT (không phải vị trí màn hình): bước nào xong, bước nào
+// đang làm, bước nào còn KHÓA (và vì sao). Mọi nơi (stepper, dashboard, gate) đọc từ đây.
+let _planConfirmed = false;   // đã "Xác nhận & Bắt đầu" ở Gán tự động (chốt kế hoạch)
+
+function batchFlowSteps() {
+  const nApi = (_importState.api1 ? 1 : 0) + (_importState.api2 ? 1 : 0);
+  const imported = nApi === 2;
+  const shiftDone = _batchStatuses[BATCH.id] === 'done';
+  const live = _opPhase === 'live' && !shiftDone;
+  const pct = _opQueue.length ? Math.round(_opDoneCount() / _opQueue.length * 100) : 0;
+  const steps = [
+    { key: 'import', label: 'Nhận dữ liệu', screen: 'autoassign', done: imported, locked: false,
+      sub: `${nApi}/2 nguồn API` },
+    { key: 'assign', label: 'Duyệt & chốt kế hoạch', screen: 'autoassign', done: _planConfirmed, locked: !imported,
+      sub: _planConfirmed ? `${BATCH_TOTALS.skuCount} SKU đã chốt` : imported ? 'kiểm tra đủ/thiếu/dư' : 'cần dữ liệu trước' },
+    { key: 'prep', label: 'Chuẩn bị ca', screen: 'operation', done: live || shiftDone, locked: !_planConfirmed,
+      sub: (live || shiftDone) ? 'đã mở ca' : _planConfirmed ? 'layout · thiết bị · dữ liệu' : 'cần chốt kế hoạch' },
+    { key: 'run', label: 'Ca chạy', screen: 'operation', done: shiftDone, locked: !live && !shiftDone,
+      sub: live ? `${pct}% · ${_opDoneCount()}/${_opQueue.length} SKU` : shiftDone ? 'đã đóng ca' : 'sau khi mở ca' },
+    { key: 'report', label: 'Biên bản & báo cáo', screen: 'reports', done: shiftDone, locked: !shiftDone,
+      sub: shiftDone ? 'sẵn sàng xem' : 'sau khi đóng ca' },
+  ];
+  let cur = steps.findIndex(s => !s.done && !s.locked);
+  if (cur < 0) cur = steps.length - 1;
+  return { steps, cur };
+}
+
+function flowNextCTA() {
+  const { steps, cur } = batchFlowSteps();
+  const s = steps[cur];
+  const label = {
+    import: 'Nhận dữ liệu về', assign: 'Duyệt gán & chốt kế hoạch', prep: 'Chạy checklist & mở ca',
+    run: 'Theo dõi ca chạy', report: 'Xem biên bản & báo cáo',
+  }[s.key];
+  return { screen: s.screen, label, n: cur + 1 };
+}
+
 function renderStepper(screenId) {
   const bar = document.getElementById('workflow-stepper');
   if (!bar) return;
-  const flow = FLOWS[currentRole];
-  const idx = flow ? flow.findIndex(s => s.screen === screenId) : -1;
-  if (idx === -1) { bar.style.display = 'none'; return; }
+  // IT: quy trình cài đặt tĩnh 3 bước (như cũ)
+  if (currentRole === 'it') {
+    const flow = FLOWS.it;
+    const idx = flow.findIndex(s => s.screen === screenId);
+    if (idx === -1) { bar.style.display = 'none'; return; }
+    bar.style.display = '';
+    bar.innerHTML = `
+      <div class="wf-label">Quy trình cài đặt:</div>
+      <div class="wf-steps">
+        ${flow.map((s, i) => {
+          const state = i < idx ? 'done' : i === idx ? 'active' : 'todo';
+          return `<div class="wf-step ${state} clickable" onclick="showScreen('${s.screen}')">
+              <span class="wf-num">${state === 'done' ? '✓' : (i + 1)}</span><span>${s.label}</span>
+            </div>${i < flow.length - 1 ? '<span class="wf-arrow">→</span>' : ''}`;
+        }).join('')}
+      </div>`;
+    return;
+  }
+  // OPS: pipeline lô hàng sống theo trạng thái thật
+  if (currentRole !== 'ops' || !['autoassign', 'operation', 'reports'].includes(screenId)) {
+    bar.style.display = 'none'; return;
+  }
+  const { steps, cur } = batchFlowSteps();
+  const cta = flowNextCTA();
   bar.style.display = '';
   bar.innerHTML = `
-    <div class="wf-label">🧭 Quy trình ${currentRole === 'it' ? 'cài đặt' : 'vận hành'}:</div>
+    <div class="wf-label">Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span></div>
     <div class="wf-steps">
-      ${flow.map((s, i) => {
-        const state = i < idx ? 'done' : i === idx ? 'active' : 'todo';
-        const access = canAccess(s.screen);
-        const click = access ? `clickable" onclick="showScreen('${s.screen}')` : '';
-        return `<div class="wf-step ${state} ${click}">
-            <span class="wf-num">${state === 'done' ? '✓' : (i + 1)}</span>
-            <span>${s.label}</span>
-          </div>${i < flow.length - 1 ? '<span class="wf-arrow">→</span>' : ''}`;
+      ${steps.map((s, i) => {
+        const state = s.done ? 'done' : s.locked ? 'locked' : i === cur ? 'active' : 'todo';
+        const click = !s.locked ? ` onclick="showScreen('${s.screen}')"` : '';
+        const tip = s.locked ? ` title="Khóa — ${s.sub}"` : '';
+        return `<div class="wf-step ${state}${!s.locked ? ' clickable' : ''}"${click}${tip}>
+            <span class="wf-num">${s.done ? '✓' : (i + 1)}</span>
+            <span class="wf-txt"><span>${s.label}</span><span class="wf-sub">${s.sub}</span></span>
+          </div>${i < steps.length - 1 ? '<span class="wf-arrow">→</span>' : ''}`;
       }).join('')}
-    </div>`;
+    </div>
+    ${cta.screen !== screenId ? `<button class="btn btn-primary btn-sm wf-cta" onclick="showScreen('${cta.screen}')">Tiếp theo: ${cta.label} ${ico('arrowRight', 13, 2.2)}</button>`
+      : `<span class="wf-cta" style="font-size:11px;color:var(--accent);font-weight:600">▸ Bạn đang ở bước ${cta.n} — ${cta.label}</span>`}`;
 }
 
 let currentRole = 'ops';
@@ -1902,6 +2008,7 @@ function canEditLayout() { return canEdit('layout'); }
 function isITRole() { return canEditLayout(); } // backward-compat cho code layout cũ
 
 function showScreen(id) {
+  if (id === 'import') id = 'autoassign';   // màn nhận dữ liệu đã gộp vào Chuẩn bị lô hàng (sync tự động)
   if (id !== 'login' && !canAccess(id)) {
     showToast(`Vai trò ${roleName()} không có quyền truy cập màn hình này`, 'warn');
     return;
@@ -1916,8 +2023,9 @@ function showScreen(id) {
   if (nav) nav.classList.add('active');
   document.getElementById('topbar-screen-name').textContent = (screens[id] || id);
   renderStepper(id);
+  const dbar = document.getElementById('op-demo-bar');
+  if (dbar) dbar.style.display = id === 'operation' ? 'flex' : 'none';
   if (id === 'dashboard')  renderDashboard();
-  if (id === 'import')     renderImportScreen();
   if (id === 'autoassign') renderAssignScreen();
   if (id === 'operation')  opEnter();
   if (id === 'lot')        { refreshLotStatuses(); applyLotViewMode(); filterLot(); }
@@ -2135,6 +2243,34 @@ function weekBars() {
 }
 
 function dashFlowGuide() {
+  // OPS: pipeline lô hàng SỐNG — bước nào xong/khóa/đang làm + một việc tiếp theo duy nhất
+  if (currentRole === 'ops') {
+    const { steps, cur } = batchFlowSteps();
+    const cta = flowNextCTA();
+    return `<div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div class="card-title" style="margin-bottom:0;display:flex;align-items:center;gap:7px"><span style="display:flex;color:var(--accent)">${ico('reports', 15)}</span>Hành trình lô ${BATCH.id}</div>
+        <button class="btn btn-primary btn-sm" onclick="showScreen('${cta.screen}')">Tiếp theo: ${cta.label} ${ico('arrowRight', 13, 2.2)}</button>
+      </div>
+      <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap">
+        ${steps.map((s, i) => {
+          const state = s.done ? 'done' : s.locked ? 'locked' : i === cur ? 'active' : 'todo';
+          const col = state === 'done' ? 'var(--green)' : state === 'active' ? 'var(--accent)' : 'var(--text-subtle)';
+          const bd  = state === 'done' ? 'var(--green)' : state === 'active' ? 'var(--accent)' : 'var(--border)';
+          return `
+          <div ${!s.locked ? `onclick="showScreen('${s.screen}')"` : `title="Khóa — ${s.sub}"`}
+               style="flex:1;min-width:140px;background:${state === 'active' ? 'var(--accent-dim)' : 'var(--surface2)'};border:1px ${state === 'locked' ? 'dashed' : 'solid'} ${bd};border-radius:10px;padding:11px 12px;${s.locked ? 'opacity:.5' : 'cursor:pointer'};transition:border-color .15s">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="display:flex;align-items:center;justify-content:center;width:21px;height:21px;border-radius:50%;background:${state === 'done' ? 'var(--green)' : state === 'active' ? 'var(--accent)' : 'var(--surface3)'};color:${state === 'done' || state === 'active' ? 'var(--on-accent)' : 'var(--text-muted)'};font-size:11px;font-weight:700;flex-shrink:0">${s.done ? '✓' : i + 1}</span>
+              <span style="font-weight:600;font-size:12px;color:${state === 'locked' ? 'var(--text-muted)' : 'var(--text)'}">${s.label}</span>
+            </div>
+            <div style="font-size:10px;color:${col};padding-left:29px">${s.sub}</div>
+          </div>
+          ${i < steps.length - 1 ? `<div style="display:flex;align-items:center;color:var(--text-subtle)">${ico('arrowRight', 14)}</div>` : ''}`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
   const flow = FLOWS[currentRole];
   if (!flow) return '';
   const title = currentRole === 'it' ? 'Quy trình cài đặt hệ thống' : 'Quy trình vận hành hằng ngày';
@@ -2224,7 +2360,7 @@ function dashBodyByRole() {
   return `
     <div class="dash-grid">
       ${statCard('box', 'var(--accent)', 'var(--accent-dim)', BATCH_TOTALS.skuCount, 'SKU lô hiện tại', null, BATCH.id)}
-      ${statCard('truck', 'var(--yellow)', 'var(--yellow-dim)', '2', 'Batch chờ xử lý', null, 'cần nhận data API')}
+      ${statCard('truck', 'var(--yellow)', 'var(--yellow-dim)', '2', 'Batch chờ xử lý', null, 'chờ nhận dữ liệu API')}
       ${statCard('check', 'var(--green)', 'var(--green-dim)', '7', 'Hoàn tất hôm nay', { up: true, v: '+2' }, '100% không lỗi')}
       ${statCard('store', 'var(--purple)', 'var(--purple-dim)', BATCH.storeBins.length, 'Cửa hàng nhận hàng', null, 'lô ' + BATCH.id)}
     </div>
@@ -2232,8 +2368,8 @@ function dashBodyByRole() {
       <div class="card" style="flex:1.6">
         <div class="card-title">Việc cần làm hôm nay</div>
         <div style="display:flex;flex-direction:column;gap:8px">
-          ${task('Chờ', 'badge-yellow', 'Nhận dữ liệu API cho <strong>BATCH-…005</strong>', 'import', 'Nhận data', true)}
-          ${task('Mới', 'badge-blue', `Xác nhận gán tự động <strong>${BATCH.id}</strong>`, 'autoassign', 'Xem kết quả', true)}
+          ${task('Mới', 'badge-blue', `Lô <strong>${BATCH.id}</strong> có dữ liệu mới từ API — nhận & duyệt gán`, 'autoassign', 'Duyệt & chốt', true)}
+          ${task('Chờ', 'badge-yellow', 'Lô <strong>BATCH-…005</strong> dự kiến có dữ liệu 14:00', 'lot', 'Xem batch', false)}
           ${task('8 ngăn', 'badge-purple', 'Bổ sung hàng khu vực A', 'replenishment', 'Bổ sung', false)}
         </div>
       </div>
@@ -2241,7 +2377,7 @@ function dashBodyByRole() {
         <div class="card-title">Truy cập nhanh</div>
         <div style="display:flex;flex-direction:column;gap:8px">
           ${quickTile('lot', 'lot', 'Quản lý LOT / Batch')}
-          ${quickTile('import', 'import', 'Nhận dữ liệu API')}
+          ${quickTile('autoassign', 'autoassign', 'Chuẩn bị lô hàng')}
           ${quickTile('operation', 'operation', 'Vận hành phân hàng')}
           ${quickTile('replenishment', 'replenishment', 'Bổ sung hàng')}
         </div>
@@ -2259,10 +2395,10 @@ function applyLotViewMode() {
 }
 
 // ── LAYOUT DATA ──
-const ZONE_COLORS = ['#58a6ff','#3fb950','#d29922','#bc8cff','#f85149'];
+const ZONE_COLORS = ['#58a6ff','#3fb950','#d29922','#bc8cff','#f85149','#39c5cf','#ff7b72','#7ee787'];
 
-// Danh sách controller do IT cấu hình ở "Cấu hình thiết bị"
-const itControllers = ['CTRL-001','CTRL-002','CTRL-003','CTRL-004'];
+// Danh sách controller do IT cấu hình ở "Cấu hình thiết bị" — sinh theo số khu (mỗi khu 1 controller)
+let itControllers = ['CTRL-001','CTRL-002','CTRL-003','CTRL-004'];
 
 function autoAssignController() {
   const used = new Set(layoutZones.map(z => z.controller).filter(Boolean));
@@ -2331,7 +2467,7 @@ function renderCurZone() {
   if (!zone) {
     panel.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:16px;color:var(--text-muted)">
-        <div style="font-size:48px">🏗</div>
+        <div style="font-size:48px"></div>
         <div style="font-size:15px;font-weight:500;color:var(--text)">Kho chưa có khu vực nào</div>
         <div style="font-size:13px">Tạo khu vực đầu tiên để bắt đầu cấu hình layout</div>
         <button class="btn btn-primary" style="margin-top:4px" onclick="openAddZoneModal()">+ Tạo khu vực đầu tiên</button>
@@ -2588,7 +2724,7 @@ function renderOverview() {
   if (!layoutZones.length) {
     panel.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;gap:16px;color:var(--text-muted)">
-        <div style="font-size:48px">🏗</div>
+        <div style="font-size:48px"></div>
         <div style="font-size:15px;font-weight:500;color:var(--text)">Kho chưa có khu vực nào</div>
         <div style="font-size:13px">Tạo khu vực đầu tiên để bắt đầu cấu hình layout</div>
         <button class="btn btn-primary" style="margin-top:4px" onclick="openAddZoneModal()">+ Tạo khu vực đầu tiên</button>
@@ -2654,7 +2790,7 @@ let _testRunning = false;
 function renderTestPanel() {
   const panel = document.getElementById('layout-test-panel');
   if (!layoutZones.length) {
-    panel.innerHTML = `<div class="empty-state"><div class="empty-icon">🔬</div><div class="empty-text">Chưa có khu vực nào để test</div></div>`;
+    panel.innerHTML = `<div class="empty-state"><div class="empty-icon"></div><div class="empty-text">Chưa có khu vực nào để test</div></div>`;
     return;
   }
   if (!_testZoneId) _testZoneId = layoutZones[0].id;
@@ -2804,36 +2940,63 @@ document.addEventListener('keydown', e => {
 
 // ════════ NGUỒN DỮ LIỆU DUY NHẤT CHO 1 BATCH ════════
 // Mọi màn (Import → Gán tự động → Vận hành → LOT → Báo cáo) đều suy ra từ đây
-const BATCH = {
-  id:        'BATCH-20260518-002',
-  dateLabel: '18/05/2026 09:15',
-  zone:      'Khu A',
-  operator:  'Trần Thị B',
-  block:     'Block 1',
-  // mỗi cửa hàng = 1 bin/đèn vật lý — vị trí do LAYOUT cấu hình, rải khắp kho (không thành 1 hàng)
-  storeBins: [
-    { store:'Cửa hàng A', addr:'0002', loc:'Khu A · Kệ 1 · T3 · N02' },
-    { store:'Cửa hàng B', addr:'0016', loc:'Khu A · Kệ 1 · T1 · N04' },
-    { store:'Cửa hàng C', addr:'0027', loc:'Khu A · Kệ 2 · T2 · N03' },
-    { store:'Cửa hàng D', addr:'0041', loc:'Khu B · Kệ 1 · T3 · N05' },
-    { store:'Cửa hàng E', addr:'0062', loc:'Khu B · Kệ 2 · T2 · N02' },
-  ],
-  // stock = tồn kho (API 1); plan[] = số lượng cần giao mỗi cửa hàng (API 2)
-  skus: [
-    { sku:'SKU-100', name:'Áo thun trắng M',   lot:'LOT-006', stock:120, plan:[30,25,28,20,17] },
-    { sku:'SKU-101', name:'Quần jean xanh 30', lot:'LOT-006', stock:80,  plan:[20,18,22,15,12] },
-    { sku:'SKU-102', name:'Giày thể thao 42',  lot:'LOT-006', stock:54,  plan:[12,11,13,10,8]  },
-    { sku:'SKU-103', name:'Túi xách da nâu',   lot:'LOT-007', stock:87,  plan:[18,17,20,16,16] },
-    { sku:'SKU-104', name:'Mũ snapback đen',   lot:'LOT-007', stock:60,  plan:[14,12,13,11,10] },
-    { sku:'SKU-105', name:'Áo hoodie xám',     lot:'LOT-007', stock:95,  plan:[22,20,21,18,14] },
-    { sku:'SKU-106', name:'Thắt lưng da',      lot:'LOT-008', stock:48,  plan:[10,10,11,9,8]   },
-    { sku:'SKU-107', name:'Ví da nam',         lot:'LOT-008', stock:72,  plan:[16,15,16,13,12] },
-    { sku:'SKU-108', name:'Kính râm UV',       lot:'LOT-008', stock:40,  plan:[9,8,10,7,8]     },
-    { sku:'SKU-109', name:'Tất thể thao',      lot:'LOT-008', stock:110, plan:[24,22,23,20,16] },
-    { sku:'SKU-110', name:'Khăn quàng len',    lot:'LOT-008', stock:36,  plan:[8,7,8,7,6]      },
-    { sku:'SKU-111', name:'Vòng tay bạc',      lot:'LOT-008', stock:50,  plan:[11,10,11,9,9]   },
-  ],
+// ════════ DỮ LIỆU DEMO SINH ĐỘNG THEO SCALE ════════
+// Production thật nhận dữ liệu từ API — wireframe sinh dữ liệu theo preset để chứng minh
+// UI scale được với kho lớn (nhiều khu / kệ / cửa hàng / SKU). PRNG có seed → ổn định giữa các reload.
+const SCALE_PRESETS = {
+  s: { label: 'Nhỏ',  zones: 2, shelves: 2, floors: 3, cells: 6,  stores: 5,  skus: 12 },
+  m: { label: 'Vừa',  zones: 4, shelves: 3, floors: 3, cells: 8,  stores: 12, skus: 24 },
+  l: { label: 'Lớn',  zones: 6, shelves: 4, floors: 4, cells: 10, stores: 24, skus: 48 },
 };
+let _scaleKey = 's';
+function _mulberry32(seed) { return function () { let t = seed += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+const SKU_NAME_POOL = ['Áo thun trắng','Quần jean xanh','Giày thể thao','Túi xách da nâu','Mũ snapback đen','Áo hoodie xám','Thắt lưng da','Ví da nam','Kính râm UV','Tất thể thao','Khăn quàng len','Vòng tay bạc','Áo sơ mi kẻ','Quần short kaki','Dép sandal','Balo laptop','Đồng hồ thể thao','Áo khoác gió','Găng tay len','Bình giữ nhiệt','Ốp lưng dẻo','Sạc dự phòng','Tai nghe không dây','Sổ tay bìa da'];
+const SKU_SIZE_POOL = ['S','M','L','XL','38','39','40','41','42','28','30','32'];
+const WORKER_POOL = ['Trần Thị B','Lê Văn C','Phạm Văn D','Ngô Thị E','Đỗ Văn F','Vũ Thị G','Bùi Văn H','Đặng Thị K'];
+const WORKER_CODES = ['NV-2207','NV-3104','NV-4102','NV-5118','NV-6125','NV-7133','NV-8141','NV-9156'];
+
+// Nhãn ngắn của cửa hàng in trên ô đèn: A..Z rồi 27, 28... (không giới hạn 26)
+function storeShortCode(i) { return i < 26 ? String.fromCharCode(65 + i) : String(i + 1); }
+
+// Chọn `n` ngăn rải đều khắp các khu (round-robin khu, vị trí ngẫu nhiên có seed) làm bin cửa hàng
+function _pickStoreBins(n, rng) {
+  const used = new Set(), bins = [];
+  for (let i = 0; i < n; i++) {
+    const z = layoutZones[i % layoutZones.length];
+    for (let attempt = 0; attempt < 200; attempt++) {
+      const si = Math.floor(rng() * z.shelves.length);
+      const fi = Math.floor(rng() * z.shelves[si].floors.length);
+      const f = z.shelves[si].floors[fi];
+      const ci = Math.floor(rng() * f.cells.length);
+      const addr = f.cells[ci];
+      if (used.has(addr)) continue;
+      used.add(addr);
+      bins.push({ store: `Cửa hàng ${storeShortCode(i)}`, code: storeShortCode(i), addr, loc: `${z.name.replace('Khu vực', 'Khu')} · ${z.shelves[si].name} · ${f.label} · N${String(ci + 1).padStart(2, '0')}` });
+      break;
+    }
+  }
+  return bins;
+}
+
+function makeBatch(p) {
+  const rng = _mulberry32(20260518);
+  const storeBins = _pickStoreBins(p.stores, rng);
+  const skus = Array.from({ length: p.skus }, (_, i) => {
+    const name = `${SKU_NAME_POOL[i % SKU_NAME_POOL.length]} ${SKU_SIZE_POOL[Math.floor(rng() * SKU_SIZE_POOL.length)]}`;
+    const plan = storeBins.map(() => 5 + Math.floor(rng() * 26));                 // mỗi cửa hàng cần 5–30
+    const planTotal = plan.reduce((a, b) => a + b, 0);
+    const ratio = 0.72 + rng() * 0.56;                                            // tồn 72%–128% kế hoạch → trộn đủ/thiếu/dư
+    return { sku: 'SKU-' + (100 + i), name, lot: 'LOT-' + String(6 + Math.floor(i / 4)).padStart(3, '0'), stock: Math.round(planTotal * ratio), plan };
+  });
+  return {
+    id: 'BATCH-20260518-002', dateLabel: '18/05/2026 09:15', zone: 'Khu A',
+    operator: WORKER_POOL[0], block: 'Block 1',
+    storeBins, skus,
+  };
+}
+
+let BATCH = null;   // gán trong rebuildDemoData()
 
 // Dữ liệu gán tự động suy ra từ BATCH
 // Thuật toán phân bổ: đủ/dư → cấp đủ kế hoạch; thiếu → chia theo tỷ lệ tồn kho
@@ -2848,33 +3011,114 @@ function allocateStock(stores, stock) {
   return alloc;
 }
 
-const ASSIGN_DATA = BATCH.skus.map((s, idx) => {
-  const plan = s.plan.reduce((a, b) => a + b, 0);
-  const diff = s.stock - plan;
-  const alloc = allocateStock(s.plan, s.stock);
-  return {
-    idx,
-    sku: s.sku, name: s.name, lot: s.lot,
-    stock: s.stock, plan, stores: s.plan, diff,
-    alloc,                                              // số lượng hệ thống phân vào từng cửa hàng
-    allocTotal: alloc.reduce((a, b) => a + b, 0),       // tổng sẽ phân ra (= stock nếu thiếu, = plan nếu đủ/dư)
-    status: diff === 0 ? 'ok' : diff > 0 ? 'surplus' : 'short',
-  };
-});
+let ASSIGN_DATA = [];
+let BATCH_TOTALS = {};
 
-// Tổng hợp dùng chung
-const BATCH_TOTALS = {
-  skuCount:   ASSIGN_DATA.length,
-  totalUnits: ASSIGN_DATA.reduce((a, d) => a + d.plan, 0),          // tổng đơn vị theo kế hoạch
-  allocUnits: ASSIGN_DATA.reduce((a, d) => a + d.allocTotal, 0),    // tổng đơn vị thực sự sẽ phân
-  totalPicks: ASSIGN_DATA.reduce((a, d) => a + d.alloc.filter(q => q > 0).length, 0),
-  nOk:        ASSIGN_DATA.filter(d => d.status === 'ok').length,
-  nShort:     ASSIGN_DATA.filter(d => d.status === 'short').length,
-  nSurplus:   ASSIGN_DATA.filter(d => d.status === 'surplus').length,
-};
+function computeAssignData() {
+  ASSIGN_DATA = BATCH.skus.map((s, idx) => {
+    const plan = s.plan.reduce((a, b) => a + b, 0);
+    const diff = s.stock - plan;
+    const alloc = allocateStock(s.plan, s.stock);
+    return {
+      idx,
+      sku: s.sku, name: s.name, lot: s.lot,
+      stock: s.stock, plan, stores: s.plan, diff,
+      alloc,                                              // số lượng hệ thống phân vào từng cửa hàng
+      allocTotal: alloc.reduce((a, b) => a + b, 0),       // tổng sẽ phân ra (= stock nếu thiếu, = plan nếu đủ/dư)
+      status: diff === 0 ? 'ok' : diff > 0 ? 'surplus' : 'short',
+    };
+  });
+  BATCH_TOTALS = {
+    skuCount:   ASSIGN_DATA.length,
+    totalUnits: ASSIGN_DATA.reduce((a, d) => a + d.plan, 0),          // tổng đơn vị theo kế hoạch
+    allocUnits: ASSIGN_DATA.reduce((a, d) => a + d.allocTotal, 0),    // tổng đơn vị thực sự sẽ phân
+    totalPicks: ASSIGN_DATA.reduce((a, d) => a + d.alloc.filter(q => q > 0).length, 0),
+    nOk:        ASSIGN_DATA.filter(d => d.status === 'ok').length,
+    nShort:     ASSIGN_DATA.filter(d => d.status === 'short').length,
+    nSurplus:   ASSIGN_DATA.filter(d => d.status === 'surplus').length,
+  };
+}
+
+// Dựng lại TOÀN BỘ dữ liệu demo theo preset scale: layout → batch → gán → hàng đợi vận hành
+function rebuildDemoData() {
+  const p = SCALE_PRESETS[_scaleKey];
+  itControllers = Array.from({ length: Math.max(4, p.zones) }, (_, i) => 'CTRL-' + String(i + 1).padStart(3, '0'));
+  seedLayoutDemo(p);
+  BATCH = makeBatch(p);
+  computeAssignData();
+  STORE_BINS = BATCH.storeBins;
+  OP_WORKERS = Array.from({ length: p.zones }, (_, i) => {
+    const name = WORKER_POOL[i % WORKER_POOL.length];
+    return { code: WORKER_CODES[i % WORKER_CODES.length], name, initials: name.split(' ').map(w => w[0]).slice(-2).join('').toUpperCase() };
+  });
+  // pipeline lô hàng quay về đầu hành trình — chờ user bấm nhận dữ liệu
+  _importState = { api1: false, api2: false };
+  _syncTimes = { api1: '—', api2: '—' };
+  _planConfirmed = false;
+  delete _batchStatuses[BATCH.id];
+  buildOpQueue();
+}
+
+// Đổi scale demo (reset toàn bộ ca đang chạy)
+function setDemoScale(key) {
+  if (!SCALE_PRESETS[key] || key === _scaleKey) return;
+  if (_opPhase === 'live' && _opElapsedMs > 0 && !confirm('Đổi quy mô demo sẽ reset ca đang chạy. Tiếp tục?')) { renderOperation(); return; }
+  _scaleKey = key;
+  if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
+  _opRunning = false;
+  const keepImport = { ..._importState }, keepPlan = _planConfirmed;   // đổi quy mô không bắt đi lại pipeline
+  rebuildDemoData();
+  _importState = keepImport; _planConfirmed = keepPlan;
+  if (keepPlan) _batchStatuses[BATCH.id] = 'running';
+  const p = SCALE_PRESETS[key];
+  showToast(`Demo kho ${p.label}: ${p.zones} khu · ${STORE_BINS.length} cửa hàng · ${ASSIGN_DATA.length} SKU`, 'info');
+  const active = document.querySelector('.screen.active');
+  if (active) showScreen(active.id.replace('screen-', ''));
+}
 let _assignFilter = 'all';
 let _assignSearch = '';
 let _surplusOpen  = true;
+
+// Panel nhận dữ liệu — USER bấm "Nhận dữ liệu" để kéo 2 nguồn API về (bước ① của pipeline)
+let _syncing = false;
+function renderSyncStrip() {
+  const el = document.getElementById('assign-sync-strip');
+  if (!el) return;
+  const both = _importState.api1 && _importState.api2;
+  const src = (key, name, tag, desc) => {
+    if (_syncing && !_importState[key]) return `<span style="display:flex;align-items:center;gap:6px"><span class="status-dot" style="background:var(--yellow);animation:tpulse .5s ease infinite alternate"></span><b class="text-mono" style="font-size:10px">${tag}</b> ${name} — <span style="color:var(--yellow)">đang tải…</span></span>`;
+    const ok = _importState[key];
+    return `<span style="display:flex;align-items:center;gap:6px" title="${desc}"><span class="status-dot ${ok ? 'online' : 'offline'}"></span><b class="text-mono" style="font-size:10px">${tag}</b> ${name} — <span class="text-mono" style="font-size:11px;color:${ok ? 'var(--green)' : 'var(--yellow)'}">${ok ? '✓ nhận lúc ' + _syncTimes[key] : 'chưa nhận'}</span></span>`;
+  };
+  el.style.borderColor = both ? 'var(--border)' : 'rgba(217,161,60,.4)';
+  el.innerHTML = `
+    ${src('api1', 'Hàng tiếp nhận', 'API 1', 'LOT, vị trí kệ, số lượng tồn')}
+    <span style="width:1px;height:14px;background:var(--border)"></span>
+    ${src('api2', 'Kế hoạch phân phối', 'API 2', 'SKU, cửa hàng, số lượng yêu cầu')}
+    <span style="flex:1"></span>
+    <span style="font-size:11px;color:var(--text-subtle)">Nguồn: ERP/WMS · endpoint cấu hình bởi IT</span>
+    <button class="btn ${both ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="resyncApis()" ${_syncing ? 'disabled' : ''}>${ico('import', 13)} ${_syncing ? 'Đang nhận…' : both ? 'Nhận lại dữ liệu' : 'Nhận dữ liệu'}</button>`;
+}
+// User bấm → kéo lần lượt 2 nguồn (mô phỏng độ trễ API thật)
+function resyncApis() {
+  if (_syncing) return;
+  _syncing = true;
+  _importState = { api1: false, api2: false };
+  renderSyncStrip();
+  const t = () => new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  setTimeout(() => {
+    _importState.api1 = true; _syncTimes.api1 = t();
+    renderSyncStrip();
+    showToast(`✓ API 1 — Hàng tiếp nhận: ${BATCH.skus.length} dòng tồn kho`, 'success');
+  }, 900);
+  setTimeout(() => {
+    _importState.api2 = true; _syncTimes.api2 = t();
+    _syncing = false;
+    renderAssignScreen();
+    renderStepper('autoassign');
+    showToast(`✓ API 2 — Kế hoạch phân phối: ${BATCH_TOTALS.skuCount} SKU × ${STORE_BINS.length} cửa hàng — duyệt kết quả gán bên dưới`, 'success');
+  }, 1800);
+}
 
 function renderAssignScreen() {
   const data = ASSIGN_DATA;
@@ -2889,6 +3133,20 @@ function renderAssignScreen() {
   const vBanner = document.getElementById('assign-view-banner');
   if (actions) actions.style.display = viewOnly ? 'none' : '';
   if (vBanner) vBanner.style.display = viewOnly ? '' : 'none';
+
+  // PANEL NHẬN DỮ LIỆU: user bấm nhận → khu duyệt gán mới mở (mờ khi chưa có dữ liệu)
+  renderSyncStrip();
+  const imported = _importState.api1 && _importState.api2;
+  document.querySelectorAll('#screen-autoassign .assign-gated').forEach(e => e.classList.toggle('off', !imported));
+  const hint = document.getElementById('assign-fetch-hint');
+  if (hint) {
+    hint.style.display = imported ? 'none' : 'flex';
+    if (!imported) hint.innerHTML = `${ico('import', 16)} Chưa có dữ liệu lô — bấm <strong>“Nhận dữ liệu”</strong> ở thanh trên để kéo tồn kho &amp; kế hoạch từ 2 API về`;
+  }
+  const cBtn = document.getElementById('btn-confirm-assign');
+  if (cBtn) { cBtn.disabled = !imported; cBtn.style.opacity = imported ? '' : '.45'; cBtn.title = imported ? '' : 'Khóa — bấm Nhận dữ liệu từ 2 API trước'; }
+  const subEl = document.getElementById('assign-subdesc');
+  if (subEl) subEl.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> — <strong>nhận dữ liệu</strong> từ 2 API → duyệt kết quả gán tồn kho × kế hoạch → <strong>chốt kế hoạch</strong>${_planConfirmed ? ' <span class="badge badge-green" style="margin-left:4px">✓ Đã chốt</span>' : ''}`;
 
   // stats
   document.getElementById('assign-stats').innerHTML = `
@@ -2915,6 +3173,24 @@ function renderAssignScreen() {
 
 function renderAssignTable() {
   const viewOnly = !canEdit('autoassign');
+  const nStores = STORE_BINS.length;
+  // Header động theo số cửa hàng của lô — kho lớn cuộn ngang, cột SKU ghim trái
+  const thead = document.getElementById('assign-thead');
+  if (thead) thead.innerHTML = `
+    <tr>
+      <th style="min-width:160px;position:sticky;left:0;background:var(--surface2);z-index:11">SKU / Tên hàng</th>
+      <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
+      <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
+      <th colspan="${nStores}" style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)">Phân vào ${nStores} cửa hàng <span style="font-weight:400;color:var(--text-subtle);font-size:10px;text-transform:none">(chỉnh được${nStores > 8 ? ' · cuộn ngang' : ''})</span></th>
+      <th style="text-align:right">Sẽ phân</th>
+      <th>Trạng thái</th>
+    </tr>
+    <tr>
+      <th style="position:sticky;left:0;background:var(--surface2);z-index:11"></th><th></th><th></th>
+      ${STORE_BINS.map((b, i) => `<th style="text-align:right;font-size:10px;${i === nStores - 1 ? 'border-right:1px solid var(--border)' : ''}" title="${b.store} · đèn ${b.addr}">${b.code}</th>`).join('')}
+      <th></th><th></th>
+    </tr>`;
+
   let rows = ASSIGN_DATA;
   if (_assignFilter !== 'all') rows = rows.filter(d => d.status === _assignFilter);
   if (_assignSearch) {
@@ -2924,7 +3200,7 @@ function renderAssignTable() {
 
   const tbody = document.getElementById('assign-tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-muted)">Không có kết quả</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${nStores + 5}" style="text-align:center;padding:32px;color:var(--text-muted)">Không có kết quả</td></tr>`;
     return;
   }
 
@@ -2942,11 +3218,11 @@ function renderAssignTable() {
     const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
 
     const inputs = d.alloc.map((q, si) =>
-      `<td style="text-align:right;padding:4px 5px;${si === 4 ? 'border-right:1px solid var(--border)' : ''}"><input class="input assign-input" style="width:46px;text-align:center;padding:4px;font-size:12px" value="${q}" oninput="updateAlloc(${d.idx}, ${si}, this.value)" ${viewOnly ? 'disabled' : ''}></td>`
+      `<td style="text-align:right;padding:4px 5px;${si === d.alloc.length - 1 ? 'border-right:1px solid var(--border)' : ''}"><input class="input assign-input" style="width:46px;text-align:center;padding:4px;font-size:12px" value="${q}" oninput="updateAlloc(${d.idx}, ${si}, this.value)" ${viewOnly ? 'disabled' : ''}></td>`
     ).join('');
 
     return `<tr style="${rowBg}">
-      <td><div class="text-mono" style="font-size:12px">${d.sku}</div><div style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${d.name}</div></td>
+      <td style="position:sticky;left:0;background:var(--surface);z-index:5"><div class="text-mono" style="font-size:12px">${d.sku}</div><div style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${d.name}</div></td>
       <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
       <td class="text-mono" style="text-align:right;color:var(--text-muted)">${d.plan}</td>
       ${inputs}
@@ -3055,13 +3331,14 @@ function doReject() {
     hideLoading();
     // cập nhật badge trên bảng LOT (row BATCH-20260518-002 → Đã từ chối)
     _batchStatuses['BATCH-20260518-002'] = 'rejected';
-    showToast('Đã từ chối — vui lòng nhận lại dữ liệu từ API', 'error');
-    setTimeout(() => showScreen('import'), 900);
+    showToast('Đã từ chối — hệ thống đồng bộ lại dữ liệu để kiểm tra & chốt lại', 'error');
+    setTimeout(() => { showScreen('autoassign'); resyncApis(); }, 900);
   }, 1000);
 }
 
 // ── FLOW 3: XÁC NHẬN & BẮT ĐẦU ──
 function openConfirmModal() {
+  if (!(_importState.api1 && _importState.api2)) { showToast('Khóa — hoàn thành Bước 1 · Nhận dữ liệu trước khi chốt kế hoạch', 'warn'); return; }
   const data       = ASSIGN_DATA;
   const nShort     = data.filter(d => d.status === 'short').length;
   const allocUnits = data.reduce((s, d) => s + d.allocTotal, 0);   // theo số đã gán (tính cả chỉnh tay)
@@ -3105,31 +3382,35 @@ function closeConfirmModal() {
 }
 function doConfirmAssign() {
   closeConfirmModal();
-  showLoading('Đang gửi lệnh bật đèn...');
+  showLoading('Đang chốt kế hoạch phân hàng...');
   setTimeout(() => {
-    document.getElementById('loading-msg').textContent = 'Đèn đang sáng — chuyển màn hình...';
+    document.getElementById('loading-msg').textContent = 'Kế hoạch đã chốt — chuyển sang chuẩn bị ca...';
     setTimeout(() => {
       hideLoading();
       _batchStatuses[BATCH.id] = 'running';
-      showToast('✓ Lô đã sẵn sàng — quét thẻ NV rồi quét SKU để bật đèn', 'success');
+      _planConfirmed = true;
+      showToast('✓ Kế hoạch đã chốt — chạy checklist chuẩn bị ca rồi mở ca', 'success');
       buildOpQueue();
       setTimeout(() => { showScreen('operation'); }, 600);
     }, 900);
   }, 1200);
 }
 
-// ════════ VẬN HÀNH PHÂN HÀNG (PUT-TO-LIGHT) — cổng quét NV + SKU ════════
-// Flow CHUẨN: NV quét THẺ NHÂN VIÊN để vào ca (Bước 1) → quét MÃ SKU (Bước 2)
-// → KHI ĐÓ đèn của tất cả cửa hàng cho SKU đó mới SÁNG → NV bỏ hàng từng đèn → xác nhận.
-// Vai trò Vận Hành = thao tác quét trực tiếp; Tổng Quản Lý = chỉ giám sát (auto mô phỏng).
-const STORE_BINS = BATCH.storeBins;
+// ════════ VẬN HÀNH PHÂN HÀNG (PUT-TO-LIGHT) — chuẩn bị ca → cổng quét → đóng ca ════════
+// Flow PRODUCTION:
+//  [CHUẨN BỊ]  ① Load layout + kiểm tra thiết bị (controller & đèn online, kết quả test gần nhất)
+//              ② Double-check dữ liệu phân hàng (SKU khớp lô, bin khớp layout, cảnh báo thiếu tồn)
+//              ③ Mở ca — chỉ mở được khi ①② đều PASS
+//  [VẬN HÀNH]  NV quét THẺ vào ca, nhận khu → quét MÃ SKU → đèn mọi cửa hàng cần SKU đó SÁNG
+//              → NV bỏ hàng, NHẤN NÚT XÁC NHẬN trên module đèn (click vào đèn) → hết đèn → SKU kế
+//  [NGOẠI LỆ]  Thiếu hàng → phiếu bổ sung / ghi nhận thiếu; đèn lỗi → bật lại / xác nhận tay (báo IT)
+//  [ĐÓNG CA]   Phân xong 100% SKU + xử lý hết sự cố mới đóng được ca → biên bản ca
+// Vai trò Vận Hành = thao tác quét trực tiếp; Tổng Quản Lý = chỉ giám sát (auto mô phỏng toàn bộ).
+let STORE_BINS = [];        // gán trong rebuildDemoData()
 const OP_TICK = 150;        // ms mỗi nhịp mô phỏng
 
-// Danh sách nhân viên trạm hợp lệ (quét thẻ để xác thực vào ca)
-const OP_WORKERS = [
-  { code: 'NV-2207', name: 'Trần Thị B', initials: 'TB' },
-  { code: 'NV-3104', name: 'Lê Văn C',   initials: 'LC' },
-];
+// Danh sách nhân viên trạm hợp lệ (quét thẻ để xác thực vào ca) — sinh theo số khu, mỗi khu 1 NV
+let OP_WORKERS = [];
 function opPrimaryWorker() { return OP_WORKERS.find(w => w.name === BATCH.operator) || OP_WORKERS[0]; }
 
 let _opQueue = [];
@@ -3149,6 +3430,7 @@ function renderOpSpeed() {
 let _opExceptions = [];
 let _opFeed = [];
 let _opView = 'map';          // 'map' | 'list'
+let _opMapZoom = null;        // null = tổng quan các khu · 'ZA' = drill-down xem kệ của 1 khu
 let _opStage = 'idle';        // 'idle'=chờ đủ NV các khu · 'await-sku'=chờ quét SKU · 'putting'=đèn sáng, đang bỏ
 let _opStepMs = 0;            // đếm ngược cho auto-driver (chế độ giám sát)
 // Mỗi KHU do 1 nhân viên phụ trách. 1 NV có thể phụ trách NHIỀU khu (khi ca chỉ 1 người).
@@ -3169,17 +3451,27 @@ function _zoneOf(addr) { return _opZones.find(z => z.addrs.has(addr)); }
 let _opAuto = false;          // true = chế độ giám sát (manager) tự mô phỏng quét
 let _opErrMsg = null;         // thông báo lỗi quét tạm thời
 let _opErrTimer = null;
+let _stationMode = false;     // true = màn hình trạm (persona NHÂN VIÊN: chữ to, một hành động)
+let _opPhase = 'prep';        // 'prep' = checklist chuẩn bị ca · 'live' = ca đang chạy
+let _opPrep = { layout: { st: 'todo', log: [] }, data: { st: 'todo', log: [] } };  // st: todo|run|done
+let _opShiftOpenAt = null;    // giờ mở ca — ghi vào biên bản ca
+let _opExcResolved = 0;       // số sự cố đã xử lý trong ca — ghi vào biên bản ca
 
-// Khu (zone) của 1 địa chỉ đèn = layoutZone chứa addr đó
-function _opZoneInfoOfAddr(addr) {
+// Index addr → khu (dựng 1 lần mỗi khi build queue — tránh quét toàn bộ layout cho từng bin)
+let _addrZoneIdx = new Map();
+function _buildAddrZoneIdx() {
+  _addrZoneIdx = new Map();
   for (const z of layoutZones)
     for (const s of z.shelves)
       for (const f of s.floors)
-        if (f.cells.includes(addr)) return { id: z.id, name: z.name, color: z.color };
-  return { id: 'ZX', name: 'Khu khác', color: 'var(--text-muted)' };
+        for (const addr of f.cells) _addrZoneIdx.set(addr, { id: z.id, name: z.name, color: z.color });
+}
+function _opZoneInfoOfAddr(addr) {
+  return _addrZoneIdx.get(addr) || { id: 'ZX', name: 'Khu khác', color: 'var(--text-muted)' };
 }
 
 function buildOpQueue() {
+  _buildAddrZoneIdx();
   _opQueue = ASSIGN_DATA
     .filter(d => d.allocTotal > 0)
     .map(d => ({
@@ -3191,11 +3483,15 @@ function buildOpQueue() {
   // Các khu có mặt trong lô → mỗi khu 1 luồng bỏ hàng (1 NV)
   const seen = new Map();
   STORE_BINS.forEach(b => { const z = _opZoneInfoOfAddr(b.addr); if (!seen.has(z.id)) seen.set(z.id, { ...z, addrs: new Set() }); seen.get(z.id).addrs.add(b.addr); });
-  _opZones = [...seen.values()].map(z => ({ id: z.id, name: z.name, color: z.color, addrs: z.addrs, worker: null, activeAddr: null, stepMs: 0, workMs: 0, units: 0 }));
+  _opZones = [...seen.values()].map(z => ({ id: z.id, name: z.name, color: z.color, addrs: z.addrs, worker: null, activeAddr: null, stepMs: 0, workMs: 0, units: 0, totalUnits: 0 }));
+  _opQueue.forEach(q => q.bins.forEach(b => { const z = _opZones.find(x => x.id === b.zoneId); if (z) z.totalUnits += b.qty; }));
+  _opMapZoom = null;
 
   _opIndex = 0; _opRunning = false; _opElapsedMs = 0; _opWorkMs = 0;
   _opExceptions = []; _opFeed = [];
   _opStage = 'idle'; _opStepMs = 900; _opErrMsg = null;
+  _opPhase = 'prep'; _opPrep = { layout: { st: 'todo', log: [] }, data: { st: 'todo', log: [] } };
+  _opShiftOpenAt = null; _opExcResolved = 0;
   if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
 }
 
@@ -3216,20 +3512,239 @@ function _opFeedPush(type, text) {
   if (_opFeed.length > 50) _opFeed.pop();
 }
 
+// ── CHUẨN BỊ CA: checklist bắt buộc trước khi mở ca ──
+function _opLayoutStats() {
+  let shelves = 0, lights = 0;
+  layoutZones.forEach(z => z.shelves.forEach(s => { shelves++; s.floors.forEach(f => lights += f.cells.length); }));
+  return { zones: layoutZones.length, shelves, lights };
+}
+function _opPrepLayoutLines() {
+  const st = _opLayoutStats();
+  const lines = [{ ok: 1, t: `Đã tải layout ${BATCH.block} — ${st.zones} khu · ${st.shelves} kệ · ${st.lights} đèn` }];
+  layoutZones.forEach(z => {
+    const n = z.shelves.reduce((a, s) => a + s.floors.reduce((x, f) => x + f.cells.length, 0), 0);
+    lines.push({ ok: 1, t: `${z.controller || 'Controller'} (${z.name}) online — ${n}/${n} đèn phản hồi ping` });
+  });
+  lines.push({ ok: 1, t: `Test đèn gần nhất ${BATCH.dateLabel.split(' ')[0]} — toàn bộ module OK` });
+  return lines;
+}
+function _opPrepDataLines() {
+  const lines = [
+    { ok: 1, t: `${BATCH_TOTALS.skuCount}/${BATCH_TOTALS.skuCount} SKU khớp danh mục lô ${BATCH.id} — kết quả gán tự động đã xác nhận` },
+    { ok: 1, t: `${STORE_BINS.length}/${STORE_BINS.length} cửa hàng đã gán bin/đèn — khớp layout kho` },
+  ];
+  if (BATCH_TOTALS.nShort) lines.push({ ok: 0, t: `${BATCH_TOTALS.nShort} SKU thiếu tồn — đã chia theo tỷ lệ, phần thiếu chuyển lô sau` });
+  lines.push({ ok: 1, t: `Tổng phân bổ ${BATCH_TOTALS.allocUnits.toLocaleString()}/${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị — sẵn sàng phân hàng` });
+  return lines;
+}
+// Chạy 1 bước checklist: hiện kết quả kiểm tra từng dòng (mô phỏng hệ thống ping/đối chiếu)
+function opPrepStart(key) {
+  const p = _opPrep[key];
+  if (!p || p.st !== 'todo' || _opPhase !== 'prep') return;
+  if (key === 'data' && _opPrep.layout.st !== 'done') { showToast('Load layout & kiểm tra thiết bị (bước 1) trước', 'warn'); return; }
+  p.st = 'run'; p.log = [];
+  const lines = key === 'layout' ? _opPrepLayoutLines() : _opPrepDataLines();
+  let i = 0;
+  const step = () => {
+    if (_opPhase !== 'prep') return;
+    p.log.push(lines[i]); i++;
+    if (i < lines.length) { _opRenderPrepLive(); setTimeout(step, 430); }
+    else {
+      p.st = 'done'; _opRenderPrepLive();
+      _opFeedPush('info', key === 'layout' ? `Checklist thiết bị PASS — layout ${BATCH.block} đã tải` : `Đã đối chiếu dữ liệu lô ${BATCH.id} — sẵn sàng mở ca`);
+      if (_opAuto) setTimeout(_opAutoPrepNext, 800);
+    }
+  };
+  _opRenderPrepLive();
+  setTimeout(step, 430);
+}
+// Chế độ giám sát (manager): tự chạy lần lượt checklist rồi mở ca
+function _opAutoPrepNext() {
+  if (_opPhase !== 'prep') return;
+  if (_opPrep.layout.st === 'run' || _opPrep.data.st === 'run') return;
+  if (_opPrep.layout.st === 'todo') opPrepStart('layout');
+  else if (_opPrep.data.st === 'todo') opPrepStart('data');
+  else opOpenShift();
+}
+function opOpenShift() {
+  if (_opPhase !== 'prep') return;
+  if (_opPrep.layout.st !== 'done' || _opPrep.data.st !== 'done') { showToast('Hoàn tất 2 bước kiểm tra trước khi mở ca', 'warn'); return; }
+  _opPhase = 'live';
+  _opShiftOpenAt = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('op-prep').style.display = 'none';
+  showToast(`▶ Đã mở ca — lô ${BATCH.id}`, 'success');
+  opStartRun();
+  _opFocusScan();
+}
+function _opRenderPrepLive() { if (_opPhase === 'prep' && document.getElementById('screen-operation').classList.contains('active')) renderOpPrep(); }
+
+function renderOpPrep() {
+  document.getElementById('op-live').style.display = 'none';
+  document.getElementById('op-complete').style.display = 'none';
+  document.getElementById('op-locked').style.display = 'none';
+  const smEl = document.getElementById('op-station-mode');
+  if (smEl) smEl.style.display = 'none';
+  const smBtn = document.getElementById('op-station-mode-btn');
+  if (smBtn) smBtn.style.display = 'none';
+  const prep = document.getElementById('op-prep');
+  prep.style.display = '';
+  const ctrl = document.getElementById('op-controls');
+  if (ctrl) ctrl.style.display = 'none';
+  const quick = document.getElementById('op-quick');
+  if (quick) quick.innerHTML = '<span style="font-size:11px;color:var(--text-subtle)">Sẵn sàng sau khi mở ca</span>';
+  const opBanner = document.getElementById('op-view-banner');
+  if (opBanner) opBanner.style.display = canEdit('operation') ? 'none' : '';
+  const sub = document.getElementById('op-subdesc');
+  if (sub) sub.innerHTML = `Chuẩn bị ca — lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · checklist bắt buộc trước khi mở ca`;
+  const scaleSel = document.getElementById('op-scale-sel');
+  if (scaleSel) scaleSel.value = _scaleKey;
+
+  const st = _opLayoutStats();
+  const canDo = canEdit('operation') && !_opAuto;
+  const ready = _opPrep.layout.st === 'done' && _opPrep.data.st === 'done';
+  const num = (n, s) => `<div class="prep-num ${s === 'done' ? 'done' : s === 'run' ? 'run' : ''}">${s === 'done' ? '✓' : n}</div>`;
+  const stBadge = s => s === 'done' ? `<span class="badge badge-green">✓ PASS</span>` : s === 'run' ? `<span class="badge badge-blue" style="animation:tpulse .8s ease infinite alternate">Đang kiểm tra…</span>` : `<span class="badge badge-gray">Chưa chạy</span>`;
+  const logHTML = p => p.log.length ? `<div class="prep-log">${p.log.map(l => `<div style="color:${l.ok ? 'var(--text)' : 'var(--yellow)'}"><span style="color:${l.ok ? 'var(--green)' : 'var(--yellow)'};flex-shrink:0;display:flex;margin-top:1px">${ico(l.ok ? 'check2' : 'alert', 13, 2.4)}</span><span>${l.t}</span></div>`).join('')}</div>` : '';
+
+  prep.innerHTML = `
+    <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:13px;flex-wrap:wrap">
+      <span style="width:42px;height:42px;border-radius:11px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('check', 22, 2)}</span>
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:15px;font-weight:700">Checklist chuẩn bị ca</div>
+        <div style="font-size:12px;color:var(--text-muted)">Hệ thống chặn mở ca khi thiết bị chưa sẵn sàng hoặc dữ liệu chưa được đối chiếu — chuẩn quy trình production.</div>
+      </div>
+      ${_opAuto ? `<span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-subtle)"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:tpulse .8s ease infinite alternate"></span>Chế độ giám sát — checklist tự chạy</span>` : ''}
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="prep-step">
+        ${num(1, _opPrep.layout.st)}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+            <div style="font-size:14px;font-weight:700">Load layout &amp; kiểm tra thiết bị</div>
+            ${stBadge(_opPrep.layout.st)}
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Tải layout kho do IT cấu hình, ping controller &amp; module đèn LED, đối chiếu kết quả test đèn gần nhất.</div>
+          <div class="prep-info">
+            <span class="prep-tag">${BATCH.block} · ${st.zones} khu · ${st.shelves} kệ · ${st.lights} đèn</span>
+            ${layoutZones.map(z => `<span class="prep-tag">${z.controller || '—'} · ${z.name}</span>`).join('')}
+          </div>
+          ${logHTML(_opPrep.layout)}
+          ${canDo && _opPrep.layout.st === 'todo' ? `<button class="btn btn-primary" style="margin-top:12px" onclick="opPrepStart('layout')">${ico('import', 15)} Load layout &amp; kiểm tra thiết bị</button>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;${_opPrep.layout.st !== 'done' ? 'opacity:.55' : ''}">
+      <div class="prep-step">
+        ${num(2, _opPrep.data.st)}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+            <div style="font-size:14px;font-weight:700">Double-check dữ liệu phân hàng</div>
+            ${stBadge(_opPrep.data.st)}
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Đối chiếu kế hoạch đã xác nhận ở <a onclick="showScreen('autoassign')" style="color:var(--accent);cursor:pointer">Gán tự động</a> với layout &amp; tồn kho — chốt số liệu trước khi đèn sáng.</div>
+          <div class="prep-info">
+            <span class="prep-tag">Lô ${BATCH.id}</span>
+            <span class="prep-tag">${BATCH_TOTALS.skuCount} SKU · ${BATCH_TOTALS.allocUnits.toLocaleString()} đơn vị</span>
+            <span class="prep-tag">${STORE_BINS.length} cửa hàng</span>
+          </div>
+          ${logHTML(_opPrep.data)}
+          ${canDo && _opPrep.data.st === 'todo' ? `<button class="btn btn-primary" style="margin-top:12px" ${_opPrep.layout.st !== 'done' ? 'disabled' : ''} onclick="opPrepStart('data')">${ico('scan', 15)} Đối chiếu dữ liệu</button>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="${!ready ? 'opacity:.55' : 'border-color:var(--green)'}">
+      <div class="prep-step">
+        ${num(3, ready ? 'run' : 'todo')}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700">Mở ca phân hàng</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">${st.zones} khu cần nhân viên — sau khi mở ca, NV quét thẻ tại trạm để vào ca, đèn chỉ sáng sau khi quét SKU.</div>
+          ${canDo ? `<button class="btn ${ready ? 'btn-success' : 'btn-secondary'}" style="margin-top:12px" ${!ready ? 'disabled' : ''} onclick="opOpenShift()">${ico('play', 15)} Mở ca phân hàng</button>`
+                  : `<div style="font-size:12px;color:var(--text-subtle);margin-top:10px">Hệ thống sẽ tự mở ca khi checklist hoàn tất (chế độ giám sát)</div>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── MÀN HÌNH TRẠM (persona nhân viên) — cùng máy trạng thái, giao diện tối giản chữ to ──
+function toggleStationMode(on) {
+  _stationMode = !!on;
+  renderOperation();
+  if (_stationMode) _opFocusScan();
+}
+
+function renderStationMode() {
+  const el = document.getElementById('op-station-mode');
+  if (!el) return;
+  const cur = _opQueue[_opIndex];
+  const paused = !_opRunning;
+  const stage = paused ? 'paused' : _opStage;
+  const S = {
+    'idle':      { c: 'var(--yellow)',     ic: 'badge', t: 'QUÉT THẺ NHÂN VIÊN ĐỂ VÀO CA' },
+    'await-sku': { c: 'var(--accent)',     ic: 'scan',  t: 'QUÉT MÃ SKU TRÊN THÙNG HÀNG' },
+    'putting':   { c: 'var(--light-on)',   ic: 'bulb',  t: 'BỎ HÀNG THEO ĐÈN — CHẠM Ô ĐỂ XÁC NHẬN' },
+    'wrap-up':   { c: 'var(--green)',      ic: 'check2',t: 'ĐÃ PHÂN XONG — CHỜ GIÁM SÁT ĐÓNG CA' },
+    'paused':    { c: 'var(--text-muted)', ic: 'pause', t: 'CA TẠM DỪNG' },
+  }[stage];
+  const locked = paused || stage === 'putting' || stage === 'wrap-up';
+  const crew = _opCrew();
+  const bins = (stage === 'putting' && cur) ? cur.bins.filter(b => b.status !== 'pending') : [];
+  const binLbl = b => b.status === 'on' ? 'CHẠM ĐỂ XÁC NHẬN' : b.status === 'done' ? '✓ ĐÃ BỎ' : b.status === 'short' ? '⚠ THIẾU HÀNG' : '✗ ĐÈN LỖI';
+  const binCol = b => b.status === 'on' ? 'var(--light-on)' : b.status === 'done' ? 'var(--green)' : b.status === 'short' ? 'var(--yellow)' : 'var(--red)';
+  el.innerHTML = `
+  <div class="sm-wrap">
+    <div class="sm-head">
+      <div class="sm-stage" style="background:${S.c}1f;color:${S.c}"><span class="op-stage-dot" style="background:${S.c}"></span>${S.t}</div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--text-muted)" class="text-mono">${crew.length} NV trong ca · ${BATCH.id}</span>
+        <button class="btn btn-secondary btn-sm" onclick="toggleStationMode(false)">Thoát màn hình trạm</button>
+      </div>
+    </div>
+    <div class="sm-scan" style="border-color:${S.c}55">
+      <span class="op-scan-ico" style="width:52px;height:52px;background:${S.c}1f;color:${S.c}">${ico(S.ic, 28, 2)}</span>
+      <input id="op-sm-input" autocomplete="off" spellcheck="false" placeholder="${locked ? '—' : 'Quét thẻ NV hoặc mã SKU…'}" ${locked ? 'disabled' : ''}
+             onkeydown="if(event.key==='Enter'){event.preventDefault();opScanSubmit(this);}">
+      <button class="btn btn-primary" style="font-size:15px;padding:13px 22px" ${locked ? 'disabled' : ''} onclick="opScanSubmit(document.getElementById('op-sm-input'))">Quét</button>
+    </div>
+    ${_opErrMsg ? `<div class="op-scan-err" style="display:flex;font-size:14px;margin-top:0">${ico('alert', 16)} ${_opErrMsg}</div>` : ''}
+    ${stage === 'putting' && cur ? `
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+      <span class="text-mono" style="font-size:26px;font-weight:700;color:var(--light-on)">${cur.sku}</span>
+      <span style="font-size:15px">${cur.name}</span>
+      <span style="font-size:13px;color:var(--text-muted)">${cur.bins.filter(b => b.status !== 'pending' && b.status !== 'on').length}/${cur.bins.length} cửa hàng</span>
+    </div>
+    <div class="sm-bins">${bins.map(b => `
+      <div class="sm-bin ${b.status}" ${b.status === 'on' ? `onclick="opManualConfirm('${b.addr}')"` : ''}>
+        <div style="font-size:13px;font-weight:700">${b.store}</div>
+        <div style="font-size:10px;color:var(--text-muted)" class="text-mono">Đèn ${b.addr} · ${b.loc}</div>
+        <div class="sm-qty">${b.confirmed ?? b.qty}</div>
+        <div style="font-size:11px;font-weight:700;color:${binCol(b)}">${binLbl(b)}</div>
+      </div>`).join('')}</div>` : ''}
+  </div>`;
+}
+
 // ── RENDER ──
 function renderOperation() {
   if (!_opQueue.length) buildOpQueue();
+  if (_opPhase === 'prep') { renderOpPrep(); return; }
+  document.getElementById('op-prep').style.display = 'none';
+  document.getElementById('op-locked').style.display = 'none';
   document.getElementById('op-live').style.display = '';
   document.getElementById('op-complete').style.display = 'none';
+  if (document.getElementById('screen-operation').classList.contains('active')) renderStepper('operation');
 
   const canControl = canEdit('operation');
   const ctrl = document.getElementById('op-controls');
   if (ctrl) ctrl.style.display = canControl ? '' : 'none';
+  const scaleSel = document.getElementById('op-scale-sel');
+  if (scaleSel) scaleSel.value = _scaleKey;
   const opBanner = document.getElementById('op-view-banner');
   if (opBanner) opBanner.style.display = canControl ? 'none' : '';
 
   const sub = document.getElementById('op-subdesc');
-  if (sub) { const st = _opZones.filter(z => z.worker).length; sub.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block} · ${_opZones.length} khu · NV: <span style="color:${st === _opZones.length ? 'var(--green)' : 'var(--yellow)'}">${st}/${_opZones.length} khu có người</span>`; }
+  if (sub) { const st = _opZones.filter(z => z.worker).length; sub.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> · ${BATCH.block}${_opShiftOpenAt ? ` · mở ca ${_opShiftOpenAt}` : ''} · NV: <span style="color:${st === _opZones.length ? 'var(--green)' : 'var(--yellow)'}">${st}/${_opZones.length} khu có người</span> · <span style="color:var(--green)">●</span> ${layoutZones.length}/${layoutZones.length} controller online`; }
 
   const pBtn = document.getElementById('op-pause-btn');
   if (pBtn) pBtn.innerHTML = _opRunning ? `${ico('pause', 15)} Tạm dừng ca` : `${ico('play', 15)} Tiếp tục ca`;
@@ -3250,18 +3765,29 @@ function renderOperation() {
   document.getElementById('opv-map').classList.toggle('active', _opView === 'map');
   document.getElementById('opv-list').classList.toggle('active', _opView === 'list');
   if (_opView === 'map') renderOpMap();
+
+  // Màn hình trạm (persona NV) phủ thay giao diện giám sát
+  const smBtn = document.getElementById('op-station-mode-btn');
+  if (smBtn) smBtn.style.display = (canControl && !_opAuto) ? '' : 'none';
+  const sm = document.getElementById('op-station-mode');
+  if (_stationMode && canControl && !_opAuto) {
+    document.getElementById('op-live').style.display = 'none';
+    sm.style.display = '';
+    renderStationMode();
+  } else { _stationMode = false; if (sm) sm.style.display = 'none'; }
 }
 
 function renderOpKpi() {
   const skuDone = _opDoneCount();
   const units = _opUnitsDone();
   const storesDone = _opQueue.reduce((a, q) => a + q.bins.filter(b => b.status === 'done' || b.status === 'short').length, 0);
-  document.getElementById('op-kpi').innerHTML = `
-    ${statCard('operation', 'var(--accent)', 'var(--accent-dim)', `${skuDone}/${_opQueue.length}`, 'SKU đã xong', null, 'trong lô')}
-    ${statCard('box', 'var(--green)', 'var(--green-dim)', `${units.toLocaleString()}`, 'Đơn vị đã phân', null, `/ ${_opUnitsTotal().toLocaleString()} đơn vị`)}
-    ${statCard('store', 'var(--purple)', 'var(--purple-dim)', storesDone.toLocaleString(), 'Lượt cửa hàng đã bỏ', null, 'đã xác nhận')}
-    ${statCard('alert', 'var(--red)', 'var(--red-dim)', _opExceptions.length, 'Sự cố', null, 'chưa xử lý')}
-  `;
+  const chip = (val, lbl, col) => `<div class="ops-stat"><b style="color:${col}">${val}</b><span>${lbl}</span></div>`;
+  const kpi = document.getElementById('op-kpi');
+  if (kpi) kpi.innerHTML =
+    chip(`${skuDone}/${_opQueue.length}`, 'SKU', 'var(--accent)') +
+    chip(units.toLocaleString(), 'đơn vị', 'var(--green)') +
+    chip(storesDone.toLocaleString(), 'lượt CH', 'var(--purple)') +
+    chip(_opExceptions.length, 'sự cố', _opExceptions.length ? 'var(--red)' : 'var(--text-subtle)');
   const dot = document.getElementById('op-live-dot');
   if (dot) dot.style.background = _opRunning ? 'var(--green)' : 'var(--yellow)';
   const fdot = document.getElementById('op-feed-dot');
@@ -3271,13 +3797,25 @@ function renderOpKpi() {
 function renderOpStrip() {
   const strip = document.getElementById('op-sku-strip');
   if (!strip) return;
-  strip.innerHTML = _opQueue.map((q, i) => {
+  // Lô lớn (hàng trăm SKU): chip đã xong gộp lại, chỉ liệt kê SKU đang làm + sắp tới
+  const MAX_CHIPS = 28;
+  const chip = (q, i) => {
     let bg, color, br = 'var(--border)';
     if (_skuResolved(q))                              { bg = 'var(--green-dim)';  color = 'var(--green)';  br = 'var(--green)'; }
     else if (i === _opIndex && _opStage === 'putting'){ bg = 'var(--accent-dim)'; color = 'var(--accent)'; br = 'var(--accent)'; }
     else                                              { bg = 'transparent';       color = 'var(--text-subtle)'; }
     return `<div title="${q.sku} · ${q.name}" style="min-width:30px;height:24px;padding:0 7px;border:1px solid ${br};border-radius:6px;background:${bg};color:${color};font-family:var(--font-mono);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">${q.sku.replace('SKU-', '')}</div>`;
-  }).join('');
+  };
+  if (_opQueue.length <= MAX_CHIPS) { strip.innerHTML = _opQueue.map(chip).join(''); return; }
+  const items = _opQueue.map((q, i) => ({ q, i }));
+  const pending = items.filter(x => !_skuResolved(x.q));
+  const doneN = _opQueue.length - pending.length;
+  const shown = pending.slice(0, MAX_CHIPS);
+  const moreN = pending.length - shown.length;
+  strip.innerHTML =
+    (doneN ? `<div style="height:24px;padding:0 9px;border:1px solid var(--green);border-radius:6px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:600;display:flex;align-items:center">✓ ${doneN} SKU xong</div>` : '') +
+    shown.map(x => chip(x.q, x.i)).join('') +
+    (moreN ? `<div style="height:24px;padding:0 9px;border:1px dashed var(--border);border-radius:6px;color:var(--text-subtle);font-size:11px;font-weight:600;display:flex;align-items:center">+${moreN} SKU chờ</div>` : '');
 }
 
 // Cổng quét: cập nhật các phần tử TĨNH (không dựng lại <input> để giữ focus khi gõ/quét)
@@ -3298,7 +3836,7 @@ function renderOpStation() {
   const stage  = paused ? 'paused' : _opStage;
   station.className = 'card op-station stage-' + stage;
 
-  // ── roster nhân viên THEO KHU (mỗi khu 1 NV, làm song song) ──
+  // ── roster nhân viên THEO KHU (mỗi khu 1 NV, làm song song) — danh sách gọn trong rail ──
   const canChangeZone = !_opAuto && _opStage !== 'putting';
   slot.innerHTML = _opZones.map(z => {
     if (z.worker) {
@@ -3306,14 +3844,19 @@ function renderOpStation() {
       const active = z.activeAddr ? `<span style="color:var(--light-on)">● đang bỏ</span>` : `<span style="color:var(--text-subtle)">${z.units} đv</span>`;
       return `<div class="op-zworker">
         <div class="op-worker-ava on" style="background:${z.color}22;color:${z.color};border-color:${z.color}">${w.initials}</div>
-        <div style="min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap">${w.name}</div>
-        <div style="font-size:10.5px;color:var(--text-muted)"><b style="color:${z.color}">${z.name}</b> · ${active}${canChangeZone ? ` · <a onclick="opClearZone('${z.id}')" style="color:var(--accent);cursor:pointer">đổi</a>` : ''}</div></div></div>`;
+        <div style="min-width:0;flex:1;display:flex;align-items:baseline;gap:6px;overflow:hidden">
+          <span style="font-size:12px;font-weight:600;white-space:nowrap">${w.name}</span>
+          <span style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b style="color:${z.color}">${z.name.replace('Khu vực', 'Khu')}</b> · ${active}</span>
+        </div>
+        ${canChangeZone ? `<a onclick="opClearZone('${z.id}')" style="color:var(--accent);cursor:pointer;font-size:10px;flex-shrink:0">đổi</a>` : ''}</div>`;
     }
     const willCover = _opAnyWorker() ? 'NV hiện có sẽ kiêm' : 'chờ quét thẻ';
-    return `<div class="op-zworker">
-      <div class="op-worker-ava off">${ico('user', 20)}</div>
-      <div style="min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text-muted);white-space:nowrap">Chưa có NV</div>
-      <div style="font-size:10.5px;color:var(--text-subtle)"><b style="color:${z.color}">${z.name}</b> · ${willCover}</div></div></div>`;
+    return `<div class="op-zworker" style="opacity:.65">
+      <div class="op-worker-ava off">${ico('user', 14)}</div>
+      <div style="min-width:0;flex:1;display:flex;align-items:baseline;gap:6px;overflow:hidden">
+        <span style="font-size:12px;font-weight:600;color:var(--text-muted);white-space:nowrap">Chưa có NV</span>
+        <span style="font-size:10px;color:var(--text-subtle);white-space:nowrap"><b style="color:${z.color}">${z.name.replace('Khu vực', 'Khu')}</b> · ${willCover}</span>
+      </div></div>`;
   }).join('');
 
   // ── huy hiệu trạng thái ──
@@ -3322,29 +3865,11 @@ function renderOpStation() {
     'idle':      { c: 'var(--yellow)',    bg: 'var(--yellow-dim)',      t: 'Bước 1 · Quét thẻ nhân viên' },
     'await-sku': { c: 'var(--accent)',    bg: 'var(--accent-dim)',      t: `Bước 2 · Quét SKU · ${nCrew} NV trong ca` },
     'putting':   { c: 'var(--light-on)',  bg: 'rgba(245,163,0,.12)',    t: `Đèn đang sáng · ${_opActiveAddrs().length} NV đang bỏ` },
+    'wrap-up':   { c: 'var(--green)',     bg: 'var(--green-dim)',       t: `Đã phân xong — còn ${_opExceptions.length} sự cố cần xử lý` },
     'paused':    { c: 'var(--text-muted)', bg: 'var(--surface2)',       t: 'Ca tạm dừng' },
   }[stage];
   badge.style.background = SB.bg; badge.style.color = SB.c;
   badge.innerHTML = `<span class="op-stage-dot" style="background:${SB.c}"></span>${SB.t}`;
-
-  // ── BẢN TRÌNH DIỄN TỰ CHẠY → hiển thị thao tác đang diễn ra tại trạm ──
-  if (_opAuto) {
-    zone.style.display = 'none';
-    const cur = _opQueue[_opIndex];
-    let ic2, c2, bg2, line, sub2;
-    if (paused) { ic2 = 'pause'; c2 = 'var(--text-muted)'; bg2 = 'var(--surface3)'; line = 'Đã tạm dừng ca'; sub2 = 'Bấm “Tiếp tục ca” để chạy tiếp'; }
-    else if (_opStage === 'idle') { ic2 = 'badge'; c2 = 'var(--yellow)'; bg2 = 'var(--yellow-dim)'; line = 'Nhân viên đang quét thẻ vào ca…'; sub2 = 'Mỗi khu một nhân viên phụ trách'; }
-    else if (_opStage === 'await-sku') { ic2 = 'scan'; c2 = 'var(--accent)'; bg2 = 'var(--accent-dim)'; line = 'Đang quét mã SKU tại trạm…'; sub2 = 'Đèn các cửa hàng sẽ bật ngay khi quét xong'; }
-    else { ic2 = 'bulb'; c2 = 'var(--light-on)'; bg2 = 'rgba(245,163,0,.12)'; const onN = cur ? cur.bins.filter(b => b.status === 'on').length : 0; line = `Đèn đang sáng — đang bỏ hàng${cur ? ' · ' + cur.sku : ''}`; sub2 = cur ? `${cur.name} · còn ${onN} cửa hàng chờ bỏ` : ''; }
-    quick.innerHTML = `<div style="display:flex;align-items:center;gap:13px;width:100%">
-        <span class="op-scan-ico" style="background:${bg2};color:${c2}">${ico(ic2, 24, 2)}</span>
-        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:${c2}">${line}</div><div style="font-size:12px;color:var(--text-muted)">${sub2}</div></div>
-        ${(!paused) ? `<span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-subtle)"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:tpulse .8s ease infinite alternate"></span>LIVE</span>` : ''}
-      </div>`;
-    errEl.style.display = 'none';
-    return;
-  }
-  zone.style.display = '';
 
   // ── ô quét theo từng bước ──
   let icoName, col, bg, hintTxt, ph, locked = false, qlabel = '', chips = '';
@@ -3369,11 +3894,16 @@ function renderOpStation() {
     const skuChips = pend.slice(0, 6).map((x, k) => `<button class="op-chip${k === 0 ? ' suggest' : ''}" onclick="opQuick('${x.q.sku}')">${x.q.sku}</button>`).join('');
     qlabel = 'Quét nhanh:';
     chips = badgeChips + skuChips;
+  } else if (_opStage === 'wrap-up') {
+    icoName = 'check2'; col = 'var(--green)'; bg = 'var(--green-dim)';
+    hintTxt = 'Đã phân xong toàn bộ SKU — xử lý nốt sự cố ở bảng “Sự cố cần xử lý” rồi đóng ca'; ph = 'Không cần quét nữa'; locked = true;
   } else { // putting
     icoName = 'bulb'; col = 'var(--light-on)'; bg = 'rgba(245,163,0,.12)';
-    hintTxt = 'Đèn đang sáng — nhân viên đang bỏ hàng vào từng cửa hàng…'; ph = 'Hoàn tất SKU hiện tại rồi quét tiếp'; locked = true;
+    hintTxt = 'Đèn đang sáng — NV bỏ hàng rồi nhấn nút xác nhận trên đèn (bấm vào đèn đang sáng)…'; ph = 'Hoàn tất SKU hiện tại rồi quét tiếp'; locked = true;
   }
-  scIco.style.background = bg; scIco.style.color = col; scIco.innerHTML = ico(icoName, 24, 2);
+  // Chế độ giám sát (manager): trạm chỉ hiển thị trạng thái tự mô phỏng — không nhập tay, không chip
+  if (_opAuto) { locked = true; chips = ''; ph = 'Chế độ giám sát — hệ thống tự mô phỏng'; }
+  scIco.style.background = bg; scIco.style.color = col; scIco.innerHTML = ico(icoName, 20, 2);
   hint.style.color = col; hint.textContent = hintTxt;
   input.placeholder = ph; input.disabled = locked; btn.disabled = locked;
   zone.classList.toggle('locked', locked);
@@ -3391,19 +3921,33 @@ function renderOpBins() {
   const resolved = cur.bins.filter(b => b.status !== 'pending' && b.status !== 'on').length;
   summary.textContent = `${resolved}/${cur.bins.length} cửa hàng`;
   const active = _opActiveAddrs();
-  grid.innerHTML = cur.bins.map(b => {
+  const manual = !_opAuto && canEdit('operation');
+  const binCard = b => {
     const isActive = active.includes(b.addr);
     const z = _zoneOf(b.addr);
     const wk = z && z.worker ? z.worker.name : 'chưa có NV';
     const cls = 'op-bin ' + (b.status === 'short' ? 'error' : b.status) + (isActive ? ' op-active' : '');
+    const clickable = manual && b.status === 'on';
     let foot;
     if (b.status === 'done')        foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--green);font-weight:600;padding:6px 0">${ico('check2', 15, 2.4)} Đã bỏ ${b.confirmed}</div>`;
     else if (b.status === 'short')  foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--yellow);font-weight:600;padding:6px 0">${ico('alert', 14)} Thiếu — bỏ ${b.confirmed}/${b.qty}</div>`;
     else if (b.status === 'error')  foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--red);font-weight:600;padding:6px 0">${ico('alert', 14)} Đèn lỗi</div>`;
-    else if (b.status === 'on')     foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--light-on);font-weight:600;padding:6px 0">${ico('bulb', 14)} ${isActive ? wk + ' đang bỏ...' : 'Đèn sáng — chờ ' + wk}</div>`;
+    else if (b.status === 'on')     foot = `<div style="display:flex;align-items:center;gap:5px;font-size:13px;color:var(--light-on);font-weight:600;padding:6px 0">${ico('bulb', 14)} ${isActive ? wk + ' đang bỏ...' : 'Đèn sáng — chờ ' + wk}${clickable ? ' · bấm để xác nhận' : ''}</div>`;
     else                            foot = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 0">Chờ quét SKU</div>`;
     const ztag = z ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:${z.color};font-weight:700"><span style="width:7px;height:7px;border-radius:50%;background:${z.color}"></span>${z.name}</span>` : '';
-    return `<div class="${cls}"><div class="op-dot"></div><div style="display:flex;justify-content:space-between;align-items:center"><div class="op-bin-store">${b.store}</div>${ztag}</div><div class="op-bin-loc">Đèn ${b.addr} · ${b.loc}</div><div class="op-bin-qty">${b.qty}</div>${foot}</div>`;
+    const click = clickable ? ` onclick="opManualConfirm('${b.addr}')" style="cursor:pointer" title="Bấm = NV nhấn nút xác nhận trên module đèn"` : '';
+    return `<div class="${cls}"${click}><div class="op-dot"></div><div style="display:flex;justify-content:space-between;align-items:center"><div class="op-bin-store">${b.store}</div>${ztag}</div><div class="op-bin-loc">Đèn ${b.addr} · ${b.loc}</div><div class="op-bin-qty">${b.qty}</div>${foot}</div>`;
+  };
+  // Nhóm theo KHU — kho lớn nhiều cửa hàng vẫn đọc được theo từng khu
+  grid.innerHTML = _opZones.map(z => {
+    const zbins = cur.bins.filter(b => b.zoneId === z.id);
+    if (!zbins.length) return '';
+    const zdone = zbins.filter(b => b.status !== 'pending' && b.status !== 'on').length;
+    return `<div style="grid-column:1/-1;display:flex;align-items:center;gap:7px;margin-top:4px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${z.color}"></span>
+        <b style="font-size:12px">${z.name}</b>
+        <span style="font-size:11px;color:var(--text-muted)">${z.worker ? '' + z.worker.name : 'chưa có NV'} · ${zdone}/${zbins.length} cửa hàng</span>
+      </div>` + zbins.map(binCard).join('');
   }).join('');
 }
 
@@ -3452,14 +3996,21 @@ function _opFindBin(sku, addr) {
   const q = _opQueue.find(x => x.sku === sku);
   return q ? q.bins.find(b => b.addr === addr) : null;
 }
+// Sau khi xử lý xong 1 sự cố: nếu đang wrap-up và đã sạch sự cố → đóng ca, xuất biên bản
+function _opAfterExcResolved() {
+  _opExcResolved++;
+  if (_opStage === 'wrap-up' && !_opExceptions.length) { opFinishRun(false); return true; }
+  return false;
+}
 function opExcRetry(i) {           // đèn lỗi → thử bật lại (mô phỏng ~65% thành công)
   const e = _opExceptions[i]; if (!e) return;
   const b = _opFindBin(e.sku, e.addr);
   if (Math.random() < 0.65) {
     if (b) { b.status = 'done'; b.confirmed = b.qty; }
     _opExceptions.splice(i, 1);
-    _opFeedPush('done', `🔄 Đèn ${e.addr} bật lại OK — ${e.store} bỏ ${e.qty}`);
+    _opFeedPush('done', `Đèn ${e.addr} bật lại OK — ${e.store} bỏ ${e.qty}`);
     showToast('✓ Đèn đã hoạt động lại — đã bỏ hàng', 'success');
+    if (_opAfterExcResolved()) return;
   } else {
     _opFeedPush('error', `✗ Đèn ${e.addr} vẫn lỗi sau khi thử lại — cần báo IT`);
     showToast('⚠ Đèn vẫn lỗi — hãy báo IT hoặc xác nhận tay', 'error');
@@ -3471,14 +4022,16 @@ function opExcManual(i) {           // bỏ qua đèn lỗi, NV xác nhận đã
   const b = _opFindBin(e.sku, e.addr);
   if (b) { b.status = 'done'; b.confirmed = b.qty; }
   _opExceptions.splice(i, 1);
-  _opFeedPush('done', `✍ Xác nhận thủ công ${e.store} · bỏ ${e.qty} (đèn ${e.addr} lỗi)`);
+  _opFeedPush('done', `Xác nhận thủ công ${e.store} · bỏ ${e.qty} (đèn ${e.addr} lỗi — đã tạo ticket IT)`);
+  if (_opAfterExcResolved()) return;
   renderOperation();
-  showToast('✓ Đã xác nhận thủ công — báo IT thay đèn sau', 'success');
+  showToast('✓ Đã xác nhận thủ công — ticket thay đèn đã gửi IT', 'success');
 }
 function opExcReplenish(i) {        // thiếu hàng → tạo yêu cầu bổ sung
   const e = _opExceptions[i]; if (!e) return;
   _opExceptions.splice(i, 1);
-  _opFeedPush('info', `📦 Tạo phiếu bổ sung ${e.missing} ${e.sku} cho ${e.store}`);
+  _opFeedPush('info', `Tạo phiếu bổ sung ${e.missing} ${e.sku} cho ${e.store}`);
+  if (_opAfterExcResolved()) return;
   renderOperation();
   showToast(`✓ Đã tạo phiếu bổ sung ${e.missing} đơn vị cho ${e.store}`, 'success');
 }
@@ -3486,6 +4039,7 @@ function opExcAccept(i) {           // chấp nhận thiếu, phần còn lại 
   const e = _opExceptions[i]; if (!e) return;
   _opExceptions.splice(i, 1);
   _opFeedPush('info', `Ghi nhận thiếu ${e.missing} ${e.sku} · ${e.store} — chuyển lô sau`);
+  if (_opAfterExcResolved()) return;
   renderOperation();
   showToast('✓ Đã ghi nhận thiếu hàng', 'info');
 }
@@ -3497,18 +4051,66 @@ function renderOpProgress() {
   document.getElementById('op-progress-text').textContent = `${done} / ${total} SKU`;
 }
 
+// Ghim / bỏ ghim khu đang xem chi tiết (bỏ ghim = tự bám theo khu đang có hoạt động)
+function opMapZoom(zoneId) { _opMapZoom = (_opMapZoom === zoneId) ? null : zoneId; renderOpMap(); }
+
+// Khu đang được xem chi tiết: ưu tiên khu đã ghim → khu đang có NV bỏ hàng → khu có đèn sáng → khu đầu
+function _opMapFocusZone(cur) {
+  if (_opMapZoom) { const z = layoutZones.find(x => x.id === _opMapZoom); if (z) return z; }
+  const act = _opZones.find(z => z.activeAddr);
+  if (act) { const z = layoutZones.find(x => x.id === act.id); if (z) return z; }
+  if (cur) { const b = cur.bins.find(x => x.status === 'on'); if (b) { const z = layoutZones.find(x => x.id === b.zoneId); if (z) return z; } }
+  return layoutZones[0];
+}
+
 function renderOpMap() {
   const panel = document.getElementById('op-map-view');
   if (!panel) return;
   const cur = _opQueue[_opIndex];
-  const letterByAddr = {}, qtyByAddr = {}, statusByAddr = {};
-  STORE_BINS.forEach((b, i) => letterByAddr[b.addr] = String.fromCharCode(65 + i));
+  const codeByAddr = {}, qtyByAddr = {}, statusByAddr = {};
+  STORE_BINS.forEach(b => codeByAddr[b.addr] = b.code);
   if (cur) cur.bins.forEach(b => { qtyByAddr[b.addr] = b.qty; statusByAddr[b.addr] = b.status; });
   const activeAddrs = _opActiveAddrs();
+  const manual = !_opAuto && canEdit('operation');
+  const putting = _opStage === 'putting' && cur;
 
+  // ── CẤP 1: dải thẻ khu (scale với mọi số khu — auto-fill grid, không vẽ phẳng cả kho) ──
+  const focus = _opMapFocusZone(cur);
+  const zoneCards = layoutZones.map(z => {
+    const zs = _opZones.find(x => x.id === z.id);
+    const zbins = putting ? cur.bins.filter(b => b.zoneId === z.id) : [];
+    const nOn = zbins.filter(b => b.status === 'on').length;
+    const nErr = zbins.filter(b => b.status === 'error').length;
+    const pct = zs && zs.totalUnits ? Math.round(zs.units / zs.totalUnits * 100) : 0;
+    const sel = focus && focus.id === z.id;
+    const cls = 'opz-card' + (sel ? ' sel' : '') + (nOn ? ' lit' : '');
+    const wk = zs && zs.worker
+      ? `<span style="color:var(--text)">${zs.worker.name}</span>${zs.activeAddr ? ` <span style="color:var(--light-on)">· đang bỏ ${zs.activeAddr}</span>` : ''}`
+      : `<span style="color:var(--yellow)">chưa có NV</span>`;
+    const state = nErr ? `<span style="color:var(--red)">${nErr} đèn lỗi</span>`
+      : nOn ? `<span style="color:var(--light-on)">${nOn} đèn sáng</span>`
+      : pct >= 100 ? `<span style="color:var(--green)">hoàn tất</span>`
+      : `<span style="color:var(--text-subtle)">chờ</span>`;
+    return `<div class="${cls}" onclick="opMapZoom('${z.id}')" title="${sel && _opMapZoom ? 'Bấm để bỏ ghim (tự bám theo hoạt động)' : 'Bấm để xem chi tiết ' + z.name}">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="width:9px;height:9px;border-radius:50%;background:${z.color};flex-shrink:0"></span>
+        <b style="font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${z.name}</b>
+        ${sel && _opMapZoom ? '<span style="font-size:9px;color:var(--accent);font-weight:700;letter-spacing:.5px">GHIM</span>' : ''}
+        <span class="text-mono" style="font-size:10px;color:var(--text-subtle)">${z.controller || ''}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${wk}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+        <div class="progress-bar" style="flex:1;height:5px"><div class="progress-fill green" style="width:${pct}%"></div></div>
+        <span class="text-mono" style="font-size:10px;color:var(--text-muted)">${zs ? zs.units : 0}/${zs ? zs.totalUnits : 0}</span>
+      </div>
+      <div style="font-size:11px;margin-top:5px">${state}</div>
+    </div>`;
+  }).join('');
+
+  // ── CẤP 2: chi tiết kệ của KHU đang chọn (không vẽ toàn bộ kho → scale với kho lớn) ──
   const cubby = addr => {
-    const letter = letterByAddr[addr];
-    if (!letter) return `<div class="cubby off" title="Đèn ${addr} · ngăn hàng khác (ngoài lô)"></div>`;
+    const code = codeByAddr[addr];
+    if (!code) return `<div class="cubby off" title="Đèn ${addr} · ngăn hàng khác (ngoài lô)"></div>`;
     const raw = statusByAddr[addr] || 'pending';
     const active = activeAddrs.includes(addr) ? ' active' : '';
     const qty = qtyByAddr[addr];
@@ -3517,9 +4119,14 @@ function renderOpMap() {
     else if (raw === 'error') ic = `<span class="cb-ic" style="color:var(--red)">${ico('alert', 11)}</span>`;
     else if (raw === 'short') ic = `<span class="cb-ic" style="color:var(--yellow)">${ico('alert', 11)}</span>`;
     else if (raw === 'on')    ic = `<span class="cb-ic" style="color:var(--light-on)">${ico('bulb', 11)}</span>`;
-    return `<div class="cubby ${raw}${active}" title="Đèn ${addr} · Cửa hàng ${letter} · ${qty ?? '—'} đơn vị"><div class="led"></div><div class="cb-store">${letter}</div><div class="cb-qty">${qty ?? ''}</div>${ic}</div>`;
+    const clickable = manual && raw === 'on';
+    const click = clickable ? ` onclick="opManualConfirm('${addr}')" style="cursor:pointer"` : '';
+    const tip = clickable ? ' — bấm = nhấn nút xác nhận trên đèn' : '';
+    return `<div class="cubby ${raw}${active}"${click} title="Đèn ${addr} · Cửa hàng ${code} · ${qty ?? '—'} đơn vị${tip}"><div class="led"></div><div class="cb-store">${code}</div><div class="cb-qty">${qty ?? ''}</div>${ic}</div>`;
   };
-  const zonesHTML = layoutZones.map(z => {
+  let zoneDetail = '';
+  if (focus) {
+    const z = focus;
     const racks = z.shelves.map(s => {
       const levels = s.floors.map(f =>
         `<div class="rack-level"><div class="rack-lvl-lbl">${f.label}</div><div class="rack-bays">${f.cells.map(cubby).join('')}</div></div>`
@@ -3528,22 +4135,30 @@ function renderOpMap() {
       return `<div class="rack-unit"><div class="rack-name"><i></i>${s.name} · ${nBin} ngăn</div><div class="rack">${levels}</div><div class="rack-feet"><span></span><span></span></div></div>`;
     }).join('');
     const zs = _opZones.find(x => x.id === z.id);
-    const wkTag = zs ? (zs.worker ? `<span class="text-sm" style="color:${z.color};font-weight:600">· 👤 ${zs.worker.name}${zs.activeAddr ? ' (đang bỏ)' : ''}</span>` : `<span class="text-sm" style="color:var(--yellow)">· chưa có NV</span>`) : (z.controller ? `<span class="text-muted text-sm">· ${z.controller}</span>` : '');
-    return `<div style="margin-bottom:22px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><span style="width:9px;height:9px;border-radius:50%;background:${z.color}"></span><b style="font-size:13px">${z.name}</b>${wkTag}</div><div class="rack-aisle">${racks}</div></div>`;
-  }).join('');
-
-  const putting = _opStage === 'putting' && cur;
+    const wkTag = zs ? (zs.worker ? `<span class="text-sm" style="color:${z.color};font-weight:600">· ${zs.worker.name}${zs.activeAddr ? ' (đang bỏ)' : ''}</span>` : `<span class="text-sm" style="color:var(--yellow)">· chưa có NV</span>`) : (z.controller ? `<span class="text-muted text-sm">· ${z.controller}</span>` : '');
+    const pinTag = _opMapZoom
+      ? `<span style="font-size:11px;color:var(--accent)">Đã ghim — <a onclick="opMapZoom('${z.id}')" style="cursor:pointer;text-decoration:underline">bỏ ghim</a></span>`
+      : `<span style="font-size:11px;color:var(--text-subtle)">Tự bám theo khu đang có hoạt động — bấm thẻ khu để ghim</span>`;
+    zoneDetail = `<div style="margin-top:4px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap"><span style="width:9px;height:9px;border-radius:50%;background:${z.color}"></span><b style="font-size:13px">${z.name}</b>${wkTag}<span style="flex:1"></span>${pinTag}</div>
+      <div class="rack-aisle">${racks}</div>
+    </div>`;
+  }
+  const zonesHTML = `<div class="opz-strip">${zoneCards}</div>${zoneDetail}`;
   const doneBins = cur ? cur.bins.filter(b => b.status !== 'pending' && b.status !== 'on').length : 0;
   const totalBins = cur ? cur.bins.length : 0;
   const binPct = totalBins ? Math.round(doneBins / totalBins * 100) : 0;
-  const hCol = putting ? 'var(--light-on)' : 'var(--accent)';
-  const hBg  = putting ? 'rgba(245,163,0,.10)' : 'var(--accent-dim)';
-  const hBd  = putting ? 'rgba(245,163,0,.3)' : 'rgba(47,111,237,.25)';
+  const wrapUp = _opStage === 'wrap-up';
+  const hCol = putting ? 'var(--light-on)' : wrapUp ? 'var(--green)' : 'var(--accent)';
+  const hBg  = putting ? 'rgba(245,163,0,.10)' : wrapUp ? 'var(--green-dim)' : 'var(--accent-dim)';
+  const hBd  = putting ? 'rgba(245,163,0,.3)' : wrapUp ? 'rgba(63,185,80,.3)' : 'rgba(47,111,237,.25)';
   const hLabel = putting ? `Đèn đang sáng · SKU ${_opDoneCount() + 1}/${_opQueue.length}`
     : _opStage === 'await-sku' ? 'Chờ quét SKU — đèn đang tắt'
+    : wrapUp ? 'Đã phân xong — đèn đang tắt'
     : 'Chờ nhân viên vào ca — đèn đang tắt';
   const hTitle = putting ? `${cur.sku} · ${cur.name}`
-    : _opStage === 'await-sku' ? 'Quét mã SKU để bật đèn' : 'Quét thẻ NV để bắt đầu';
+    : _opStage === 'await-sku' ? 'Quét mã SKU để bật đèn'
+    : wrapUp ? 'Xử lý nốt sự cố để đóng ca' : 'Quét thẻ NV để bắt đầu';
   const hStatus = putting ? `Đã xác nhận ${doneBins}/${totalBins} cửa hàng`
     : `${_opDoneCount()}/${_opQueue.length} SKU đã phân xong`;
   const header = `
@@ -3568,7 +4183,7 @@ function renderOpMap() {
       </div>
     </div>
     ${header}
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Mỗi kệ nhìn ngang theo tầng (T3→T1) · ô = ngăn, chấm góc trái = module LED · số = lượng cần bỏ, chữ góc phải = cửa hàng (A–E) · viền xanh = đèn NV đang bỏ · ô gạch mờ = ngăn hàng khác.</div>
+    <div style="font-size:11px;color:var(--text-subtle);margin-bottom:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="Thẻ khu: bấm để ghim xem chi tiết. Kệ nhìn ngang theo tầng — ô = ngăn, số = lượng cần bỏ, chữ = mã cửa hàng, viền xanh = đèn NV đang bỏ, ô gạch mờ = ngăn hàng khác. Bấm vào đèn sáng = NV nhấn nút xác nhận trên module.">Bấm thẻ khu để ghim chi tiết · số = lượng cần bỏ · chữ = mã cửa hàng · bấm đèn sáng = nhấn nút xác nhận trên module</div>
     ${zonesHTML}
   </div>`;
 }
@@ -3577,9 +4192,65 @@ function renderOpMap() {
 function opEnter() {
   if (!_opQueue.length) buildOpQueue();
   _opAuto = !canEdit('operation');                       // ops = thao tác tay; manager = giám sát (auto)
-  if (_opQueue.length && _opDoneCount() === _opQueue.length) { renderOpComplete(false); return; }
+  // Manager giám sát: coi như Vận Hành đã nhận data & chốt kế hoạch (mô phỏng câu chuyện hoàn chỉnh)
+  if (_opAuto && !_planConfirmed) {
+    _importState.api1 = _importState.api2 = true;
+    _planConfirmed = true;
+    _opFeedPush('info', `Kế hoạch lô ${BATCH.id} đã được Quản Lý Vận Hành chốt — vào giám sát ca`);
+  }
+  // GATE: kế hoạch chưa chốt → chưa vào vận hành (giữ pipeline đúng thứ tự)
+  if (!_planConfirmed) { renderOpLocked(); return; }
+  const lk = document.getElementById('op-locked');
+  if (lk) lk.style.display = 'none';
+  if (_opPhase === 'live' && _opQueue.length && _opDoneCount() === _opQueue.length && !_opExceptions.length) { renderOpComplete(false); return; }
+  if (_opPhase === 'prep') {                              // ca chưa mở → chạy checklist chuẩn bị trước
+    renderOpPrep();
+    if (_opAuto) setTimeout(_opAutoPrepNext, 900);
+    return;
+  }
   opStartRun();
   _opFocusScan();
+}
+
+// Màn vận hành bị KHÓA khi kế hoạch chưa chốt — giải thích vì sao + đường đi tiếp
+function renderOpLocked() {
+  ['op-live', 'op-prep', 'op-complete', 'op-station-mode'].forEach(id => { const e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  const ctrl = document.getElementById('op-controls');
+  if (ctrl) ctrl.style.display = 'none';
+  const smBtn = document.getElementById('op-station-mode-btn');
+  if (smBtn) smBtn.style.display = 'none';
+  const sub = document.getElementById('op-subdesc');
+  if (sub) sub.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> — chưa sẵn sàng vận hành`;
+  const quick = document.getElementById('op-quick');
+  if (quick) quick.innerHTML = '<span style="font-size:11px;color:var(--text-subtle)">Khóa tới khi chốt kế hoạch</span>';
+  const scaleSel = document.getElementById('op-scale-sel');
+  if (scaleSel) scaleSel.value = _scaleKey;
+  const imported = _importState.api1 && _importState.api2;
+  const el = document.getElementById('op-locked');
+  el.style.display = '';
+  el.innerHTML = `
+    <div class="card" style="max-width:560px;margin:48px auto;text-align:center;padding:36px 28px">
+      <span style="width:58px;height:58px;border-radius:50%;background:var(--yellow-dim);color:var(--yellow);display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px">${ico('alert', 28, 2)}</span>
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">Chưa thể vận hành lô ${BATCH.id}</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:18px">${imported
+        ? 'Dữ liệu đã nhận đủ — còn thiếu bước <strong>duyệt &amp; chốt kế hoạch</strong> ở màn Chuẩn bị lô hàng.'
+        : 'Cần <strong>nhận dữ liệu từ 2 API</strong> rồi <strong>duyệt &amp; chốt kế hoạch</strong> ở Chuẩn bị lô hàng trước khi mở ca.'}</div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showScreen('autoassign')">${ico('autoassign', 15)} Đi duyệt &amp; chốt kế hoạch</button>
+      </div>
+      <div style="margin-top:22px;padding-top:14px;border-top:1px dashed var(--border)">
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--text-subtle)" onclick="demoSkipToOps()">${ico('zap', 12)} Mô phỏng: chốt nhanh kế hoạch để xem vận hành</button>
+      </div>
+    </div>`;
+}
+
+// Demo: tự hoàn tất Nhận dữ liệu + Chốt kế hoạch để xem ngay phần vận hành
+function demoSkipToOps() {
+  _importState.api1 = _importState.api2 = true;
+  _planConfirmed = true;
+  _batchStatuses[BATCH.id] = 'running';
+  showToast('Mô phỏng: đã nhận dữ liệu & chốt kế hoạch — vào chuẩn bị ca', 'info');
+  showScreen('operation');
 }
 
 function opStartRun() {
@@ -3606,12 +4277,13 @@ function opScanSubmit(inp) {
   if (!_opRunning) { _opFlashErr('Ca đang tạm dừng — bấm “Tiếp tục ca” trước.'); return; }
   if (_opStage === 'idle') opScanEmployee(code);
   else if (_opStage === 'await-sku') { if (_looksLikeBadge(code)) opScanEmployee(code); else opScanSku(code); }  // 1 máy quét: tự phân biệt thẻ NV / SKU
+  else if (_opStage === 'wrap-up') _opFlashErr('Ca đã phân xong — xử lý nốt sự cố để đóng ca.');
   else _opFlashErr('Đang bỏ hàng — hoàn tất SKU hiện tại trước khi quét tiếp.');
-  setTimeout(() => { const i = document.getElementById('op-scan-input'); if (i && !i.disabled) i.focus(); }, 20);
+  _opFocusScan();
 }
 function _looksLikeBadge(code) { return /^NV-?\d{2,}$/i.test((code || '').replace(/\s/g, '')); }
 function opQuick(code) { const inp = document.getElementById('op-scan-input'); if (!inp || inp.disabled) return; inp.value = code; opScanSubmit(inp); }
-function _opFocusScan() { if (_opAuto) return; setTimeout(() => { const i = document.getElementById('op-scan-input'); if (i && !i.disabled) i.focus(); }, 30); }
+function _opFocusScan() { if (_opAuto) return; setTimeout(() => { const i = document.getElementById(_stationMode ? 'op-sm-input' : 'op-scan-input'); if (i && !i.disabled) i.focus(); }, 30); }
 
 // Quét thẻ → NV vào ca, nhận khu chưa có người. CHỈ cần ≥1 NV là quét SKU được.
 function opScanEmployee(code) {
@@ -3659,10 +4331,23 @@ function opClearZone(id) {
   if (w) _opFeedPush('info', `${w.name} rời ${z.name}`);
   z.worker = null; z.activeAddr = null;
   // nếu NV này không còn phụ trách khu nào & còn NV khác → vẫn ở await-sku; hết NV → idle
-  _opStage = _opAnyWorker() ? 'await-sku' : 'idle';
+  if (_opStage !== 'wrap-up') _opStage = _opAnyWorker() ? 'await-sku' : 'idle';
   _opErrMsg = null;
   renderOperation();
   _opFocusScan();
+}
+
+// NV nhấn NÚT XÁC NHẬN trên module đèn (click vào đèn đang sáng = nhấn nút vật lý trên thiết bị)
+function opManualConfirm(addr) {
+  if (_opAuto || !canEdit('operation') || !_opRunning || _opStage !== 'putting') return;
+  const cur = _opQueue[_opIndex]; if (!cur) return;
+  const b = cur.bins.find(x => x.addr === addr && x.status === 'on'); if (!b) return;
+  b.status = 'done'; b.confirmed = b.qty;
+  const z = _zoneOf(addr);
+  if (z) { z.units += b.qty; if (z.activeAddr === addr) z.activeAddr = null; }
+  _opFeedPush('done', `✓ [${z ? z.name : '—'}] Nhấn nút xác nhận đèn ${addr} — ${b.store} đủ ${b.qty}`);
+  if (_opCheckSkuDone(cur)) return;
+  renderOperation();
 }
 
 // Chế độ giám sát (manager): tự phân NV — staff đủ các khu rồi mới quét SKU (để minh hoạ 2 NV song song)
@@ -3682,11 +4367,12 @@ function _opAutoStaff() {
 function _opFlashErr(msg) {
   _opErrMsg = msg;
   renderOpStation();
+  if (_stationMode) renderStationMode();
   const z = document.getElementById('op-scan-zone');
   if (z) { z.classList.remove('err'); void z.offsetWidth; z.classList.add('err'); }
   showToast('⚠ ' + msg, 'error');
   clearTimeout(_opErrTimer);
-  _opErrTimer = setTimeout(() => { _opErrMsg = null; const zz = document.getElementById('op-scan-zone'); if (zz) zz.classList.remove('err'); renderOpStation(); }, 2800);
+  _opErrTimer = setTimeout(() => { _opErrMsg = null; const zz = document.getElementById('op-scan-zone'); if (zz) zz.classList.remove('err'); renderOpStation(); if (_stationMode) renderStationMode(); }, 2800);
 }
 
 // chọn đèn kế tiếp trong KHU. NV của khu chỉ bỏ 1 đèn 1 lúc → nếu NV đang bận khu khác thì khu này chờ.
@@ -3707,11 +4393,12 @@ function _opResolveExcAt(i) {
   if (e.type === 'error') {
     const b = _opFindBin(e.sku, e.addr);
     if (b && b.status === 'error') { b.status = 'done'; b.confirmed = b.qty; const z = _zoneOf(e.addr); if (z) z.units += b.qty; }
-    _opFeedPush('done', `🔄 [${e.zone || ''}] Đèn ${e.addr} bật lại OK — ${e.store} bỏ ${e.qty}`);
+    _opFeedPush('done', `[${e.zone || ''}] Đèn ${e.addr} bật lại OK — ${e.store} bỏ ${e.qty}`);
   } else {
-    _opFeedPush('info', `📦 Đã tạo phiếu bổ sung ${e.missing} ${e.sku} cho ${e.store}`);
+    _opFeedPush('info', `Đã tạo phiếu bổ sung ${e.missing} ${e.sku} cho ${e.store}`);
   }
   _opExceptions.splice(i, 1);
+  _opExcResolved++;
 }
 function _opAutoResolveExc() {
   if (!_opExceptions.length) return;
@@ -3720,6 +4407,26 @@ function _opAutoResolveExc() {
   if (i < 0) return;
   _opResolveExcAt(i);
   renderOperation();
+}
+
+// SKU vừa xử lý xong toàn bộ đèn → sang SKU kế / wrap-up (còn sự cố treo) / đóng ca
+function _opCheckSkuDone(cur) {
+  if (!cur || !_skuResolved(cur)) return false;
+  const sh = cur.bins.filter(b => b.status === 'short').length;
+  const er = cur.bins.filter(b => b.status === 'error').length;
+  _opFeedPush('skuDone', `Hoàn tất ${cur.sku} — ${cur.bins.filter(b => b.status === 'done').length}/${cur.bins.length} cửa hàng${sh ? `, ${sh} thiếu` : ''}${er ? `, ${er} lỗi` : ''}`);
+  _opZones.forEach(z => z.activeAddr = null);
+  const pend = _opPending();
+  if (pend.length) { _opStage = 'await-sku'; _opStepMs = 700 + Math.random() * 800; renderOperation(); _opFocusScan(); return true; }
+  // production: chưa đóng ca nếu còn sự cố chưa xử lý (thiếu hàng / đèn lỗi)
+  if (!_opAuto && _opExceptions.length) {
+    _opStage = 'wrap-up';
+    _opFeedPush('info', `Đã phân xong ${_opQueue.length}/${_opQueue.length} SKU — xử lý nốt ${_opExceptions.length} sự cố để đóng ca`);
+    renderOperation();
+    return true;
+  }
+  opFinishRun(false);
+  return true;
 }
 
 function opTick() {
@@ -3740,6 +4447,8 @@ function opTick() {
     }
     renderOpKpi(); return;
   }
+  // ── stage WRAP-UP: đã phân xong, chờ xử lý sự cố để đóng ca ──
+  if (_opStage === 'wrap-up') { renderOpKpi(); return; }
 
   // ── stage PUTTING: MỖI KHU là 1 luồng bỏ hàng SONG SONG ──
   const cur = _opQueue[_opIndex];
@@ -3774,16 +4483,7 @@ function opTick() {
   }
 
   // SKU xong khi MỌI đèn (tất cả khu) đã xử lý
-  if (_skuResolved(cur)) {
-    const sh = cur.bins.filter(b => b.status === 'short').length;
-    const er = cur.bins.filter(b => b.status === 'error').length;
-    _opFeedPush('skuDone', `Hoàn tất ${cur.sku} — ${cur.bins.filter(b => b.status === 'done').length}/${cur.bins.length} cửa hàng${sh ? `, ${sh} thiếu` : ''}${er ? `, ${er} lỗi` : ''}`);
-    _opZones.forEach(z => z.activeAddr = null);
-    const pend = _opPending();
-    if (pend.length) { _opStage = 'await-sku'; _opStepMs = 700 + Math.random() * 800; renderOperation(); _opFocusScan(); }
-    else opFinishRun(false);
-    return;
-  }
+  if (_opCheckSkuDone(cur)) return;
 
   if (changed) renderOperation();
   else { renderOpKpi(); renderOpProgress(); }   // nhịp chờ: chỉ cập nhật số liệu, không dựng lại đèn
@@ -3796,7 +4496,12 @@ function opTogglePause() {
   else { opStartRun(); showToast('Tiếp tục ca', 'info'); }
 }
 function opFinishEarly() {
-  if (!confirm('Kết thúc ca sớm? Các SKU chưa xong sẽ được ghi nhận còn dở.')) return;
+  const allDone = _opQueue.length && _opDoneCount() === _opQueue.length;
+  if (allDone && !_opExceptions.length) { opFinishRun(false); return; }   // đã sạch việc → đóng ca bình thường
+  const parts = [];
+  if (!allDone) parts.push(`${_opQueue.length - _opDoneCount()} SKU chưa xong sẽ ghi nhận còn dở`);
+  if (_opExceptions.length) parts.push(`${_opExceptions.length} sự cố chưa xử lý sẽ chuyển sang ca sau`);
+  if (!confirm(`Kết thúc ca sớm?\n· ${parts.join('\n· ')}`)) return;
   opFinishRun(true);
 }
 function opFinishRun(early) {
@@ -3808,6 +4513,11 @@ function opFinishRun(early) {
 
 function renderOpComplete(early) {
   document.getElementById('op-live').style.display = 'none';
+  document.getElementById('op-prep').style.display = 'none';
+  document.getElementById('op-locked').style.display = 'none';
+  _stationMode = false;
+  const smEl = document.getElementById('op-station-mode');
+  if (smEl) smEl.style.display = 'none';
   const el = document.getElementById('op-complete');
   el.style.display = '';
   let done = 0, shorts = 0, errs = 0, unitsPut = 0;
@@ -3818,11 +4528,13 @@ function renderOpComplete(early) {
     if (b.status === 'error') errs++;
   }));
   _batchStatuses[BATCH.id] = early ? 'running' : 'done';
+  if (document.getElementById('screen-operation').classList.contains('active')) renderStepper('operation');
   el.innerHTML = `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:14px;text-align:center">
       <span style="width:72px;height:72px;border-radius:50%;background:${early ? 'var(--yellow-dim)' : 'var(--green-dim)'};color:${early ? 'var(--yellow)' : 'var(--green)'};display:flex;align-items:center;justify-content:center">${ico(early ? 'stop' : 'checkCircle', 38, 2)}</span>
       <div style="font-size:22px;font-weight:700">${early ? 'Đã kết thúc ca sớm' : 'Hoàn tất ca phân hàng!'}</div>
       <div style="font-size:13px;color:var(--text-muted)">Lô ${BATCH.id} · ${skuDone}/${_opQueue.length} SKU · ${String(Math.floor(_opElapsedMs / 60000)).padStart(2, '0')}:${String(Math.floor(_opElapsedMs / 1000) % 60).padStart(2, '0')}</div>
+      <div style="font-size:12px;color:var(--text-muted)">Biên bản ca: mở ${_opShiftOpenAt || '—'} · đóng ${new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} · ${_opExcResolved} sự cố đã xử lý${early && _opExceptions.length ? ` · <span style="color:var(--yellow)">${_opExceptions.length} sự cố chuyển ca sau</span>` : ''}</div>
       <div class="stat-grid stat-grid-4" style="width:100%;max-width:700px;margin-top:8px">
         <div class="stat-card"><div class="stat-label">Cửa hàng xác nhận</div><div class="stat-value" style="color:var(--green)">${done}</div></div>
         <div class="stat-card"><div class="stat-label">Đơn vị đã phân</div><div class="stat-value">${unitsPut.toLocaleString()}</div></div>
@@ -3874,24 +4586,24 @@ function refreshLotStatuses() {
     row.style.background = 'rgba(63,185,80,.05)';
     statusEl.innerHTML = `<span class="badge badge-yellow" style="animation:tpulse .8s ease infinite alternate">● Đang phân hàng</span>`;
     actionsEl.innerHTML = `
-      <button class="btn btn-ghost btn-sm">👁 Xem</button>
-      <button class="btn btn-success btn-sm" style="animation:tpulse 1s ease infinite alternate" onclick="showScreen('operation')">💡 Tiếp tục vận hành</button>`;
+      <button class="btn btn-ghost btn-sm">Xem</button>
+      <button class="btn btn-success btn-sm" style="animation:tpulse 1s ease infinite alternate" onclick="showScreen('operation')">Tiếp tục vận hành</button>`;
   } else if (st === 'done') {
     row.style.outline = '2px solid var(--green)';
     row.style.outlineOffset = '-2px';
     row.style.background = 'rgba(63,185,80,.05)';
     statusEl.innerHTML = `<span class="badge badge-green">✓ Hoàn tất</span>`;
     actionsEl.innerHTML = `
-      <button class="btn btn-ghost btn-sm">👁 Xem</button>
-      <button class="btn btn-ghost btn-sm" onclick="showScreen('reports')">📊 Báo cáo</button>`;
+      <button class="btn btn-ghost btn-sm">Xem</button>
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('reports')">Báo cáo</button>`;
   } else if (st === 'rejected') {
     row.style.outline = '2px solid var(--red)';
     row.style.outlineOffset = '-2px';
     row.style.background = 'rgba(248,81,73,.04)';
     statusEl.innerHTML = `<span class="badge badge-red">✗ Đã từ chối</span>`;
     actionsEl.innerHTML = `
-      <button class="btn btn-ghost btn-sm">👁 Xem</button>
-      <button class="btn btn-primary btn-sm" onclick="showScreen('import')">📥 Nhận lại data</button>`;
+      <button class="btn btn-ghost btn-sm">Xem</button>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('autoassign')">Chuẩn bị lại lô</button>`;
   }
 }
 
@@ -3932,139 +4644,36 @@ function filterLot() {
 }
 
 // ════════ NHẬN DỮ LIỆU API (1 luồng: kéo 2 nguồn → đối chiếu → xác nhận) ════════
+// USER chủ động bấm "Nhận dữ liệu" trong màn Chuẩn bị lô hàng để kéo dữ liệu từ 2 API về.
+// _importState là cờ pipeline; _syncTimes hiển thị giờ nhận trên strip trạng thái.
 let _importState = { api1: false, api2: false };
-const IMPORT_SOURCES = [
-  { key: 'api1', name: 'Hàng tiếp nhận',     tag: 'API 1', tagCls: 'badge-blue',   icon: 'box',   url: 'https://api.client.com/receiving/latest',         desc: () => `${BATCH.skus.length} dòng tồn kho` },
-  { key: 'api2', name: 'Kế hoạch phân phối', tag: 'API 2', tagCls: 'badge-purple', icon: 'store', url: 'https://api.client.com/distribution-plan/latest', desc: () => `${BATCH_TOTALS.skuCount} SKU × ${BATCH.storeBins.length} cửa hàng` },
-];
-
-function renderImportScreen() {
-  const bid = document.getElementById('import-batch-id');
-  if (bid) bid.textContent = BATCH.id;
-  const n = (_importState.api1 ? 1 : 0) + (_importState.api2 ? 1 : 0);
-  const prog = document.getElementById('import-source-progress');
-  if (prog) prog.textContent = `${n}/2 nguồn đã nhận`;
-
-  document.getElementById('import-sources').innerHTML = IMPORT_SOURCES.map(s => {
-    const done = _importState[s.key];
-    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid ${done ? 'var(--green)' : 'var(--border)'};border-radius:11px;background:${done ? 'var(--green-dim)' : 'var(--surface2)'};transition:all .15s">
-      <span style="width:40px;height:40px;border-radius:10px;background:var(--surface);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--shadow)">${ico(s.icon, 20)}</span>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px"><span style="font-weight:600;font-size:14px">${s.name}</span><span class="badge ${s.tagCls}" style="font-size:10px">${s.tag}</span></div>
-        <div class="text-mono" style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.url}</div>
-      </div>
-      <span class="badge ${done ? 'badge-green' : 'badge-gray'}" style="white-space:nowrap">${done ? '✓ ' + s.desc() : 'Chưa kéo'}</span>
-      <button class="btn ${done ? 'btn-secondary' : 'btn-primary'} btn-sm" style="white-space:nowrap" onclick="pullApi('${s.key}')">${ico('replenishment', 14)} ${done ? 'Kéo lại' : 'Kéo dữ liệu'}</button>
-    </div>`;
-  }).join('');
-
-  renderImportRecon();
-}
-
-function pullApi(key) {
-  const s = IMPORT_SOURCES.find(x => x.key === key);
-  showLoading(`Đang kéo ${s.name.toLowerCase()} từ API...`);
-  setTimeout(() => {
-    hideLoading();
-    _importState[key] = true;
-    renderImportScreen();
-    showToast(`✓ Đã nhận ${s.name.toLowerCase()} (${s.desc()})`, 'success');
-  }, 900);
-}
-
-function renderImportRecon() {
-  const both = _importState.api1 && _importState.api2;
-  const btn = document.getElementById('import-confirm-btn');
-  if (btn) { btn.disabled = !both; btn.style.opacity = both ? '' : '.5'; }
-  const badges = document.getElementById('import-recon-badges');
-  const body = document.getElementById('import-recon-body');
-  if (!both) {
-    if (badges) badges.innerHTML = '';
-    body.innerHTML = `<div class="empty-state" style="padding:32px">
-      <div style="color:var(--text-subtle);display:flex;justify-content:center;margin-bottom:10px">${ico('autoassign', 34, 1.6)}</div>
-      <div class="empty-text">Kéo cả <strong>2 nguồn</strong> để hệ thống đối chiếu tồn kho với kế hoạch phân phối</div>
-    </div>`;
-    return;
-  }
-  badges.innerHTML =
-    `<span class="badge badge-green">${BATCH_TOTALS.nOk} đủ</span>` +
-    (BATCH_TOTALS.nShort ? `<span class="badge badge-red">${BATCH_TOTALS.nShort} thiếu</span>` : '') +
-    (BATCH_TOTALS.nSurplus ? `<span class="badge badge-yellow">${BATCH_TOTALS.nSurplus} dư</span>` : '');
-
-  const rows = ASSIGN_DATA.map(d => {
-    const cls = d.status === 'short' ? 'error' : d.status === 'surplus' ? 'warn' : 'ok';
-    const stockColor = d.status === 'short' ? 'color:var(--red)' : d.status === 'surplus' ? 'color:var(--yellow)' : 'color:var(--green)';
-    const diffStr = d.diff === 0 ? '0' : d.diff > 0 ? `+${d.diff}` : `${d.diff}`;
-    const diffCls = d.diff === 0 ? 'diff-ok' : d.diff > 0 ? 'diff-warn' : 'diff-err';
-    const badge = d.status === 'short' ? `<span class="badge badge-red">Thiếu ${Math.abs(d.diff)}</span>`
-                : d.status === 'surplus' ? `<span class="badge badge-yellow">Dư ${d.diff}</span>`
-                : `<span class="badge badge-green">Đủ</span>`;
-    return `<tr class="validation-row ${cls}">
-      <td class="text-mono">${d.sku}</td><td>${d.name}</td>
-      <td class="text-mono text-sm" style="color:var(--text-muted)">${d.lot}</td>
-      <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
-      <td class="text-mono" style="text-align:right;font-weight:600">${d.plan}</td>
-      <td class="assign-diff ${diffCls}" style="text-align:right">${diffStr}</td>
-      <td>${badge}</td></tr>`;
-  }).join('');
-
-  body.innerHTML = `
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">So sánh <strong>tổng tồn kho (API 1)</strong> với <strong>tổng kế hoạch (API 2)</strong> theo từng SKU. Việc chia cho từng cửa hàng sẽ làm ở bước Gán tự động.</div>
-    <div class="table-wrap" style="max-height:300px;overflow-y:auto">
-      <table>
-        <thead><tr>
-          <th>SKU</th><th>Tên hàng</th><th>LOT</th>
-          <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
-          <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
-          <th style="text-align:right">Chênh lệch</th>
-          <th>Trạng thái</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <div class="divider"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);flex-wrap:wrap;gap:8px">
-      <span>Tổng <strong>${BATCH_TOTALS.skuCount} SKU</strong> · tồn ${ASSIGN_DATA.reduce((a, d) => a + d.stock, 0).toLocaleString()} · kế hoạch ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị</span>
-      ${BATCH_TOTALS.nShort ? `<span style="color:var(--yellow)">⚠ ${BATCH_TOTALS.nShort} SKU thiếu — sẽ phân theo tỷ lệ tồn kho ở bước sau</span>` : ''}
-    </div>`;
-}
-
-function confirmImport() {
-  if (!(_importState.api1 && _importState.api2)) { showToast('Cần kéo cả 2 nguồn dữ liệu trước', 'warn'); return; }
-  showLoading('Đang đối chiếu & tính phân phối...');
-  setTimeout(() => {
-    hideLoading();
-    showToast('✓ Đã tính xong — chuyển sang Kết quả gán tự động', 'success');
-    showScreen('autoassign');
-  }, 1100);
-}
-
-// ── SEED LAYOUT DEMO (để Layout & Light Test có dữ liệu sẵn) ──
-function seedLayoutDemo() {
+let _syncTimes = { api1: '—', api2: '—' };
+// ── SEED LAYOUT DEMO (để Layout & Light Test có dữ liệu sẵn) — số khu/kệ/tầng/ngăn theo preset ──
+function seedLayoutDemo(p) {
   let addr = 1;
-  const mkAddr = () => String(addr++).padStart(4,'0');
-  const mkZone = (id,name,color,controller,nS,nF,nC) => ({
+  const mkAddr = () => String(addr++).padStart(4, '0');
+  const mkZone = (id, name, color, controller, nS, nF, nC) => ({
     id, name, color, controller,
-    shelves: Array.from({length:nS},(_, si)=>({
-      name:`Kệ ${si+1}`,
-      floors: Array.from({length:nF},(_, fi)=>({
-        label:`T${nF-fi}`,
-        cells: Array.from({length:nC},()=>mkAddr())
+    shelves: Array.from({ length: nS }, (_, si) => ({
+      name: `Kệ ${si + 1}`,
+      floors: Array.from({ length: nF }, (_, fi) => ({
+        label: `T${nF - fi}`,
+        cells: Array.from({ length: nC }, () => mkAddr())
       }))
     }))
   });
-  layoutZones = [
-    mkZone('ZA','Khu vực A', ZONE_COLORS[0], 'CTRL-001', 2,3,6),
-    mkZone('ZB','Khu vực B', ZONE_COLORS[1], 'CTRL-002', 2,3,6),
-  ];
-  _curZone   = 'ZA';
-  _testZoneId = 'ZA';
+  layoutZones = Array.from({ length: p.zones }, (_, i) => {
+    const letter = storeShortCode(i);
+    return mkZone('Z' + letter, 'Khu vực ' + letter, ZONE_COLORS[i % ZONE_COLORS.length], itControllers[i] || ('CTRL-' + String(i + 1).padStart(3, '0')), p.shelves, p.floors, p.cells);
+  });
+  _curZone = layoutZones[0].id;
+  _testZoneId = layoutZones[0].id;
 }
 
 // ── BỔ SUNG HÀNG (REPLENISHMENT) ──
 function startReplen() {
   const v = document.querySelector('#screen-replenishment input')?.value || 'SKU';
-  showToast(`💡 Đèn đang sáng tại các ngăn chứa ${v} — bấm vào ngăn đã bổ sung xong để CONFIRM`, 'info');
+  showToast(`Đèn đang sáng tại các ngăn chứa ${v} — bấm vào ngăn đã bổ sung xong để CONFIRM`, 'info');
 }
 function replenDone(el) {
   const dot = el.querySelector('.light-dot');
@@ -4145,7 +4754,7 @@ document.addEventListener('click', function(e) {
   const label = (btn.textContent || '').trim().replace(/\s+/g, ' ');
 
   // Xóa hàng
-  if (label === '🗑' || /^🗑/.test(label)) {
+  if (label === '' || /^/.test(label)) {
     const tr = btn.closest('tr');
     const name = tr ? tr.cells[0].textContent.trim() : 'mục này';
     if (confirm(`Xóa "${name}"? Thao tác không thể hoàn tác.`)) {
@@ -4155,7 +4764,7 @@ document.addEventListener('click', function(e) {
     return;
   }
   // Sửa hàng
-  if (/^✏/.test(label)) {
+  if (/^/.test(label)) {
     const tr = btn.closest('tr');
     if (!tr) return;
     const name = tr.cells[0].textContent.trim();
@@ -4189,7 +4798,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ── INIT ──
-seedLayoutDemo();        // tạo sẵn 2 khu vực mẫu
+rebuildDemoData();       // sinh layout + lô hàng + hàng đợi vận hành theo preset scale
 updateRoleDesc();        // mô tả role mặc định trên màn login
 applyRoleAccess();       // sidebar theo role mặc định
 showScreen('login');     // bắt đầu từ màn đăng nhập

@@ -14,8 +14,8 @@ Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 
 | Vai trò | Nhiệm vụ | Màn hình thấy được |
 |---|---|---|
-| 📊 **Tổng Quản Lý** | Giám sát & ra quyết định | Dashboard, LOT/Batch *(xem)*, Gán tự động *(xem)*, Báo cáo |
-| 🏭 **Quản Lý Vận Hành** | Vận hành phân hàng hằng ngày | Dashboard, LOT/Batch, Nhận API, Gán tự động *(thao tác)*, Bổ sung hàng, Layout *(xem)*, Báo cáo |
+| 📊 **Tổng Quản Lý** | Giám sát & ra quyết định | Dashboard, LOT/Batch *(xem)*, Chuẩn bị lô *(xem)*, Vận hành *(giám sát)*, Báo cáo |
+| 🏭 **Quản Lý Vận Hành** | Vận hành phân hàng hằng ngày | Dashboard, LOT/Batch, Chuẩn bị lô hàng *(thao tác)*, Vận hành *(điều khiển)*, Bổ sung hàng, Layout *(xem)*, Báo cáo |
 | 🔧 **IT / Kỹ Thuật** | Cài đặt & bảo trì hệ thống | Dashboard, Tạo Layout kho *(chỉnh sửa)*, Light Module Test, Cấu hình thiết bị |
 
 ## Màn hình
@@ -23,10 +23,10 @@ Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 | Màn hình | Mô tả |
 |---|---|
 | Đăng nhập | Chọn vai trò → mô tả nhiệm vụ → vào Dashboard |
-| Dashboard | Trang chủ theo vai trò: KPI, việc cần làm, truy cập nhanh |
+| Dashboard | Trang chủ theo vai trò: hành trình lô, việc cần làm, truy cập nhanh |
 | Quản lý LOT / Batch | Theo dõi tiến độ các đợt phân hàng trong ngày |
-| Nhận dữ liệu API | Kết nối 2 đầu API: hàng tiếp nhận và kế hoạch phân phối |
-| Kết quả gán tự động | Mapping tồn kho × kế hoạch — đủ/thiếu/dư, xác nhận/từ chối/tính lại |
+| Chuẩn bị lô hàng | Bấm **Nhận dữ liệu** kéo 2 API về (strip trạng thái từng nguồn) → duyệt kết quả gán tồn kho × kế hoạch (đủ/thiếu/dư, chỉnh tay) → chốt kế hoạch / từ chối / tính lại |
+| Giám sát vận hành | Chuẩn bị ca (load layout, kiểm tra thiết bị, double-check dữ liệu) → ca chạy thực: quét thẻ NV + SKU, đèn sáng, nhấn nút xác nhận, xử lý sự cố → biên bản ca |
 | Báo cáo & thống kê | Sản lượng, độ chính xác, hiệu suất theo khu vực & nhân sự |
 | Tạo Layout kho | Cấu hình khu vực, kệ, tầng — kéo thả gán địa chỉ đèn |
 | Bổ sung hàng | Replenishment — đèn sáng hướng dẫn vị trí cần bổ sung |
@@ -39,13 +39,52 @@ Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 API 1 — Hàng tiếp nhận        API 2 — Kế hoạch phân phối
 (LOT, vị trí kệ, số lượng)    (SKU, cửa hàng, số lượng yêu cầu)
               └──────────────┬──────────────┘
+              user bấm "Nhận dữ liệu" → kéo 2 nguồn về
                              ▼
-                  Thuật toán gán tự động
+        Thuật toán gán tự động → người duyệt, chốt kế hoạch
                              ▼
-              Xác nhận kết quả → Bật đèn
+   Chuẩn bị ca: load layout · kiểm tra controller/đèn · double-check dữ liệu
                              ▼
-                  Công nhân phân hàng theo đèn
+                           Mở ca
+                             ▼
+   NV quét thẻ vào ca → quét SKU → đèn sáng → bỏ hàng → nhấn nút xác nhận
+                             ▼
+   Xử lý sự cố (thiếu hàng → phiếu bổ sung · đèn lỗi → báo IT)
+                             ▼
+                   Đóng ca → biên bản ca
 ```
+
+## Dữ liệu demo & khả năng scale
+
+Toàn bộ dữ liệu (layout, lô hàng, SKU, cửa hàng, nhân viên) được **sinh động theo preset quy mô** — không hardcode. Đổi quy mô bằng dropdown trên màn Vận hành:
+
+| Preset | Khu | Đèn | Cửa hàng | SKU |
+|---|---|---|---|---|
+| Kho nhỏ | 2 | 72 | 5 | 12 |
+| Kho vừa | 4 | 288 | 12 | 24 |
+| Kho lớn | 6 | 960 | 24 | 48 |
+
+UI thiết kế để scale: sơ đồ kho hiển thị 2 cấp (thẻ tổng quan từng khu → chi tiết kệ của khu đang chọn, tự bám theo hoạt động hoặc ghim), bảng gán tự động sinh cột theo số cửa hàng (cuộn ngang, cột SKU ghim trái), dải SKU gộp chip khi lô lớn, bảng đèn nhóm theo khu.
+
+## Hành trình lô hàng (Batch Pipeline)
+
+User flow được dẫn bằng **pipeline 5 bước sống theo trạng thái thật** — hiển thị trên mọi màn thuộc quy trình và dashboard:
+
+```
+① Nhận dữ liệu → ② Duyệt & chốt kế hoạch → ③ Chuẩn bị ca → ④ Ca chạy → ⑤ Biên bản & báo cáo
+```
+
+- Bước chưa đủ điều kiện bị **khóa kèm lý do** (vd: chưa nhận dữ liệu thì khu duyệt gán mờ + nút chốt khóa; chưa chốt kế hoạch thì màn vận hành khóa)
+- Luôn có đúng **một nút "Tiếp theo"** chỉ việc cần làm
+- Tổng Quản Lý vào giám sát được bỏ qua gate (mô phỏng việc Vận Hành đã làm các bước trước)
+
+## Giao diện
+
+Theme **control-room tối** (graphite + amber — màu đèn LED của sản phẩm), bộ icon SVG thống nhất, type scale 6 cỡ chữ:
+
+- **Màn Giám sát vận hành** bố cục control-room không cuộn: thanh trạng thái ca (chỉ số gọn + tiến độ + dải SKU) ghim trên · trái = sơ đồ kho chủ đạo · phải = trạm quét, sự cố, nhật ký
+- **Màn hình trạm** — persona nhân viên: chữ to, một hành động (quét → đèn → chạm xác nhận), bật bằng nút "Màn hình trạm"
+- **Demo bar** đáy màn — gom toàn bộ điều khiển mô phỏng (tốc độ, quy mô kho, quét nhanh), tách hẳn khỏi UI sản phẩm
 
 ## Tech
 
