@@ -1057,7 +1057,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <div class="page-desc" id="op-subdesc">—</div>
       </div>
       <div style="display:flex;gap:8px;align-items:flex-start">
-        <button class="btn btn-secondary" id="op-station-mode-btn" onclick="toggleStationMode(true)" title="Giao diện nhân viên tại trạm — chữ to, một hành động">Màn hình trạm</button>
+        <button class="btn btn-secondary" id="op-station-mode-btn" onclick="toggleStationMode(true)" title="Giao diện NHÂN VIÊN tại trạm — chữ to, một hành động: quét → đèn → chạm xác nhận">Trạm quét (NV)</button>
         <div style="display:flex;gap:8px" id="op-controls">
           <button class="btn btn-secondary" id="op-pause-btn" onclick="opTogglePause()"></button>
           <button class="btn btn-danger" id="op-finish-btn" onclick="opFinishEarly()"></button>
@@ -1081,6 +1081,7 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   <div class="ops-bar">
     <div class="ops-bar-row">
       <span id="op-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></span>
+      <span class="op-stage-badge" id="op-stage-chip" style="padding:4px 11px;font-size:11px"><!-- JS --></span>
       <div class="ops-stats" id="op-kpi"><!-- JS: stat chips --></div>
       <div class="progress-bar" style="flex:1;min-width:120px;height:6px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
       <div class="text-mono" id="op-progress-text" style="white-space:nowrap;font-size:11px;color:var(--text-muted)">0 / 0 SKU</div>
@@ -1089,7 +1090,6 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
         <button class="view-btn" id="opv-list" onclick="setOpView('list')">Theo SKU</button>
       </div>
     </div>
-    <div id="op-sku-strip" class="ops-skustrip"></div>
   </div>
 
   <!-- CONTROL-ROOM GRID: trái = sơ đồ kho (chủ đạo) · phải = trạm quét / sự cố / nhật ký -->
@@ -1110,23 +1110,8 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
     </div>
 
     <div class="ops-rail">
-      <!-- TRẠM QUÉT — cổng vào của flow: thẻ NV → SKU → đèn sáng -->
-      <div class="card op-station stage-idle" id="op-station">
-        <div class="op-station-head">
-          <div class="op-stage-badge" id="op-stage-badge"><!-- JS --></div>
-        </div>
-        <div class="op-scan-zone" id="op-scan-zone">
-          <div class="op-scan-ico" id="op-scan-ico"></div>
-          <div style="flex:1;min-width:0">
-            <div class="op-scan-hint" id="op-scan-hint">—</div>
-            <input id="op-scan-input" class="input" autocomplete="off" spellcheck="false" style="font-size:13px"
-                   placeholder="Quét hoặc nhập mã…" onkeydown="if(event.key==='Enter'){event.preventDefault();opScanSubmit(this);}">
-          </div>
-          <button class="btn btn-primary btn-sm" id="op-scan-btn" onclick="opScanSubmit(document.getElementById('op-scan-input'))" style="white-space:nowrap">Quét</button>
-        </div>
-        <div class="op-scan-err" id="op-scan-err" style="display:none"></div>
-        <div class="op-worker" id="op-worker-slot"><!-- JS: NV theo khu --></div>
-      </div>
+      <!-- TRẠM QUÉT (mini) — màn giám sát KHÔNG nhập liệu; NV thao tác trong "Trạm quét" -->
+      <div class="card" id="op-gate-card"><!-- rendered by JS --></div>
 
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -3753,8 +3738,7 @@ function renderOperation() {
 
   renderOpKpi();
   renderOpSpeed();
-  renderOpStrip();
-  renderOpStation();
+  renderOpGate();
   renderOpBins();
   renderOpFeed();
   renderOpExceptions();
@@ -3794,123 +3778,55 @@ function renderOpKpi() {
   if (fdot) { fdot.style.background = _opRunning ? 'var(--green)' : 'var(--text-subtle)'; fdot.style.boxShadow = _opRunning ? '0 0 5px var(--green)' : 'none'; }
 }
 
-function renderOpStrip() {
-  const strip = document.getElementById('op-sku-strip');
-  if (!strip) return;
-  // Lô lớn (hàng trăm SKU): chip đã xong gộp lại, chỉ liệt kê SKU đang làm + sắp tới
-  const MAX_CHIPS = 28;
-  const chip = (q, i) => {
-    let bg, color, br = 'var(--border)';
-    if (_skuResolved(q))                              { bg = 'var(--green-dim)';  color = 'var(--green)';  br = 'var(--green)'; }
-    else if (i === _opIndex && _opStage === 'putting'){ bg = 'var(--accent-dim)'; color = 'var(--accent)'; br = 'var(--accent)'; }
-    else                                              { bg = 'transparent';       color = 'var(--text-subtle)'; }
-    return `<div title="${q.sku} · ${q.name}" style="min-width:30px;height:24px;padding:0 7px;border:1px solid ${br};border-radius:6px;background:${bg};color:${color};font-family:var(--font-mono);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">${q.sku.replace('SKU-', '')}</div>`;
+// Trạng thái máy trạng thái ca — dùng chung cho stage chip (ops bar) + thẻ Trạm quét + Trạm quét NV
+function _opStageInfo() {
+  const paused = !_opRunning;
+  const stage = paused ? 'paused' : _opStage;
+  return {
+    stage,
+    ...{
+      'idle':      { c: 'var(--yellow)',     ic: 'badge',  t: 'Chờ NV quét thẻ vào ca' },
+      'await-sku': { c: 'var(--accent)',     ic: 'scan',   t: `Chờ quét SKU · ${_opCrew().length} NV trong ca` },
+      'putting':   { c: 'var(--light-on)',   ic: 'bulb',   t: `Đèn đang sáng · ${_opActiveAddrs().length} NV đang bỏ` },
+      'wrap-up':   { c: 'var(--green)',      ic: 'check2', t: `Đã phân xong — còn ${_opExceptions.length} sự cố` },
+      'paused':    { c: 'var(--text-muted)', ic: 'pause',  t: 'Ca tạm dừng' },
+    }[stage],
   };
-  if (_opQueue.length <= MAX_CHIPS) { strip.innerHTML = _opQueue.map(chip).join(''); return; }
-  const items = _opQueue.map((q, i) => ({ q, i }));
-  const pending = items.filter(x => !_skuResolved(x.q));
-  const doneN = _opQueue.length - pending.length;
-  const shown = pending.slice(0, MAX_CHIPS);
-  const moreN = pending.length - shown.length;
-  strip.innerHTML =
-    (doneN ? `<div style="height:24px;padding:0 9px;border:1px solid var(--green);border-radius:6px;background:var(--green-dim);color:var(--green);font-size:11px;font-weight:600;display:flex;align-items:center">✓ ${doneN} SKU xong</div>` : '') +
-    shown.map(x => chip(x.q, x.i)).join('') +
-    (moreN ? `<div style="height:24px;padding:0 9px;border:1px dashed var(--border);border-radius:6px;color:var(--text-subtle);font-size:11px;font-weight:600;display:flex;align-items:center">+${moreN} SKU chờ</div>` : '');
 }
 
-// Cổng quét: cập nhật các phần tử TĨNH (không dựng lại <input> để giữ focus khi gõ/quét)
-function renderOpStation() {
-  const station = document.getElementById('op-station');
-  if (!station) return;
-  const slot  = document.getElementById('op-worker-slot');
-  const badge = document.getElementById('op-stage-badge');
-  const scIco = document.getElementById('op-scan-ico');
-  const zone  = document.getElementById('op-scan-zone');
-  const hint  = document.getElementById('op-scan-hint');
-  const input = document.getElementById('op-scan-input');
-  const btn   = document.getElementById('op-scan-btn');
-  const quick = document.getElementById('op-quick');
-  const errEl = document.getElementById('op-scan-err');
+// Thẻ "Trạm quét" trên màn GIÁM SÁT: chỉ trạng thái + lối vào Trạm quét — KHÔNG nhập liệu ở đây
+function renderOpGate() {
+  const S = _opStageInfo();
+  // stage chip trên ops bar
+  const chip = document.getElementById('op-stage-chip');
+  if (chip) { chip.style.background = S.c + '1f'; chip.style.color = S.c; chip.innerHTML = `<span class="op-stage-dot" style="background:${S.c}"></span>${S.t}`; }
 
-  const paused = !_opRunning;
-  const stage  = paused ? 'paused' : _opStage;
-  station.className = 'card op-station stage-' + stage;
-
-  // ── roster nhân viên THEO KHU (mỗi khu 1 NV, làm song song) — danh sách gọn trong rail ──
-  const canChangeZone = !_opAuto && _opStage !== 'putting';
-  slot.innerHTML = _opZones.map(z => {
-    if (z.worker) {
-      const w = z.worker;
-      const active = z.activeAddr ? `<span style="color:var(--light-on)">● đang bỏ</span>` : `<span style="color:var(--text-subtle)">${z.units} đv</span>`;
-      return `<div class="op-zworker">
-        <div class="op-worker-ava on" style="background:${z.color}22;color:${z.color};border-color:${z.color}">${w.initials}</div>
-        <div style="min-width:0;flex:1;display:flex;align-items:baseline;gap:6px;overflow:hidden">
-          <span style="font-size:12px;font-weight:600;white-space:nowrap">${w.name}</span>
-          <span style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b style="color:${z.color}">${z.name.replace('Khu vực', 'Khu')}</b> · ${active}</span>
-        </div>
-        ${canChangeZone ? `<a onclick="opClearZone('${z.id}')" style="color:var(--accent);cursor:pointer;font-size:10px;flex-shrink:0">đổi</a>` : ''}</div>`;
-    }
-    const willCover = _opAnyWorker() ? 'NV hiện có sẽ kiêm' : 'chờ quét thẻ';
-    return `<div class="op-zworker" style="opacity:.65">
-      <div class="op-worker-ava off">${ico('user', 14)}</div>
-      <div style="min-width:0;flex:1;display:flex;align-items:baseline;gap:6px;overflow:hidden">
-        <span style="font-size:12px;font-weight:600;color:var(--text-muted);white-space:nowrap">Chưa có NV</span>
-        <span style="font-size:10px;color:var(--text-subtle);white-space:nowrap"><b style="color:${z.color}">${z.name.replace('Khu vực', 'Khu')}</b> · ${willCover}</span>
-      </div></div>`;
-  }).join('');
-
-  // ── huy hiệu trạng thái ──
-  const nCrew = _opCrew().length;
-  const SB = {
-    'idle':      { c: 'var(--yellow)',    bg: 'var(--yellow-dim)',      t: 'Bước 1 · Quét thẻ nhân viên' },
-    'await-sku': { c: 'var(--accent)',    bg: 'var(--accent-dim)',      t: `Bước 2 · Quét SKU · ${nCrew} NV trong ca` },
-    'putting':   { c: 'var(--light-on)',  bg: 'rgba(245,163,0,.12)',    t: `Đèn đang sáng · ${_opActiveAddrs().length} NV đang bỏ` },
-    'wrap-up':   { c: 'var(--green)',     bg: 'var(--green-dim)',       t: `Đã phân xong — còn ${_opExceptions.length} sự cố cần xử lý` },
-    'paused':    { c: 'var(--text-muted)', bg: 'var(--surface2)',       t: 'Ca tạm dừng' },
-  }[stage];
-  badge.style.background = SB.bg; badge.style.color = SB.c;
-  badge.innerHTML = `<span class="op-stage-dot" style="background:${SB.c}"></span>${SB.t}`;
-
-  // ── ô quét theo từng bước ──
-  let icoName, col, bg, hintTxt, ph, locked = false, qlabel = '', chips = '';
-  if (paused) {
-    icoName = 'pause'; col = 'var(--text-muted)'; bg = 'var(--surface3)';
-    hintTxt = 'Ca đang tạm dừng — bấm “Tiếp tục ca” để quét tiếp'; ph = '…'; locked = true;
-  } else if (_opStage === 'idle') {
-    icoName = 'badge'; col = 'var(--yellow)'; bg = 'var(--yellow-dim)';
-    hintTxt = 'BƯỚC 1 — Mỗi nhân viên quét thẻ của mình để vào ca';
-    ph = 'Quét thẻ nhân viên (vd: NV-2207)…';
-    const inCrew = new Set(_opCrew().map(w => w.code));
-    qlabel = 'Quét thẻ:';
-    chips = OP_WORKERS.filter(w => !inCrew.has(w.code)).map(w => `<button class="op-chip" onclick="opQuick('${w.code}')">${ico('badge', 13)} ${w.name} · ${w.code}</button>`).join('');
-  } else if (_opStage === 'await-sku') {
-    icoName = 'scan'; col = 'var(--accent)'; bg = 'var(--accent-dim)';
-    const free = _opUnstaffedZones().length;
-    hintTxt = `BƯỚC 2 — Quét mã SKU để bật đèn${free ? ` · hoặc quét thêm thẻ NV cho ${free} khu còn trống` : ''}`;
-    ph = 'Quét mã SKU (vd: SKU-100)…';
-    const pend = _opPending();
-    const inCrew = new Set(_opCrew().map(w => w.code));
-    const badgeChips = free ? OP_WORKERS.filter(w => !inCrew.has(w.code)).map(w => `<button class="op-chip" onclick="opQuick('${w.code}')">${ico('badge', 12)} +${w.name}</button>`).join('') : '';
-    const skuChips = pend.slice(0, 6).map((x, k) => `<button class="op-chip${k === 0 ? ' suggest' : ''}" onclick="opQuick('${x.q.sku}')">${x.q.sku}</button>`).join('');
-    qlabel = 'Quét nhanh:';
-    chips = badgeChips + skuChips;
-  } else if (_opStage === 'wrap-up') {
-    icoName = 'check2'; col = 'var(--green)'; bg = 'var(--green-dim)';
-    hintTxt = 'Đã phân xong toàn bộ SKU — xử lý nốt sự cố ở bảng “Sự cố cần xử lý” rồi đóng ca'; ph = 'Không cần quét nữa'; locked = true;
-  } else { // putting
-    icoName = 'bulb'; col = 'var(--light-on)'; bg = 'rgba(245,163,0,.12)';
-    hintTxt = 'Đèn đang sáng — NV bỏ hàng rồi nhấn nút xác nhận trên đèn (bấm vào đèn đang sáng)…'; ph = 'Hoàn tất SKU hiện tại rồi quét tiếp'; locked = true;
+  const card = document.getElementById('op-gate-card');
+  if (card) {
+    card.style.borderColor = S.stage === 'paused' ? 'var(--border)' : S.c + '55';
+    card.innerHTML = `
+      <div class="card-title" style="margin-bottom:9px">Trạm quét</div>
+      <div style="display:flex;align-items:center;gap:9px">
+        <span class="op-scan-ico" style="width:34px;height:34px;background:${S.c}1f;color:${S.c}">${ico(S.ic, 18, 2)}</span>
+        <div style="flex:1;min-width:0;font-size:12px;font-weight:600;color:${S.c}">${S.t}</div>
+      </div>
+      ${_opAuto
+        ? `<div style="font-size:11px;color:var(--text-subtle);margin-top:9px;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:tpulse .8s ease infinite alternate"></span>Hệ thống tự mô phỏng thao tác NV</div>`
+        : `<button class="btn btn-primary btn-sm" style="width:100%;margin-top:10px" onclick="toggleStationMode(true)">${ico('scan', 13)} Mở trạm quét — NV thao tác</button>`}`;
   }
-  // Chế độ giám sát (manager): trạm chỉ hiển thị trạng thái tự mô phỏng — không nhập tay, không chip
-  if (_opAuto) { locked = true; chips = ''; ph = 'Chế độ giám sát — hệ thống tự mô phỏng'; }
-  scIco.style.background = bg; scIco.style.color = col; scIco.innerHTML = ico(icoName, 20, 2);
-  hint.style.color = col; hint.textContent = hintTxt;
-  input.placeholder = ph; input.disabled = locked; btn.disabled = locked;
-  zone.classList.toggle('locked', locked);
-  quick.innerHTML = chips ? `<span class="op-quick-lbl">${qlabel}</span>${chips}` : '';
 
-  if (_opErrMsg) { errEl.style.display = ''; errEl.innerHTML = `${ico('alert', 14)} ${_opErrMsg}`; }
-  else errEl.style.display = 'none';
+  // chip quét nhanh (demo bar) — mô phỏng máy quét của NV
+  const quick = document.getElementById('op-quick');
+  if (!quick) return;
+  if (_opAuto || S.stage === 'paused') { quick.innerHTML = '<span style="font-size:11px;color:var(--text-subtle)">—</span>'; return; }
+  if (_opStage === 'idle' || _opStage === 'await-sku') {
+    const inCrew = new Set(_opCrew().map(w => w.code));
+    const badgeChips = OP_WORKERS.filter(w => !inCrew.has(w.code)).slice(0, 4).map(w => `<button class="op-chip" onclick="opQuick('${w.code}')">${ico('badge', 12)} ${w.code}</button>`).join('');
+    const skuChips = _opStage === 'await-sku' ? _opPending().slice(0, 5).map((x, k) => `<button class="op-chip${k === 0 ? ' suggest' : ''}" onclick="opQuick('${x.q.sku}')">${x.q.sku}</button>`).join('') : '';
+    quick.innerHTML = badgeChips + skuChips || '—';
+  } else {
+    quick.innerHTML = `<span style="font-size:11px;color:var(--text-subtle)">đang bỏ hàng — bấm đèn sáng để xác nhận</span>`;
+  }
 }
 
 function renderOpBins() {
@@ -4268,11 +4184,9 @@ function opPauseRun() {
   renderOperation();
 }
 
-// ── CỔNG QUÉT: thẻ NV → SKU → đèn sáng ──
-function opScanSubmit(inp) {
-  if (!inp) return;
-  const code = (inp.value || '').trim();
-  inp.value = '';
+// ── CỔNG QUÉT: thẻ NV → SKU → đèn sáng (mọi đường quét đều đi qua opScanCode) ──
+function opScanCode(code) {
+  code = (code || '').trim();
   if (!code) return;
   if (!_opRunning) { _opFlashErr('Ca đang tạm dừng — bấm “Tiếp tục ca” trước.'); return; }
   if (_opStage === 'idle') opScanEmployee(code);
@@ -4281,9 +4195,10 @@ function opScanSubmit(inp) {
   else _opFlashErr('Đang bỏ hàng — hoàn tất SKU hiện tại trước khi quét tiếp.');
   _opFocusScan();
 }
+function opScanSubmit(inp) { if (!inp) return; const c = inp.value; inp.value = ''; opScanCode(c); }
 function _looksLikeBadge(code) { return /^NV-?\d{2,}$/i.test((code || '').replace(/\s/g, '')); }
-function opQuick(code) { const inp = document.getElementById('op-scan-input'); if (!inp || inp.disabled) return; inp.value = code; opScanSubmit(inp); }
-function _opFocusScan() { if (_opAuto) return; setTimeout(() => { const i = document.getElementById(_stationMode ? 'op-sm-input' : 'op-scan-input'); if (i && !i.disabled) i.focus(); }, 30); }
+function opQuick(code) { opScanCode(code); }   // chip quét nhanh (demo) — không phụ thuộc ô nhập
+function _opFocusScan() { if (_opAuto || !_stationMode) return; setTimeout(() => { const i = document.getElementById('op-sm-input'); if (i && !i.disabled) i.focus(); }, 30); }
 
 // Quét thẻ → NV vào ca, nhận khu chưa có người. CHỈ cần ≥1 NV là quét SKU được.
 function opScanEmployee(code) {
@@ -4366,13 +4281,13 @@ function _opAutoStaff() {
 
 function _opFlashErr(msg) {
   _opErrMsg = msg;
-  renderOpStation();
+  renderOpGate();
   if (_stationMode) renderStationMode();
   const z = document.getElementById('op-scan-zone');
   if (z) { z.classList.remove('err'); void z.offsetWidth; z.classList.add('err'); }
   showToast('⚠ ' + msg, 'error');
   clearTimeout(_opErrTimer);
-  _opErrTimer = setTimeout(() => { _opErrMsg = null; const zz = document.getElementById('op-scan-zone'); if (zz) zz.classList.remove('err'); renderOpStation(); if (_stationMode) renderStationMode(); }, 2800);
+  _opErrTimer = setTimeout(() => { _opErrMsg = null; const zz = document.getElementById('op-scan-zone'); if (zz) zz.classList.remove('err'); renderOpGate(); if (_stationMode) renderStationMode(); }, 2800);
 }
 
 // chọn đèn kế tiếp trong KHU. NV của khu chỉ bỏ 1 đèn 1 lúc → nếu NV đang bận khu khác thì khu này chờ.
