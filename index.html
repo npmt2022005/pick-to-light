@@ -3290,7 +3290,7 @@ function rowState(d) {
   const dropped = d.alloc.filter(q => q === 0).length;
   const fullActive = d.alloc.every((q, i) => q === 0 || q >= d.stores[i]);                    // CH đang nhận đều đủ kế hoạch
   const extra = d.allocTotal - d.plan;
-  if (!fullActive) return { cls: 'badge-yellow', label: dropped ? `Chia tỷ lệ · bỏ ${dropped} CH` : 'Chia tỷ lệ — chưa đủ KH' };
+  if (!fullActive) return { cls: 'badge-yellow', label: dropped ? `Chưa đủ KH · bỏ ${dropped} CH` : 'Chưa đủ KH — kiểm tra số' };
   if (dropped) return { cls: 'badge-green', label: `Đủ ${d.alloc.length - dropped}/${d.alloc.length} CH · bỏ ${dropped}` };
   if (extra > 0) return { cls: 'badge-purple', label: `Vượt KH +${extra}` };                  // chia phần dư cho CH
   if (d.stock - d.allocTotal > 0 && d.diff > 0) return { cls: 'badge-yellow', label: `Dư ${d.stock - d.allocTotal} · lưu kho` };
