@@ -3663,7 +3663,7 @@ let _opErrMsg = null;         // thông báo lỗi quét tạm thời
 let _opErrTimer = null;
 let _stationMode = false;     // true = màn hình trạm (persona NHÂN VIÊN: chữ to, một hành động)
 let _opPhase = 'prep';        // 'prep' = checklist chuẩn bị ca · 'live' = ca đang chạy
-let _opPrep = { layout: { st: 'todo', log: [] }, data: { st: 'todo', log: [] } };  // st: todo|run|done
+let _opPrep = { layout: { st: 'todo', log: [] } };  // st: todo|run|done
 let _opShiftOpenAt = null;    // giờ mở ca — ghi vào biên bản ca
 let _opExcResolved = 0;       // số sự cố đã xử lý trong ca — ghi vào biên bản ca
 
@@ -3736,6 +3736,7 @@ function _opPrepLayoutLines() {
     lines.push({ ok: 1, t: `${z.controller || 'Controller'} (${z.name}) online — ${n}/${n} đèn phản hồi ping` });
   });
   lines.push({ ok: 1, t: `Test đèn gần nhất ${BATCH.dateLabel.split(' ')[0]} — toàn bộ module OK` });
+  lines.push({ ok: 1, t: `${STORE_BINS.length}/${STORE_BINS.length} cửa hàng đã gán bin/đèn — địa chỉ khớp layout` });
   return lines;
 }
 function _opPrepDataLines() {
@@ -3751,9 +3752,8 @@ function _opPrepDataLines() {
 function opPrepStart(key) {
   const p = _opPrep[key];
   if (!p || p.st !== 'todo' || _opPhase !== 'prep') return;
-  if (key === 'data' && _opPrep.layout.st !== 'done') { showToast('Load layout & kiểm tra thiết bị (bước 1) trước', 'warn'); return; }
   p.st = 'run'; p.log = [];
-  const lines = key === 'layout' ? _opPrepLayoutLines() : _opPrepDataLines();
+  const lines = _opPrepLayoutLines();
   let i = 0;
   const step = () => {
     if (_opPhase !== 'prep') return;
@@ -3761,7 +3761,7 @@ function opPrepStart(key) {
     if (i < lines.length) { _opRenderPrepLive(); setTimeout(step, 430); }
     else {
       p.st = 'done'; _opRenderPrepLive();
-      _opFeedPush('info', key === 'layout' ? `Checklist thiết bị PASS — layout ${BATCH.block} đã tải` : `Đã đối chiếu dữ liệu lô ${BATCH.id} — sẵn sàng mở ca`);
+      _opFeedPush('info', `Checklist thiết bị PASS — layout ${BATCH.block} đã tải, ${STORE_BINS.length} CH khớp bin/đèn`);
       if (_opAuto) setTimeout(_opAutoPrepNext, 800);
     }
   };
@@ -3771,14 +3771,13 @@ function opPrepStart(key) {
 // Chế độ giám sát (manager): tự chạy lần lượt checklist rồi mở ca
 function _opAutoPrepNext() {
   if (_opPhase !== 'prep') return;
-  if (_opPrep.layout.st === 'run' || _opPrep.data.st === 'run') return;
+  if (_opPrep.layout.st === 'run') return;
   if (_opPrep.layout.st === 'todo') opPrepStart('layout');
-  else if (_opPrep.data.st === 'todo') opPrepStart('data');
   else opOpenShift();
 }
 function opOpenShift() {
   if (_opPhase !== 'prep') return;
-  if (_opPrep.layout.st !== 'done' || _opPrep.data.st !== 'done') { showToast('Hoàn tất 2 bước kiểm tra trước khi mở ca', 'warn'); return; }
+  if (_opPrep.layout.st !== 'done') { showToast('Hoàn tất kiểm tra thiết bị trước khi mở ca', 'warn'); return; }
   _opPhase = 'live';
   _opShiftOpenAt = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
   document.getElementById('op-prep').style.display = 'none';
@@ -3811,7 +3810,7 @@ function renderOpPrep() {
 
   const st = _opLayoutStats();
   const canDo = canEdit('operation') && !_opAuto;
-  const ready = _opPrep.layout.st === 'done' && _opPrep.data.st === 'done';
+  const ready = _opPrep.layout.st === 'done';
   const num = (n, s) => `<div class="prep-num ${s === 'done' ? 'done' : s === 'run' ? 'run' : ''}">${s === 'done' ? '✓' : n}</div>`;
   const stBadge = s => s === 'done' ? `<span class="badge badge-green">✓ PASS</span>` : s === 'run' ? `<span class="badge badge-blue" style="animation:tpulse .8s ease infinite alternate">Đang kiểm tra…</span>` : `<span class="badge badge-gray">Chưa chạy</span>`;
   const logHTML = p => p.log.length ? `<div class="prep-log">${p.log.map(l => `<div style="color:${l.ok ? 'var(--text)' : 'var(--yellow)'}"><span style="color:${l.ok ? 'var(--green)' : 'var(--yellow)'};flex-shrink:0;display:flex;margin-top:1px">${ico(l.ok ? 'check2' : 'alert', 13, 2.4)}</span><span>${l.t}</span></div>`).join('')}</div>` : '';
@@ -3820,10 +3819,10 @@ function renderOpPrep() {
     <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:13px;flex-wrap:wrap">
       <span style="width:42px;height:42px;border-radius:11px;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico('check', 22, 2)}</span>
       <div style="flex:1;min-width:200px">
-        <div style="font-size:15px;font-weight:700">Checklist chuẩn bị ca</div>
-        <div style="font-size:12px;color:var(--text-muted)">Hệ thống chặn mở ca khi thiết bị chưa sẵn sàng hoặc dữ liệu chưa được đối chiếu — chuẩn quy trình production.</div>
+        <div style="font-size:15px;font-weight:700">Chuẩn bị ca — lô ${BATCH.id}</div>
+        <div style="font-size:12px;color:var(--text-muted)">Xác nhận thiết bị sẵn sàng trước khi bật đèn. Dữ liệu phân hàng đã chốt ở bước trước.</div>
       </div>
-      ${_opAuto ? `<span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-subtle)"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:tpulse .8s ease infinite alternate"></span>Chế độ giám sát — checklist tự chạy</span>` : ''}
+      ${_opAuto ? `<span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-subtle)"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:tpulse .8s ease infinite alternate"></span>Chế độ giám sát — tự chạy</span>` : ''}
     </div>
 
     <div class="card" style="margin-bottom:12px">
@@ -3834,7 +3833,7 @@ function renderOpPrep() {
             <div style="font-size:14px;font-weight:700">Load layout &amp; kiểm tra thiết bị</div>
             ${stBadge(_opPrep.layout.st)}
           </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Tải layout kho do IT cấu hình, ping controller &amp; module đèn LED, đối chiếu kết quả test đèn gần nhất.</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Tải layout kho, ping controller &amp; module đèn LED, xác nhận địa chỉ bin của từng cửa hàng khớp layout.</div>
           <div class="prep-info">
             <span class="prep-tag">${BATCH.block} · ${st.zones} khu · ${st.shelves} kệ · ${st.lights} đèn</span>
             ${layoutZones.map(z => `<span class="prep-tag">${z.controller || '—'} · ${z.name}</span>`).join('')}
@@ -3845,34 +3844,14 @@ function renderOpPrep() {
       </div>
     </div>
 
-    <div class="card" style="margin-bottom:12px;${_opPrep.layout.st !== 'done' ? 'opacity:.55' : ''}">
-      <div class="prep-step">
-        ${num(2, _opPrep.data.st)}
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-            <div style="font-size:14px;font-weight:700">Double-check dữ liệu phân hàng</div>
-            ${stBadge(_opPrep.data.st)}
-          </div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Đối chiếu kế hoạch đã xác nhận ở <a onclick="showScreen('autoassign')" style="color:var(--accent);cursor:pointer">Gán tự động</a> với layout &amp; tồn kho — chốt số liệu trước khi đèn sáng.</div>
-          <div class="prep-info">
-            <span class="prep-tag">Lô ${BATCH.id}</span>
-            <span class="prep-tag">${BATCH_TOTALS.skuCount} SKU · ${BATCH_TOTALS.allocUnits.toLocaleString()} đơn vị</span>
-            <span class="prep-tag">${STORE_BINS.length} cửa hàng</span>
-          </div>
-          ${logHTML(_opPrep.data)}
-          ${canDo && _opPrep.data.st === 'todo' ? `<button class="btn btn-primary" style="margin-top:12px" ${_opPrep.layout.st !== 'done' ? 'disabled' : ''} onclick="opPrepStart('data')">${ico('scan', 15)} Đối chiếu dữ liệu</button>` : ''}
-        </div>
-      </div>
-    </div>
-
     <div class="card" style="${!ready ? 'opacity:.55' : 'border-color:var(--green)'}">
       <div class="prep-step">
-        ${num(3, ready ? 'run' : 'todo')}
+        ${num(2, ready ? 'run' : 'todo')}
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700">Mở ca phân hàng</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">${st.zones} khu cần nhân viên — sau khi mở ca, NV quét thẻ tại trạm để vào ca, đèn chỉ sáng sau khi quét SKU.</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">${st.zones} khu · ${STORE_BINS.length} cửa hàng · ${BATCH_TOTALS.allocUnits.toLocaleString()} đơn vị — NV quét thẻ tại trạm để vào ca sau khi mở.</div>
           ${canDo ? `<button class="btn ${ready ? 'btn-success' : 'btn-secondary'}" style="margin-top:12px" ${!ready ? 'disabled' : ''} onclick="opOpenShift()">${ico('play', 15)} Mở ca phân hàng</button>`
-                  : `<div style="font-size:12px;color:var(--text-subtle);margin-top:10px">Hệ thống sẽ tự mở ca khi checklist hoàn tất (chế độ giám sát)</div>`}
+                  : `<div style="font-size:12px;color:var(--text-subtle);margin-top:10px">Hệ thống sẽ tự mở ca khi thiết bị PASS (chế độ giám sát)</div>`}
         </div>
       </div>
     </div>`;
