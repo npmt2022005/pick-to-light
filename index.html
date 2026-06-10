@@ -347,6 +347,8 @@ tr:last-child td { border-bottom: none; }
 /* phần duyệt gán mờ đi khi chưa nhận dữ liệu API */
 .assign-gated { transition: opacity .25s ease, filter .25s ease; }
 .assign-gated.off { opacity: .22; filter: saturate(.4); pointer-events: none; user-select: none; }
+/* sticky confirm bar — cuộn xuống vẫn thấy nút chốt + trạng thái */
+.assign-sticky-bar { position: sticky; bottom: 0; z-index: 20; background: var(--surface); border-top: 2px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .wf-arrow { color:var(--text-subtle); font-size:14px; }
 
 /* ── DASHBOARD ── */
@@ -991,8 +993,6 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
       </div>
       <div style="display:flex;gap:8px" id="assign-actions">
         <button class="btn btn-secondary" onclick="openRecalcModal()">Tính lại</button>
-        <button class="btn btn-danger" onclick="openRejectModal()">Từ chối</button>
-        <button class="btn btn-success" id="btn-confirm-assign" onclick="openConfirmModal()">Xác nhận &amp; Bắt đầu</button>
       </div>
     </div>
     <div id="assign-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
@@ -1003,46 +1003,47 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
   <!-- DỮ LIỆU GỐC 2 API — user bấm nhận từng nguồn, XEM danh sách thô, rồi mới Xác nhận & Đối chiếu -->
   <div id="assign-raw" style="margin-bottom:16px"><!-- rendered by JS --></div>
 
+  <!-- Separator: kết thúc giai đoạn 1 (nhận dữ liệu) → giai đoạn 2 (duyệt gán) -->
+  <div id="assign-phase2-sep" class="assign-gated" style="display:flex;align-items:center;gap:12px;margin:4px 0 14px">
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+    <span style="font-size:10px;font-weight:700;color:var(--text-subtle);text-transform:uppercase;letter-spacing:1.5px">Duyệt kết quả gán</span>
+    <div style="flex:1;height:1px;background:var(--border)"></div>
+  </div>
+
   <!-- Stats -->
   <div class="stat-grid stat-grid-4 assign-gated" style="margin-bottom:16px" id="assign-stats"></div>
 
-  <!-- Surplus note panel -->
-  <div id="assign-surplus-panel" class="assign-gated" style="margin-bottom:16px;display:none">
-    <div style="background:var(--yellow-dim);border:1px solid rgba(210,153,34,.35);border-radius:var(--radius);padding:12px 16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--yellow)">
-          ⚠ Hàng dư — cần lưu kho hoặc điều phối lại
-        </div>
-        <button class="btn btn-ghost btn-sm" style="color:var(--yellow);font-size:11px" onclick="toggleSurplusDetail()">
-          <span id="surplus-toggle-label">▼ Thu gọn</span>
-        </button>
-      </div>
-      <div id="surplus-detail">
-        <div style="display:flex;flex-wrap:wrap;gap:6px" id="surplus-chips"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- Filter bar -->
   <div class="assign-gated" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-    <span id="assign-edit-hint" style="font-size:12px;color:var(--text-muted)">Thiếu/dư → chỉnh tay: nhập <b>0</b> để bỏ một cửa hàng, bấm nút <b>chia lại</b> để tồn kho tự chia cho các cửa hàng còn nhận, <b>↺</b> về gán tự động</span>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <span style="font-size:12px;color:var(--text-muted)">Lọc:</span>
-      <button class="btn btn-sm btn-primary" id="filter-all"   onclick="filterAssign('all')">Tất cả</button>
-      <button class="btn btn-sm btn-secondary" id="filter-ok"  onclick="filterAssign('ok')">Đủ</button>
-      <button class="btn btn-sm btn-secondary" id="filter-short" onclick="filterAssign('short')">Thiếu</button>
-      <button class="btn btn-sm btn-secondary" id="filter-surplus" onclick="filterAssign('surplus')">Dư</button>
-      <input class="input" placeholder="Tìm SKU..." style="width:170px" oninput="searchAssign(this.value)">
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-sm btn-primary" id="filter-all"    onclick="filterAssign('all')">Tất cả</button>
+      <button class="btn btn-sm btn-secondary" id="filter-short" onclick="filterAssign('short')">Thiếu <span id="fc-short"></span></button>
+      <button class="btn btn-sm btn-secondary" id="filter-ok"   onclick="filterAssign('ok')">Đủ <span id="fc-ok"></span></button>
+      <button class="btn btn-sm btn-secondary" id="filter-surplus" onclick="filterAssign('surplus')">Dư <span id="fc-surplus"></span></button>
     </div>
+    <input class="input" placeholder="Tìm SKU..." style="width:170px;margin-left:auto" oninput="searchAssign(this.value)">
   </div>
 
   <!-- Table -->
   <div class="card assign-gated" style="padding:0">
-    <div class="table-wrap" style="max-height:calc(100vh - 360px);overflow-y:auto">
+    <div class="table-wrap" style="max-height:calc(100vh - 340px);overflow-y:auto">
       <table id="assign-table">
-        <thead id="assign-thead" style="position:sticky;top:0;background:var(--surface2);z-index:10"><!-- rendered by JS — số cột cửa hàng động theo lô --></thead>
+        <thead id="assign-thead" style="position:sticky;top:0;background:var(--surface2);z-index:10"><!-- rendered by JS --></thead>
         <tbody id="assign-tbody"></tbody>
+        <tfoot id="assign-tfoot" style="position:sticky;bottom:0;background:var(--surface2);z-index:10;border-top:2px solid var(--border)"><!-- rendered by JS --></tfoot>
       </table>
+    </div>
+  </div>
+
+  <!-- Sticky confirm bar — luôn hiện khi cuộn xuống -->
+  <div class="assign-sticky-bar assign-gated" id="assign-sticky-bar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="assign-need-action-badge"></span>
+      <span id="assign-sticky-msg" style="font-size:12px;color:var(--text-muted)"></span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-danger" onclick="openRejectModal()">Từ chối lô</button>
+      <button class="btn btn-success" id="btn-confirm-assign" onclick="openConfirmModal()">Xác nhận &amp; Bắt đầu</button>
     </div>
   </div>
 </div>
@@ -1746,6 +1747,21 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
     <div class="modal-footer" style="flex-shrink:0">
       <button class="btn btn-secondary" onclick="closeConfirmModal()">Quay lại</button>
       <button class="btn btn-success" onclick="doConfirmAssign()">✓ Chốt & Bắt đầu phân hàng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: xác nhận hành động nguy hiểm (dùng chung) -->
+<div id="modal-danger-confirm" style="display:none" class="modal-backdrop" onclick="if(event.target===this)_closeDangerConfirm()">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div class="modal-title" id="dc-title">Xác nhận</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="_closeDangerConfirm()">✕</button>
+    </div>
+    <div class="modal-body" id="dc-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="_closeDangerConfirm()">Huỷ</button>
+      <button class="btn btn-danger" id="dc-ok-btn">Xác nhận</button>
     </div>
   </div>
 </div>
@@ -3174,20 +3190,16 @@ function renderAssignScreen() {
   const nOk      = data.filter(d => d.status === 'ok').length;
   const nShort   = data.filter(d => d.status === 'short').length;
   const nSurplus = data.filter(d => d.status === 'surplus').length;
-  const totalStock= data.reduce((s,d) => s + d.stock, 0);
+  const nNeedAction = data.filter(d => d.allocTotal > d.stock).length;
 
-  // view-only cho Tổng Quản Lý
   const viewOnly = !canEdit('autoassign');
   const actions = document.getElementById('assign-actions');
   const vBanner = document.getElementById('assign-view-banner');
   if (actions) actions.style.display = viewOnly ? 'none' : '';
   if (vBanner) vBanner.style.display = viewOnly ? '' : 'none';
 
-  // PANEL DỮ LIỆU GỐC: nhận từng API → xem danh sách → đối chiếu xong khu duyệt gán mới mở
   renderAssignRaw();
   document.querySelectorAll('#screen-autoassign .assign-gated').forEach(e => e.classList.toggle('off', !_mapped));
-  const cBtn = document.getElementById('btn-confirm-assign');
-  if (cBtn) { cBtn.disabled = !_mapped; cBtn.style.opacity = _mapped ? '' : '.45'; cBtn.title = _mapped ? '' : 'Khóa — nhận & đối chiếu 2 nguồn dữ liệu trước'; }
   const subEl = document.getElementById('assign-subdesc');
   if (subEl) subEl.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> — <strong>nhận &amp; xem dữ liệu</strong> từng API → <strong>đối chiếu</strong> → duyệt kết quả gán → <strong>chốt kế hoạch</strong>${_planConfirmed ? ' <span class="badge badge-green" style="margin-left:4px">✓ Đã chốt</span>' : ''}`;
 
@@ -3195,23 +3207,37 @@ function renderAssignScreen() {
   document.getElementById('assign-stats').innerHTML = `
     <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">${data.length}</div><div class="stat-sub">lô ${BATCH.id}</div></div>
     <div class="stat-card"><div class="stat-label">Tổng sẽ phân</div><div class="stat-value" id="stat-alloc-units">${BATCH_TOTALS.allocUnits.toLocaleString()}</div><div class="stat-sub">/ ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị theo kế hoạch</div></div>
-    <div class="stat-card"><div class="stat-label">Cấp đủ kế hoạch</div><div class="stat-value" style="color:var(--green)">${nOk + nSurplus}</div><div class="stat-sub">${nSurplus} SKU dư → lưu kho</div></div>
-    <div class="stat-card"><div class="stat-label">Thiếu hàng — cần xử lý</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">nhập 0 để bỏ CH · bấm chia lại</div></div>
+    <div class="stat-card"><div class="stat-label">Đủ / Dư lưu kho</div><div class="stat-value" style="color:var(--green)">${nOk + nSurplus}</div><div class="stat-sub">${nSurplus} SKU có hàng dư</div></div>
+    <div class="stat-card"><div class="stat-label">Cần xử lý</div><div class="stat-value" id="stat-need-action" style="color:${nNeedAction > 0 ? 'var(--red)' : 'var(--green)'}">${nNeedAction > 0 ? nNeedAction : '✓'}</div><div class="stat-sub" id="stat-need-sub">${nNeedAction > 0 ? `${nNeedAction} SKU còn phân vượt tồn kho` : 'Tất cả SKU hợp lệ'}</div></div>
   `;
 
-  // surplus panel
-  const surplus = data.filter(d => d.status === 'surplus');
-  const sp = document.getElementById('assign-surplus-panel');
-  sp.style.display = surplus.length ? '' : 'none';
-  document.getElementById('surplus-chips').innerHTML = surplus.map(d =>
-    `<div style="background:var(--surface);border:1px solid rgba(210,153,34,.4);border-radius:20px;padding:3px 10px;font-size:11px;display:flex;align-items:center;gap:6px">
-      <span class="text-mono" style="color:var(--yellow)">${d.sku}</span>
-      <span style="color:var(--text-muted)">${d.name}</span>
-      <span style="font-family:var(--font-mono);font-weight:600;color:var(--yellow)">+${d.diff}</span>
-    </div>`
-  ).join('');
-
+  _updateFilterBtnCounts(nOk, nShort, nSurplus);
+  _updateStickyBar(nNeedAction);
   renderAssignTable();
+}
+
+function _updateFilterBtnCounts(nOk, nShort, nSurplus) {
+  const fc = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n ? `(${n})` : ''; };
+  fc('fc-ok', nOk); fc('fc-short', nShort); fc('fc-surplus', nSurplus);
+}
+
+function _updateStickyBar(nNeedAction) {
+  const hasOver = nNeedAction === undefined ? ASSIGN_DATA.some(d => d.allocTotal > d.stock) : nNeedAction > 0;
+  const n = nNeedAction === undefined ? ASSIGN_DATA.filter(d => d.allocTotal > d.stock).length : nNeedAction;
+  const cBtn = document.getElementById('btn-confirm-assign');
+  if (cBtn && _mapped) { cBtn.disabled = hasOver; cBtn.style.opacity = hasOver ? '.45' : ''; cBtn.title = hasOver ? 'Còn SKU phân vượt tồn kho' : ''; }
+  if (cBtn && !_mapped) { cBtn.disabled = true; cBtn.style.opacity = '.45'; cBtn.title = 'Nhận & đối chiếu 2 nguồn trước'; }
+  const badge = document.getElementById('assign-need-action-badge');
+  const msg   = document.getElementById('assign-sticky-msg');
+  if (badge) badge.innerHTML = hasOver
+    ? `<span class="badge badge-red">${n} SKU cần xử lý</span>`
+    : `<span class="badge badge-green">✓ Tất cả hợp lệ</span>`;
+  if (msg) msg.textContent = hasOver ? 'Nhập 0 để bỏ CH → bấm Chia lại để phân lại' : 'Sẵn sàng chốt kế hoạch';
+  // sync stat card
+  const statEl = document.getElementById('stat-need-action');
+  const subEl  = document.getElementById('stat-need-sub');
+  if (statEl) { statEl.textContent = hasOver ? n : '✓'; statEl.style.color = hasOver ? 'var(--red)' : 'var(--green)'; }
+  if (subEl)  subEl.textContent = hasOver ? `${n} SKU còn phân vượt tồn kho` : 'Tất cả SKU hợp lệ';
 }
 
 function renderAssignTable() {
@@ -3224,12 +3250,13 @@ function renderAssignTable() {
       <th style="min-width:160px;position:sticky;left:0;background:var(--surface2);z-index:11">SKU / Tên hàng</th>
       <th style="text-align:right">Tồn kho<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 1</span></th>
       <th style="text-align:right">Kế hoạch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">API 2</span></th>
+      <th style="text-align:right">Chênh lệch<br><span style="font-weight:400;color:var(--text-subtle);font-size:10px">tồn − KH</span></th>
       <th colspan="${nStores}" style="text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)">Phân vào ${nStores} cửa hàng <span style="font-weight:400;color:var(--text-subtle);font-size:10px;text-transform:none">(chỉnh được${nStores > 8 ? ' · cuộn ngang' : ''})</span></th>
       <th style="text-align:right">Sẽ phân</th>
       <th>Trạng thái</th>
     </tr>
     <tr>
-      <th style="position:sticky;left:0;background:var(--surface2);z-index:11"></th><th></th><th></th>
+      <th style="position:sticky;left:0;background:var(--surface2);z-index:11"></th><th></th><th></th><th></th>
       ${STORE_BINS.map((b, i) => `<th style="text-align:right;font-size:10px;${i === nStores - 1 ? 'border-right:1px solid var(--border)' : ''}" title="${b.store} · đèn ${b.addr}">${b.code}</th>`).join('')}
       <th></th><th></th>
     </tr>`;
@@ -3262,18 +3289,33 @@ function renderAssignTable() {
     ).join('');
 
     const tools = viewOnly ? '' : `
-      <button class="btn btn-ghost btn-sm" style="padding:3px 6px;font-size:10px" title="Chia lại tồn kho cho các cửa hàng đang nhận (ô = 0 sẽ bị bỏ qua) — ưu tiên cấp đủ kế hoạch" onclick="redistributeRow(${d.idx})">${ico('autoassign', 12)}</button>
-      <button class="btn btn-ghost btn-sm" style="padding:3px 6px;font-size:10px" title="Về kết quả gán tự động ban đầu" onclick="resetRow(${d.idx})">↺</button>`;
+      <button class="btn btn-ghost btn-sm" style="padding:2px 7px;font-size:10px;display:inline-flex;align-items:center;gap:3px" title="Chia lại tồn kho cho các CH đang nhận (ô = 0 sẽ bị bỏ qua)" onclick="redistributeRow(${d.idx})">${ico('autoassign', 11)} Chia lại</button>
+      <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px" title="Về kết quả gán tự động ban đầu" onclick="resetRow(${d.idx})">↺</button>`;
 
     return `<tr style="${rowBg}">
       <td style="position:sticky;left:0;background:var(--surface);z-index:5"><div class="text-mono" style="font-size:12px">${d.sku}</div><div style="font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${d.name}</div></td>
       <td class="text-mono" style="text-align:right;${stockColor};font-weight:600">${d.stock}</td>
       <td class="text-mono" style="text-align:right;color:var(--text-muted)">${d.plan}</td>
+      <td class="text-mono" style="text-align:right;font-size:12px;font-weight:600;color:${d.diff < 0 ? 'var(--red)' : d.diff > 0 ? 'var(--yellow)' : 'var(--green)'}">${d.diff > 0 ? '+' : ''}${d.diff}</td>
       ${inputs}
       <td class="text-mono" id="alloc-sum-${d.idx}" style="text-align:right;font-weight:700;color:${d.allocTotal > d.stock ? 'var(--red)' : 'var(--text)'}">${d.allocTotal}</td>
       <td style="white-space:nowrap"><span id="alloc-badge-${d.idx}" class="badge ${st.cls}">${st.label}</span>${tools}</td>
     </tr>`;
   }).join('');
+
+  // tfoot: tổng phân theo từng cửa hàng
+  const tfoot = document.getElementById('assign-tfoot');
+  if (tfoot) {
+    const storeTotals = STORE_BINS.map((_, i) => ASSIGN_DATA.reduce((s, d) => s + (d.alloc[i] || 0), 0));
+    const grandTotal  = ASSIGN_DATA.reduce((s, d) => s + d.allocTotal, 0);
+    tfoot.innerHTML = `<tr>
+      <td style="position:sticky;left:0;background:var(--surface2);padding:5px 8px;font-size:11px;font-weight:600;color:var(--text-muted)">Tổng / CH</td>
+      <td></td><td></td><td></td>
+      ${storeTotals.map((t, i) => `<td id="ft-store-${i}" class="text-mono" style="text-align:right;font-size:11px;padding:5px 5px;${i === storeTotals.length-1 ? 'border-right:1px solid var(--border)' : ''}">${t}</td>`).join('')}
+      <td id="ft-total" class="text-mono" style="text-align:right;font-size:11px;font-weight:700;padding:5px 8px">${grandTotal}</td>
+      <td></td>
+    </tr>`;
+  }
 }
 
 // Trạng thái SỐNG của 1 dòng theo số liệu user đã chỉnh (không phải trạng thái gán gốc)
@@ -3322,16 +3364,15 @@ function updateAlloc(idx, storeIdx, val) {
   if (badge) { const st = rowState(d); badge.className = 'badge ' + st.cls; badge.textContent = st.label; }
   const inp = document.getElementById(`alloc-in-${idx}-${storeIdx}`);
   if (inp) { inp.classList.toggle('zero', d.alloc[storeIdx] === 0); inp.classList.toggle('overplan', d.alloc[storeIdx] > d.stores[storeIdx]); }
-  // screen-level: stat "Tổng sẽ phân" + trạng thái nút chốt
+  // screen-level: stat tổng + sticky bar + need-action counter + tfoot
   const statEl = document.getElementById('stat-alloc-units');
   if (statEl) statEl.textContent = BATCH_TOTALS.allocUnits.toLocaleString();
-  const hasOver = ASSIGN_DATA.some(r => r.allocTotal > r.stock);
-  const cBtn = document.getElementById('btn-confirm-assign');
-  if (cBtn && _mapped) {
-    cBtn.disabled = hasOver;
-    cBtn.style.opacity = hasOver ? '.45' : '';
-    cBtn.title = hasOver ? 'Có SKU đang phân vượt tồn kho — kiểm tra lại' : '';
-  }
+  _updateStickyBar();
+  // cập nhật tổng cột cửa hàng trong tfoot
+  const ftStore = document.getElementById(`ft-store-${storeIdx}`);
+  if (ftStore) ftStore.textContent = ASSIGN_DATA.reduce((s, d) => s + (d.alloc[storeIdx] || 0), 0);
+  const ftTotal = document.getElementById('ft-total');
+  if (ftTotal) ftTotal.textContent = BATCH_TOTALS.allocUnits;
 }
 
 // THIẾU HÀNG: user nhập 0 để BỎ cửa hàng → bấm chia lại: tồn kho chia cho các CH còn nhận,
@@ -4598,12 +4639,26 @@ function opTogglePause() {
 }
 function opFinishEarly() {
   const allDone = _opQueue.length && _opDoneCount() === _opQueue.length;
-  if (allDone && !_opExceptions.length) { opFinishRun(false); return; }   // đã sạch việc → đóng ca bình thường
+  if (allDone && !_opExceptions.length) { opFinishRun(false); return; }
   const parts = [];
-  if (!allDone) parts.push(`${_opQueue.length - _opDoneCount()} SKU chưa xong sẽ ghi nhận còn dở`);
-  if (_opExceptions.length) parts.push(`${_opExceptions.length} sự cố chưa xử lý sẽ chuyển sang ca sau`);
-  if (!confirm(`Kết thúc ca sớm?\n· ${parts.join('\n· ')}`)) return;
-  opFinishRun(true);
+  if (!allDone) parts.push(`<li style="margin-bottom:5px"><span style="color:var(--yellow);font-weight:600">${_opQueue.length - _opDoneCount()} SKU chưa xong</span> — sẽ ghi nhận còn dở trong biên bản</li>`);
+  if (_opExceptions.length) parts.push(`<li><span style="color:var(--red);font-weight:600">${_opExceptions.length} sự cố chưa xử lý</span> — sẽ chuyển sang ca sau</li>`);
+  _openDangerConfirm(
+    'Kết thúc ca sớm?',
+    `<ul style="margin:4px 0 0;padding-left:16px;font-size:13px;color:var(--text-muted);list-style:disc">${parts.join('')}</ul>`,
+    () => opFinishRun(true)
+  );
+}
+
+function _openDangerConfirm(title, bodyHTML, onConfirm) {
+  document.getElementById('dc-title').textContent = title;
+  document.getElementById('dc-body').innerHTML = bodyHTML;
+  const okBtn = document.getElementById('dc-ok-btn');
+  okBtn.onclick = () => { _closeDangerConfirm(); onConfirm(); };
+  document.getElementById('modal-danger-confirm').style.display = 'flex';
+}
+function _closeDangerConfirm() {
+  document.getElementById('modal-danger-confirm').style.display = 'none';
 }
 function opFinishRun(early) {
   _opRunning = false;
