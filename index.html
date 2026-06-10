@@ -440,19 +440,23 @@ tr:last-child td { border-bottom: none; }
 
 /* ── CONTROL-ROOM LAYOUT (màn vận hành) ── */
 #screen-operation { padding-bottom: calc(var(--demobar-h) + 6px); }
-.ops-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; margin-bottom: 12px; }
+.ops-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 12px; }
 .ops-bar-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .ops-stats { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .ops-stat { display: flex; align-items: baseline; gap: 5px; padding: 3px 9px; border-radius: 7px; background: var(--surface2); border: 1px solid var(--border); white-space: nowrap; }
 .ops-stat b { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
 .ops-stat span { font-size: 10px; color: var(--text-muted); }
+.ops-kpi-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.ops-kpi-card { display: flex; flex-direction: column; padding: 9px 14px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); flex: 1; min-width: 100px; }
+.ops-kpi-card b { font-family: var(--font-mono); font-size: 22px; font-weight: 700; line-height: 1.1; }
+.ops-kpi-card span { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 .ops-skustrip { display: flex; gap: 4px; flex-wrap: nowrap; overflow-x: auto; margin-top: 8px; padding-bottom: 2px; }
 .ops-skustrip::-webkit-scrollbar { height: 5px; }
 .ops-skustrip::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 .ops-skustrip > div { flex-shrink: 0; }
 .ops-grid { display: grid; grid-template-columns: minmax(0, 1fr) 332px; gap: 12px; align-items: start; }
-.ops-main { max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - var(--demobar-h) - 196px); overflow-y: auto; min-width: 0; }
-.ops-rail { display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - var(--demobar-h) - 196px); }
+.ops-main { max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - var(--demobar-h) - 250px); overflow-y: auto; min-width: 0; }
+.ops-rail { display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - var(--topbar-h) - var(--statusbar-h) - var(--demobar-h) - 250px); }
 .ops-feedcard { flex: 1; min-height: 80px; display: flex; flex-direction: column; }
 @media (max-width: 1150px) { .ops-grid { grid-template-columns: 1fr; } .ops-main, .ops-rail { max-height: none; } }
 
@@ -1079,19 +1083,20 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
 
   <div id="op-live">
 
-  <!-- OPS BAR — thanh trạng thái ca: mọi chỉ số sống trên 1 dòng, không chiếm màn hình -->
+  <!-- OPS BAR — thanh trạng thái ca -->
   <div class="ops-bar">
     <div class="ops-bar-row">
       <span id="op-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></span>
       <span class="op-stage-badge" id="op-stage-chip" style="padding:4px 11px;font-size:11px"><!-- JS --></span>
-      <div class="ops-stats" id="op-kpi"><!-- JS: stat chips --></div>
-      <div class="progress-bar" style="flex:1;min-width:120px;height:6px"><div class="progress-fill green" id="op-progress-fill" style="width:0%"></div></div>
-      <div class="text-mono" id="op-progress-text" style="white-space:nowrap;font-size:11px;color:var(--text-muted)">0 / 0 SKU</div>
+      <span id="op-elapsed" class="text-mono" style="font-size:12px;color:var(--text-subtle);white-space:nowrap;min-width:36px">00:00</span>
+      <div class="progress-bar" style="flex:1;min-width:100px;height:10px;border-radius:5px"><div class="progress-fill green" id="op-progress-fill" style="width:0%;border-radius:5px"></div></div>
+      <div class="text-mono" id="op-progress-text" style="white-space:nowrap;font-size:12px;font-weight:600">0 / 0 SKU</div>
       <div class="view-toggle" style="margin:0">
         <button class="view-btn active" id="opv-map" onclick="setOpView('map')">Sơ đồ kho</button>
         <button class="view-btn" id="opv-list" onclick="setOpView('list')">Theo SKU</button>
       </div>
     </div>
+    <div id="op-kpi" class="ops-kpi-row"><!-- JS: stat cards --></div>
   </div>
 
   <!-- CONTROL-ROOM GRID: trái = sơ đồ kho (chủ đạo) · phải = trạm quét / sự cố / nhật ký -->
@@ -1112,18 +1117,19 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
     </div>
 
     <div class="ops-rail">
-      <!-- TRẠM QUÉT (mini) — màn giám sát KHÔNG nhập liệu; NV thao tác trong "Trạm quét" -->
-      <div class="card" id="op-gate-card"><!-- rendered by JS --></div>
-
-      <div class="card">
+      <!-- SỰ CỐ — lên đầu rail, manager thấy ngay khi có vấn đề -->
+      <div class="card" id="op-exc-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="card-title" style="margin-bottom:0">Sự cố cần xử lý</div>
           <span id="op-exc-count" class="badge badge-gray" style="font-size:10px">0</span>
         </div>
-        <div id="op-exceptions" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto">
+        <div id="op-exceptions" style="display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto">
           <!-- rendered by JS -->
         </div>
       </div>
+
+      <!-- TRẠM QUÉT (mini) — trạng thái NV, không nhập liệu ở đây -->
+      <div class="card" id="op-gate-card"><!-- rendered by JS --></div>
 
       <div class="card ops-feedcard">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -3969,13 +3975,17 @@ function renderOpKpi() {
   const skuDone = _opDoneCount();
   const units = _opUnitsDone();
   const storesDone = _opQueue.reduce((a, q) => a + q.bins.filter(b => b.status === 'done' || b.status === 'short').length, 0);
-  const chip = (val, lbl, col) => `<div class="ops-stat"><b style="color:${col}">${val}</b><span>${lbl}</span></div>`;
+  const mm = String(Math.floor(_opElapsedMs / 60000)).padStart(2, '0');
+  const ss = String(Math.floor(_opElapsedMs / 1000) % 60).padStart(2, '0');
+  const card = (val, lbl, col) => `<div class="ops-kpi-card"><b style="color:${col}">${val}</b><span>${lbl}</span></div>`;
   const kpi = document.getElementById('op-kpi');
   if (kpi) kpi.innerHTML =
-    chip(`${skuDone}/${_opQueue.length}`, 'SKU', 'var(--accent)') +
-    chip(units.toLocaleString(), 'đơn vị', 'var(--green)') +
-    chip(storesDone.toLocaleString(), 'lượt CH', 'var(--purple)') +
-    chip(_opExceptions.length, 'sự cố', _opExceptions.length ? 'var(--red)' : 'var(--text-subtle)');
+    card(`${skuDone}/${_opQueue.length}`, 'SKU hoàn thành', 'var(--accent)') +
+    card(units.toLocaleString(), 'Đơn vị đã bỏ', 'var(--green)') +
+    card(storesDone.toLocaleString(), 'Lượt cửa hàng', 'var(--purple)') +
+    card(_opExceptions.length || '0', 'Sự cố', _opExceptions.length ? 'var(--red)' : 'var(--text-subtle)');
+  const elapsed = document.getElementById('op-elapsed');
+  if (elapsed) elapsed.textContent = mm + ':' + ss;
   const dot = document.getElementById('op-live-dot');
   if (dot) dot.style.background = _opRunning ? 'var(--green)' : 'var(--yellow)';
   const fdot = document.getElementById('op-feed-dot');
@@ -4084,7 +4094,9 @@ function renderOpFeed() {
 function renderOpExceptions() {
   const box = document.getElementById('op-exceptions');
   const cnt = document.getElementById('op-exc-count');
+  const excCard = document.getElementById('op-exc-card');
   if (cnt) { cnt.textContent = _opExceptions.length; cnt.className = 'badge ' + (_opExceptions.length ? 'badge-red' : 'badge-gray'); cnt.style.fontSize = '10px'; }
+  if (excCard) { excCard.style.borderColor = _opExceptions.length ? 'rgba(240,86,74,.45)' : ''; excCard.style.background = _opExceptions.length ? 'rgba(240,86,74,.04)' : ''; }
   if (!_opExceptions.length) { box.innerHTML = `<div style="font-size:12px;color:var(--text-subtle);padding:6px 2px">Chưa có sự cố — ca chạy ổn định</div>`; return; }
   const canDo = canEdit('operation');
   box.innerHTML = _opExceptions.map((e, i) => {
