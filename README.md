@@ -25,7 +25,7 @@ Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 | Đăng nhập | Chọn vai trò → mô tả nhiệm vụ → vào Dashboard |
 | Dashboard | Trang chủ theo vai trò: hành trình lô, việc cần làm, truy cập nhanh |
 | Quản lý LOT / Batch | Theo dõi tiến độ các đợt phân hàng trong ngày |
-| Chuẩn bị lô hàng | Bấm **Nhận dữ liệu** kéo 2 API về (strip trạng thái từng nguồn) → duyệt kết quả gán tồn kho × kế hoạch (đủ/thiếu/dư, chỉnh tay) → chốt kế hoạch / từ chối / tính lại |
+| Chuẩn bị lô hàng | Nhận **từng API** và xem danh sách thô (bảng tồn kho · bảng kế hoạch) → bấm **Xác nhận & Đối chiếu** hệ thống mới map 2 nguồn → duyệt kết quả gán (đủ/thiếu/dư, chỉnh tay) → chốt kế hoạch |
 | Giám sát vận hành | Chuẩn bị ca (load layout, kiểm tra thiết bị, double-check dữ liệu) → ca chạy thực: quét thẻ NV + SKU, đèn sáng, nhấn nút xác nhận, xử lý sự cố → biên bản ca |
 | Báo cáo & thống kê | Sản lượng, độ chính xác, hiệu suất theo khu vực & nhân sự |
 | Tạo Layout kho | Cấu hình khu vực, kệ, tầng — kéo thả gán địa chỉ đèn |
@@ -39,7 +39,7 @@ Xem trực tiếp trên trình duyệt — không cần cài đặt hay server.
 API 1 — Hàng tiếp nhận        API 2 — Kế hoạch phân phối
 (LOT, vị trí kệ, số lượng)    (SKU, cửa hàng, số lượng yêu cầu)
               └──────────────┬──────────────┘
-              user bấm "Nhận dữ liệu" → kéo 2 nguồn về
+       nhận từng nguồn → NGƯỜI XEM dữ liệu thô → Xác nhận & Đối chiếu
                              ▼
         Thuật toán gán tự động → người duyệt, chốt kế hoạch
                              ▼

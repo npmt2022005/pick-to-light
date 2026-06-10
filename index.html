@@ -995,12 +995,10 @@ body.login-mode .main { margin-left: 0; margin-top: 0; margin-bottom: 0; }
     <div id="assign-view-banner" style="display:none;margin-top:10px;background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius);padding:8px 14px;font-size:12px;color:var(--accent)">
       Chế độ xem (Tổng Quản Lý) — chỉ Quản Lý Vận Hành mới được xác nhận / từ chối / tính lại
     </div>
-    <!-- SYNC STRIP — trạng thái 2 nguồn API (đồng bộ tự động, con người chỉ duyệt) -->
-    <div id="assign-sync-strip" style="margin-top:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:12px"></div>
   </div>
 
-  <!-- Hint khi chưa nhận dữ liệu -->
-  <div id="assign-fetch-hint" style="display:none;align-items:center;gap:10px;justify-content:center;padding:14px;margin-bottom:16px;border:1.5px dashed rgba(217,161,60,.45);border-radius:var(--radius);background:var(--yellow-dim);font-size:13px;color:var(--yellow);font-weight:600"></div>
+  <!-- DỮ LIỆU GỐC 2 API — user bấm nhận từng nguồn, XEM danh sách thô, rồi mới Xác nhận & Đối chiếu -->
+  <div id="assign-raw" style="margin-bottom:16px"><!-- rendered by JS --></div>
 
   <!-- Stats -->
   <div class="stat-grid stat-grid-4 assign-gated" style="margin-bottom:16px" id="assign-stats"></div>
@@ -1917,7 +1915,7 @@ function batchFlowSteps() {
     { key: 'import', label: 'Nhận dữ liệu', screen: 'autoassign', done: imported, locked: false,
       sub: `${nApi}/2 nguồn API` },
     { key: 'assign', label: 'Duyệt & chốt kế hoạch', screen: 'autoassign', done: _planConfirmed, locked: !imported,
-      sub: _planConfirmed ? `${BATCH_TOTALS.skuCount} SKU đã chốt` : imported ? 'kiểm tra đủ/thiếu/dư' : 'cần dữ liệu trước' },
+      sub: _planConfirmed ? `${BATCH_TOTALS.skuCount} SKU đã chốt` : !imported ? 'cần dữ liệu trước' : !_mapped ? 'đối chiếu 2 nguồn' : 'kiểm tra đủ/thiếu/dư' },
     { key: 'prep', label: 'Chuẩn bị ca', screen: 'operation', done: live || shiftDone, locked: !_planConfirmed,
       sub: (live || shiftDone) ? 'đã mở ca' : _planConfirmed ? 'layout · thiết bị · dữ liệu' : 'cần chốt kế hoạch' },
     { key: 'run', label: 'Ca chạy', screen: 'operation', done: shiftDone, locked: !live && !shiftDone,
@@ -1934,7 +1932,7 @@ function flowNextCTA() {
   const { steps, cur } = batchFlowSteps();
   const s = steps[cur];
   const label = {
-    import: 'Nhận dữ liệu về', assign: 'Duyệt gán & chốt kế hoạch', prep: 'Chạy checklist & mở ca',
+    import: 'Nhận dữ liệu về', assign: _mapped ? 'Duyệt gán & chốt kế hoạch' : 'Xem & đối chiếu 2 nguồn', prep: 'Chạy checklist & mở ca',
     run: 'Theo dõi ca chạy', report: 'Xem biên bản & báo cáo',
   }[s.key];
   return { screen: s.screen, label, n: cur + 1 };
@@ -3039,6 +3037,7 @@ function rebuildDemoData() {
   // pipeline lô hàng quay về đầu hành trình — chờ user bấm nhận dữ liệu
   _importState = { api1: false, api2: false };
   _syncTimes = { api1: '—', api2: '—' };
+  _mapped = false; _rawOpen = false;
   _planConfirmed = false;
   delete _batchStatuses[BATCH.id];
   buildOpQueue();
@@ -3051,9 +3050,9 @@ function setDemoScale(key) {
   _scaleKey = key;
   if (_opTimer) { clearInterval(_opTimer); _opTimer = null; }
   _opRunning = false;
-  const keepImport = { ..._importState }, keepPlan = _planConfirmed;   // đổi quy mô không bắt đi lại pipeline
+  const keepImport = { ..._importState }, keepPlan = _planConfirmed, keepMapped = _mapped;   // đổi quy mô không bắt đi lại pipeline
   rebuildDemoData();
-  _importState = keepImport; _planConfirmed = keepPlan;
+  _importState = keepImport; _planConfirmed = keepPlan; _mapped = keepMapped;
   if (keepPlan) _batchStatuses[BATCH.id] = 'running';
   const p = SCALE_PRESETS[key];
   showToast(`Demo kho ${p.label}: ${p.zones} khu · ${STORE_BINS.length} cửa hàng · ${ASSIGN_DATA.length} SKU`, 'info');
@@ -3064,45 +3063,107 @@ let _assignFilter = 'all';
 let _assignSearch = '';
 let _surplusOpen  = true;
 
-// Panel nhận dữ liệu — USER bấm "Nhận dữ liệu" để kéo 2 nguồn API về (bước ① của pipeline)
-let _syncing = false;
-function renderSyncStrip() {
-  const el = document.getElementById('assign-sync-strip');
-  if (!el) return;
-  const both = _importState.api1 && _importState.api2;
-  const src = (key, name, tag, desc) => {
-    if (_syncing && !_importState[key]) return `<span style="display:flex;align-items:center;gap:6px"><span class="status-dot" style="background:var(--yellow);animation:tpulse .5s ease infinite alternate"></span><b class="text-mono" style="font-size:10px">${tag}</b> ${name} — <span style="color:var(--yellow)">đang tải…</span></span>`;
-    const ok = _importState[key];
-    return `<span style="display:flex;align-items:center;gap:6px" title="${desc}"><span class="status-dot ${ok ? 'online' : 'offline'}"></span><b class="text-mono" style="font-size:10px">${tag}</b> ${name} — <span class="text-mono" style="font-size:11px;color:${ok ? 'var(--green)' : 'var(--yellow)'}">${ok ? '✓ nhận lúc ' + _syncTimes[key] : 'chưa nhận'}</span></span>`;
-  };
-  el.style.borderColor = both ? 'var(--border)' : 'rgba(217,161,60,.4)';
-  el.innerHTML = `
-    ${src('api1', 'Hàng tiếp nhận', 'API 1', 'LOT, vị trí kệ, số lượng tồn')}
-    <span style="width:1px;height:14px;background:var(--border)"></span>
-    ${src('api2', 'Kế hoạch phân phối', 'API 2', 'SKU, cửa hàng, số lượng yêu cầu')}
-    <span style="flex:1"></span>
-    <span style="font-size:11px;color:var(--text-subtle)">Nguồn: ERP/WMS · endpoint cấu hình bởi IT</span>
-    <button class="btn ${both ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="resyncApis()" ${_syncing ? 'disabled' : ''}>${ico('import', 13)} ${_syncing ? 'Đang nhận…' : both ? 'Nhận lại dữ liệu' : 'Nhận dữ liệu'}</button>`;
-}
-// User bấm → kéo lần lượt 2 nguồn (mô phỏng độ trễ API thật)
-function resyncApis() {
-  if (_syncing) return;
-  _syncing = true;
-  _importState = { api1: false, api2: false };
-  renderSyncStrip();
-  const t = () => new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+// ── DỮ LIỆU GỐC 2 API ──
+// Flow client yêu cầu: bấm nhận TỪNG nguồn → XEM danh sách thô của nguồn đó →
+// đủ 2 nguồn → bấm "Xác nhận & Đối chiếu" → hệ thống MỚI map tồn kho × kế hoạch thành bảng gán.
+let _syncingKey = { api1: false, api2: false };
+let _mapped = false;        // đã đối chiếu 2 nguồn → mở khu duyệt gán
+let _rawOpen = false;       // sau khi đối chiếu vẫn xem lại được dữ liệu gốc (chỉ xem)
+
+function fetchApi(key) {
+  if (_syncingKey[key]) return;
+  _syncingKey[key] = true;
+  if (_mapped) { _mapped = false; _rawOpen = false; }   // nhận lại dữ liệu → phải đối chiếu lại
+  renderAssignScreen();
   setTimeout(() => {
-    _importState.api1 = true; _syncTimes.api1 = t();
-    renderSyncStrip();
-    showToast(`✓ API 1 — Hàng tiếp nhận: ${BATCH.skus.length} dòng tồn kho`, 'success');
-  }, 900);
-  setTimeout(() => {
-    _importState.api2 = true; _syncTimes.api2 = t();
-    _syncing = false;
+    _syncingKey[key] = false;
+    _importState[key] = true;
+    _syncTimes[key] = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     renderAssignScreen();
     renderStepper('autoassign');
-    showToast(`✓ API 2 — Kế hoạch phân phối: ${BATCH_TOTALS.skuCount} SKU × ${STORE_BINS.length} cửa hàng — duyệt kết quả gán bên dưới`, 'success');
-  }, 1800);
+    showToast(key === 'api1'
+      ? `✓ API 1 — Hàng tiếp nhận: ${BATCH.skus.length} dòng tồn kho — kiểm tra danh sách bên dưới`
+      : `✓ API 2 — Kế hoạch phân phối: ${BATCH_TOTALS.skuCount} SKU × ${STORE_BINS.length} cửa hàng — kiểm tra rồi đối chiếu`, 'success');
+  }, 1000);
+}
+function resyncApis() { fetchApi('api1'); setTimeout(() => fetchApi('api2'), 500); }   // nhận lại cả 2 (luồng Từ chối)
+
+// User đã xem dữ liệu thô 2 nguồn → bấm đối chiếu: hệ thống map tồn × kế hoạch → bảng gán
+function confirmMapping() {
+  if (!(_importState.api1 && _importState.api2)) { showToast('Nhận đủ 2 nguồn dữ liệu trước khi đối chiếu', 'warn'); return; }
+  showLoading('Đang đối chiếu tồn kho × kế hoạch & gán tự động...');
+  setTimeout(() => {
+    hideLoading();
+    _mapped = true; _rawOpen = false;
+    renderAssignScreen();
+    renderStepper('autoassign');
+    showToast(`✓ Đã đối chiếu — ${BATCH_TOTALS.skuCount} SKU gán vào ${STORE_BINS.length} cửa hàng, duyệt bên dưới`, 'success');
+  }, 1200);
+}
+function toggleRawView() { _rawOpen = !_rawOpen; renderAssignScreen(); }
+
+function renderAssignRaw() {
+  const el = document.getElementById('assign-raw');
+  if (!el) return;
+  const both = _importState.api1 && _importState.api2;
+
+  // Sau khi đối chiếu: thu thành 1 dòng trạng thái + link xem lại dữ liệu gốc
+  if (_mapped && !_rawOpen) {
+    el.innerHTML = `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:12px">
+      <span class="status-dot online"></span><span>Đã đối chiếu 2 nguồn — API 1 ✓ ${_syncTimes.api1} · API 2 ✓ ${_syncTimes.api2}</span>
+      <span style="flex:1"></span>
+      <a onclick="toggleRawView()" style="color:var(--accent);cursor:pointer;font-size:12px">Xem dữ liệu gốc</a>
+      <button class="btn btn-secondary btn-sm" onclick="resyncApis()">${ico('replenishment', 12)} Nhận lại</button>
+    </div>`;
+    return;
+  }
+
+  const panel = (key, tag, name, desc, bodyHTML, footNote) => {
+    const ok = _importState[key], loading = _syncingKey[key];
+    const status = loading
+      ? `<span class="badge badge-yellow" style="animation:tpulse .6s ease infinite alternate">Đang tải…</span>`
+      : ok ? `<span class="badge badge-green">✓ nhận lúc ${_syncTimes[key]}</span>` : `<span class="badge badge-gray">Chưa nhận</span>`;
+    return `<div class="card" style="padding:0;overflow:hidden;${ok ? '' : 'border-style:dashed'}">
+      <div style="display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface2)">
+        <span class="badge badge-blue text-mono" style="font-size:10px">${tag}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700">${name}</div>
+          <div style="font-size:10px;color:var(--text-subtle)">${desc}</div>
+        </div>
+        ${status}
+        <button class="btn ${ok ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="fetchApi('${key}')" ${loading ? 'disabled' : ''}>${ico('import', 12)} ${ok ? 'Nhận lại' : 'Nhận dữ liệu'}</button>
+      </div>
+      ${ok
+        ? `<div class="table-wrap" style="max-height:240px;overflow:auto">${bodyHTML}</div>
+           <div style="padding:7px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)">${footNote}</div>`
+        : `<div style="padding:30px;text-align:center;color:var(--text-subtle);font-size:12px">${loading ? 'Đang kéo dữ liệu từ endpoint…' : 'Bấm “Nhận dữ liệu” để tải danh sách từ ERP/WMS về xem trước khi đối chiếu'}</div>`}
+    </div>`;
+  };
+
+  // API 1 — danh sách tồn kho thô
+  const t1 = `<table><thead style="position:sticky;top:0;background:var(--surface2);z-index:5"><tr><th>SKU</th><th>Tên hàng</th><th>LOT</th><th style="text-align:right">Tồn kho</th></tr></thead><tbody>
+    ${BATCH.skus.map(s => `<tr><td class="text-mono" style="font-size:12px">${s.sku}</td><td style="font-size:12px">${s.name}</td><td class="text-mono" style="font-size:11px;color:var(--text-muted)">${s.lot}</td><td class="text-mono" style="text-align:right;font-weight:600">${s.stock}</td></tr>`).join('')}
+  </tbody></table>`;
+  const sumStock = BATCH.skus.reduce((a, s) => a + s.stock, 0);
+
+  // API 2 — danh sách kế hoạch thô (cột cửa hàng động, cuộn ngang)
+  const t2 = `<table><thead style="position:sticky;top:0;background:var(--surface2);z-index:5"><tr>
+      <th style="position:sticky;left:0;background:var(--surface2);z-index:6">SKU</th>
+      ${STORE_BINS.map(b => `<th class="text-mono" style="text-align:right;font-size:10px" title="${b.store}">${b.code}</th>`).join('')}
+      <th style="text-align:right">Tổng</th></tr></thead><tbody>
+    ${BATCH.skus.map(s => `<tr><td class="text-mono" style="font-size:12px;position:sticky;left:0;background:var(--surface);z-index:4">${s.sku}</td>${s.plan.map(q => `<td class="text-mono" style="text-align:right;font-size:11px;color:var(--text-muted)">${q}</td>`).join('')}<td class="text-mono" style="text-align:right;font-weight:600">${s.plan.reduce((a, b) => a + b, 0)}</td></tr>`).join('')}
+  </tbody></table>`;
+
+  el.innerHTML = `
+    ${_mapped ? `<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><a onclick="toggleRawView()" style="color:var(--accent);cursor:pointer;font-size:12px">▲ Thu gọn dữ liệu gốc</a></div>` : ''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px">
+      ${panel('api1', 'API 1', 'Hàng tiếp nhận', 'Tồn kho theo SKU · nguồn ERP/WMS', t1, `${BATCH.skus.length} SKU · tổng tồn ${sumStock.toLocaleString()} đơn vị`)}
+      ${panel('api2', 'API 2', 'Kế hoạch phân phối', `Số lượng yêu cầu theo ${STORE_BINS.length} cửa hàng`, t2, `${BATCH.skus.length} SKU × ${STORE_BINS.length} cửa hàng · tổng yêu cầu ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị`)}
+    </div>
+    ${!_mapped ? `<div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text-muted)">${both ? 'Kiểm tra 2 danh sách trên — đối chiếu xong mới có bảng gán để duyệt' : 'Nhận đủ 2 nguồn để đối chiếu'}</span>
+      <button class="btn btn-success" ${both ? '' : 'disabled style="opacity:.45"'} onclick="confirmMapping()">${ico('autoassign', 15)} Xác nhận &amp; Đối chiếu 2 nguồn</button>
+    </div>` : ''}`;
 }
 
 function renderAssignScreen() {
@@ -3119,19 +3180,13 @@ function renderAssignScreen() {
   if (actions) actions.style.display = viewOnly ? 'none' : '';
   if (vBanner) vBanner.style.display = viewOnly ? '' : 'none';
 
-  // PANEL NHẬN DỮ LIỆU: user bấm nhận → khu duyệt gán mới mở (mờ khi chưa có dữ liệu)
-  renderSyncStrip();
-  const imported = _importState.api1 && _importState.api2;
-  document.querySelectorAll('#screen-autoassign .assign-gated').forEach(e => e.classList.toggle('off', !imported));
-  const hint = document.getElementById('assign-fetch-hint');
-  if (hint) {
-    hint.style.display = imported ? 'none' : 'flex';
-    if (!imported) hint.innerHTML = `${ico('import', 16)} Chưa có dữ liệu lô — bấm <strong>“Nhận dữ liệu”</strong> ở thanh trên để kéo tồn kho &amp; kế hoạch từ 2 API về`;
-  }
+  // PANEL DỮ LIỆU GỐC: nhận từng API → xem danh sách → đối chiếu xong khu duyệt gán mới mở
+  renderAssignRaw();
+  document.querySelectorAll('#screen-autoassign .assign-gated').forEach(e => e.classList.toggle('off', !_mapped));
   const cBtn = document.getElementById('btn-confirm-assign');
-  if (cBtn) { cBtn.disabled = !imported; cBtn.style.opacity = imported ? '' : '.45'; cBtn.title = imported ? '' : 'Khóa — bấm Nhận dữ liệu từ 2 API trước'; }
+  if (cBtn) { cBtn.disabled = !_mapped; cBtn.style.opacity = _mapped ? '' : '.45'; cBtn.title = _mapped ? '' : 'Khóa — nhận & đối chiếu 2 nguồn dữ liệu trước'; }
   const subEl = document.getElementById('assign-subdesc');
-  if (subEl) subEl.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> — <strong>nhận dữ liệu</strong> từ 2 API → duyệt kết quả gán tồn kho × kế hoạch → <strong>chốt kế hoạch</strong>${_planConfirmed ? ' <span class="badge badge-green" style="margin-left:4px">✓ Đã chốt</span>' : ''}`;
+  if (subEl) subEl.innerHTML = `Lô <span class="text-mono" style="color:var(--accent)">${BATCH.id}</span> — <strong>nhận &amp; xem dữ liệu</strong> từng API → <strong>đối chiếu</strong> → duyệt kết quả gán → <strong>chốt kế hoạch</strong>${_planConfirmed ? ' <span class="badge badge-green" style="margin-left:4px">✓ Đã chốt</span>' : ''}`;
 
   // stats
   document.getElementById('assign-stats').innerHTML = `
@@ -3323,7 +3378,7 @@ function doReject() {
 
 // ── FLOW 3: XÁC NHẬN & BẮT ĐẦU ──
 function openConfirmModal() {
-  if (!(_importState.api1 && _importState.api2)) { showToast('Khóa — hoàn thành Bước 1 · Nhận dữ liệu trước khi chốt kế hoạch', 'warn'); return; }
+  if (!_mapped) { showToast('Khóa — nhận & đối chiếu 2 nguồn dữ liệu trước khi chốt kế hoạch', 'warn'); return; }
   const data       = ASSIGN_DATA;
   const nShort     = data.filter(d => d.status === 'short').length;
   const allocUnits = data.reduce((s, d) => s + d.allocTotal, 0);   // theo số đã gán (tính cả chỉnh tay)
@@ -4111,6 +4166,7 @@ function opEnter() {
   // Manager giám sát: coi như Vận Hành đã nhận data & chốt kế hoạch (mô phỏng câu chuyện hoàn chỉnh)
   if (_opAuto && !_planConfirmed) {
     _importState.api1 = _importState.api2 = true;
+    _mapped = true;
     _planConfirmed = true;
     _opFeedPush('info', `Kế hoạch lô ${BATCH.id} đã được Quản Lý Vận Hành chốt — vào giám sát ca`);
   }
@@ -4163,6 +4219,7 @@ function renderOpLocked() {
 // Demo: tự hoàn tất Nhận dữ liệu + Chốt kế hoạch để xem ngay phần vận hành
 function demoSkipToOps() {
   _importState.api1 = _importState.api2 = true;
+  _mapped = true;
   _planConfirmed = true;
   _batchStatuses[BATCH.id] = 'running';
   showToast('Mô phỏng: đã nhận dữ liệu & chốt kế hoạch — vào chuẩn bị ca', 'info');
