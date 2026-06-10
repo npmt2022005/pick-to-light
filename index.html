@@ -3195,7 +3195,7 @@ function renderAssignScreen() {
   // stats
   document.getElementById('assign-stats').innerHTML = `
     <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">${data.length}</div><div class="stat-sub">lô ${BATCH.id}</div></div>
-    <div class="stat-card"><div class="stat-label">Tổng sẽ phân</div><div class="stat-value">${BATCH_TOTALS.allocUnits.toLocaleString()}</div><div class="stat-sub">/ ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị theo kế hoạch</div></div>
+    <div class="stat-card"><div class="stat-label">Tổng sẽ phân</div><div class="stat-value" id="stat-alloc-units">${BATCH_TOTALS.allocUnits.toLocaleString()}</div><div class="stat-sub">/ ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị theo kế hoạch</div></div>
     <div class="stat-card"><div class="stat-label">Cấp đủ kế hoạch</div><div class="stat-value" style="color:var(--green)">${nOk + nSurplus}</div><div class="stat-sub">${nSurplus} SKU dư → lưu kho</div></div>
     <div class="stat-card"><div class="stat-label">Thiếu — chia tỷ lệ</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">phân theo tồn kho hiện có</div></div>
   `;
@@ -3257,7 +3257,7 @@ function renderAssignTable() {
     const inputs = d.alloc.map((q, si) =>
       `<td style="text-align:right;padding:4px 5px;${si === d.alloc.length - 1 ? 'border-right:1px solid var(--border)' : ''}">
         <input class="input assign-input${q === 0 ? ' zero' : q > d.stores[si] ? ' overplan' : ''}" id="alloc-in-${d.idx}-${si}" style="width:46px;text-align:center;padding:4px;font-size:12px" value="${q}"
-               oninput="updateAlloc(${d.idx}, ${si}, this.value)" onchange="renderAssignScreen()" ${viewOnly ? 'disabled' : ''}>
+               oninput="updateAlloc(${d.idx}, ${si}, this.value)" ${viewOnly ? 'disabled' : ''}>
         <div style="font-size:9px;color:var(--text-subtle);text-align:center;margin-top:1px">KH ${d.stores[si]}</div>
       </td>`
     ).join('');
@@ -3296,13 +3296,14 @@ function _recalcAssignTotals() {
   BATCH_TOTALS.totalPicks = ASSIGN_DATA.reduce((a, d) => a + d.alloc.filter(q => q > 0).length, 0);
 }
 
-// Chỉnh số trực tiếp → cập nhật SỐNG: tổng, badge trạng thái, style ô (không re-render để giữ focus)
+// Chỉnh số trực tiếp → cập nhật SỐNG: tổng, badge trạng thái, style ô, stat cards, nút chốt (không re-render để giữ focus + scroll)
 function updateAlloc(idx, storeIdx, val) {
   const d = ASSIGN_DATA[idx];
   if (!d) return;
   d.alloc[storeIdx] = Math.max(0, parseInt(val) || 0);
   d.allocTotal = d.alloc.reduce((a, b) => a + b, 0);
   _recalcAssignTotals();
+  // row-level
   const cell = document.getElementById('alloc-sum-' + idx);
   if (cell) {
     cell.textContent = d.allocTotal;
@@ -3312,6 +3313,16 @@ function updateAlloc(idx, storeIdx, val) {
   if (badge) { const st = rowState(d); badge.className = 'badge ' + st.cls; badge.textContent = st.label; }
   const inp = document.getElementById(`alloc-in-${idx}-${storeIdx}`);
   if (inp) { inp.classList.toggle('zero', d.alloc[storeIdx] === 0); inp.classList.toggle('overplan', d.alloc[storeIdx] > d.stores[storeIdx]); }
+  // screen-level: stat "Tổng sẽ phân" + trạng thái nút chốt
+  const statEl = document.getElementById('stat-alloc-units');
+  if (statEl) statEl.textContent = BATCH_TOTALS.allocUnits.toLocaleString();
+  const hasOver = ASSIGN_DATA.some(r => r.allocTotal > r.stock);
+  const cBtn = document.getElementById('btn-confirm-assign');
+  if (cBtn && _mapped) {
+    cBtn.disabled = hasOver;
+    cBtn.style.opacity = hasOver ? '.45' : '';
+    cBtn.title = hasOver ? 'Có SKU đang phân vượt tồn kho — kiểm tra lại' : '';
+  }
 }
 
 // THIẾU HÀNG: user nhập 0 để BỎ cửa hàng → bấm chia lại: tồn kho chia cho các CH còn nhận,
