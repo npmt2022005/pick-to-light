@@ -2972,8 +2972,12 @@ function makeBatch(p) {
     const name = `${SKU_NAME_POOL[i % SKU_NAME_POOL.length]} ${SKU_SIZE_POOL[Math.floor(rng() * SKU_SIZE_POOL.length)]}`;
     const plan = storeBins.map(() => 5 + Math.floor(rng() * 26));                 // mỗi cửa hàng cần 5–30
     const planTotal = plan.reduce((a, b) => a + b, 0);
-    const ratio = 0.72 + rng() * 0.56;                                            // tồn 72%–128% kế hoạch → trộn đủ/thiếu/dư
-    return { sku: 'SKU-' + (100 + i), name, lot: 'LOT-' + String(6 + Math.floor(i / 4)).padStart(3, '0'), stock: Math.round(planTotal * ratio), plan };
+    // 3 bucket đều: idx%3=0 → đủ chính xác · idx%3=1 → thiếu 65–90% · idx%3=2 → dư 110–135%
+    const bucket = i % 3;
+    const stock = bucket === 0 ? planTotal
+                : bucket === 1 ? Math.round(planTotal * (0.65 + rng() * 0.25))
+                : Math.round(planTotal * (1.10 + rng() * 0.25));
+    return { sku: 'SKU-' + (100 + i), name, lot: 'LOT-' + String(6 + Math.floor(i / 4)).padStart(3, '0'), stock, plan };
   });
   return {
     id: 'BATCH-20260518-002', dateLabel: '18/05/2026 09:15', zone: 'Khu A',
@@ -3004,15 +3008,17 @@ function computeAssignData() {
   ASSIGN_DATA = BATCH.skus.map((s, idx) => {
     const plan = s.plan.reduce((a, b) => a + b, 0);
     const diff = s.stock - plan;
-    const alloc = allocateStock(s.plan, s.stock);
+    const status = diff === 0 ? 'ok' : diff > 0 ? 'surplus' : 'short';
+    // Thiếu: khởi đầu bằng plan gốc (tổng > stock) → buộc user quyết định cắt cửa hàng nào
+    // Đủ/Dư: phân đủ plan cho tất cả
+    const alloc = status === 'short' ? s.plan.slice() : allocateStock(s.plan, s.stock);
     return {
       idx,
       sku: s.sku, name: s.name, lot: s.lot,
-      stock: s.stock, plan, stores: s.plan, diff,
-      alloc,                                              // số lượng hệ thống phân vào từng cửa hàng
-      autoAlloc: alloc.slice(),                           // bản gán tự động gốc — để user bấm ↺ quay về
-      allocTotal: alloc.reduce((a, b) => a + b, 0),       // tổng sẽ phân ra (= stock nếu thiếu, = plan nếu đủ/dư)
-      status: diff === 0 ? 'ok' : diff > 0 ? 'surplus' : 'short',
+      stock: s.stock, plan, stores: s.plan, diff, status,
+      alloc,
+      autoAlloc: alloc.slice(),
+      allocTotal: alloc.reduce((a, b) => a + b, 0),
     };
   });
   BATCH_TOTALS = {
@@ -3197,7 +3203,7 @@ function renderAssignScreen() {
     <div class="stat-card"><div class="stat-label">Tổng SKU</div><div class="stat-value" style="color:var(--accent)">${data.length}</div><div class="stat-sub">lô ${BATCH.id}</div></div>
     <div class="stat-card"><div class="stat-label">Tổng sẽ phân</div><div class="stat-value" id="stat-alloc-units">${BATCH_TOTALS.allocUnits.toLocaleString()}</div><div class="stat-sub">/ ${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị theo kế hoạch</div></div>
     <div class="stat-card"><div class="stat-label">Cấp đủ kế hoạch</div><div class="stat-value" style="color:var(--green)">${nOk + nSurplus}</div><div class="stat-sub">${nSurplus} SKU dư → lưu kho</div></div>
-    <div class="stat-card"><div class="stat-label">Thiếu — chia tỷ lệ</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">phân theo tồn kho hiện có</div></div>
+    <div class="stat-card"><div class="stat-label">Thiếu hàng — cần xử lý</div><div class="stat-value" style="color:var(--red)">${nShort}</div><div class="stat-sub">nhập 0 để bỏ CH · bấm chia lại</div></div>
   `;
 
   // surplus panel
@@ -3280,13 +3286,13 @@ function renderAssignTable() {
 // Trạng thái SỐNG của 1 dòng theo số liệu user đã chỉnh (không phải trạng thái gán gốc)
 function rowState(d) {
   const over = d.allocTotal - d.stock;
-  if (over > 0) return { cls: 'badge-red', label: `Vượt tồn +${over}` };                       // chặn chốt
+  if (over > 0) return { cls: 'badge-red', label: `Thiếu ${over} — bỏ CH hoặc giảm số` };    // thiếu hàng: tổng phân > tồn kho
   const dropped = d.alloc.filter(q => q === 0).length;
-  const fullActive = d.alloc.every((q, i) => q === 0 || q >= d.stores[i]);                     // CH đang nhận đều đủ kế hoạch
+  const fullActive = d.alloc.every((q, i) => q === 0 || q >= d.stores[i]);                    // CH đang nhận đều đủ kế hoạch
   const extra = d.allocTotal - d.plan;
-  if (!fullActive) return { cls: 'badge-red', label: dropped ? `Thiếu · đã bỏ ${dropped} CH` : 'Thiếu — chia tỷ lệ' };
+  if (!fullActive) return { cls: 'badge-yellow', label: dropped ? `Chia tỷ lệ · bỏ ${dropped} CH` : 'Chia tỷ lệ — chưa đủ KH' };
   if (dropped) return { cls: 'badge-green', label: `Đủ ${d.alloc.length - dropped}/${d.alloc.length} CH · bỏ ${dropped}` };
-  if (extra > 0) return { cls: 'badge-purple', label: `Vượt KH +${extra}` };                   // chia phần dư cho CH
+  if (extra > 0) return { cls: 'badge-purple', label: `Vượt KH +${extra}` };                  // chia phần dư cho CH
   if (d.stock - d.allocTotal > 0 && d.diff > 0) return { cls: 'badge-yellow', label: `Dư ${d.stock - d.allocTotal} · lưu kho` };
   return { cls: 'badge-green', label: 'Phân đủ' };
 }
@@ -3644,7 +3650,7 @@ function _opPrepDataLines() {
     { ok: 1, t: `${BATCH_TOTALS.skuCount}/${BATCH_TOTALS.skuCount} SKU khớp danh mục lô ${BATCH.id} — kết quả gán tự động đã xác nhận` },
     { ok: 1, t: `${STORE_BINS.length}/${STORE_BINS.length} cửa hàng đã gán bin/đèn — khớp layout kho` },
   ];
-  if (BATCH_TOTALS.nShort) lines.push({ ok: 0, t: `${BATCH_TOTALS.nShort} SKU thiếu tồn — đã chia theo tỷ lệ, phần thiếu chuyển lô sau` });
+  if (BATCH_TOTALS.nShort) lines.push({ ok: 0, t: `${BATCH_TOTALS.nShort} SKU thiếu tồn — đã bỏ cửa hàng ưu tiên thấp, phần thiếu chuyển lô sau` });
   lines.push({ ok: 1, t: `Tổng phân bổ ${BATCH_TOTALS.allocUnits.toLocaleString()}/${BATCH_TOTALS.totalUnits.toLocaleString()} đơn vị — sẵn sàng phân hàng` });
   return lines;
 }
