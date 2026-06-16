@@ -1902,6 +1902,29 @@ function renderPhanCong(el) {
   el.innerHTML = html;
 }
 
+function startNewSession() {
+  if (state.simTimer) clearInterval(state.simTimer);
+  state.opsStep            = 0;
+  state.simRunning         = false;
+  state.simTimer           = null;
+  state.simDone            = false;
+  state.workerActive       = [false, false, false];
+  state.workerRound        = [0, 0, 0];
+  state.workerStoreIdx     = [0, 0, 0];
+  state.workerScanningNext = [false, false, false];
+  state.workerDone         = [false, false, false];
+  state.confirmed          = [new Array(9).fill(false), new Array(9).fill(false), new Array(9).fill(false)];
+  state.distributed        = Array.from({length: SKUS.length}, () => new Array(STORES.length).fill(0));
+  state.editPlan           = Array.from({length: SKUS.length}, (_, si) => [...PLAN[si]]);
+  state.zoneAssignments    = {
+    A: { yellow: null, red: null, green: null },
+    B: { yellow: null, red: null, green: null },
+    C: { yellow: null, red: null, green: null },
+  };
+  state.selectingSlot = null;
+  setScreen('phancong');
+}
+
 /* ═══════════════════════════════════════════════════════════
    SCREEN 5: VẬN HÀNH
 ═══════════════════════════════════════════════════════════ */
@@ -2044,6 +2067,7 @@ function renderOpsSidebar() {
         ✓ Phiên hoàn thành!
       </div>
       <button class="btn btn-success" style="width:100%;font-size:11px" onclick="setScreen('baocao')">Xem Báo cáo →</button>
+      <button class="btn btn-primary" style="width:100%;font-size:11px" onclick="startNewSession()">↩ Phiên phân hàng tiếp theo</button>
     `;
   } else if (state.simRunning) {
     html += `
