@@ -431,6 +431,164 @@ input[type="number"]:focus {
   transition: width .4s ease;
 }
 
+/* ─── PHÂN CÔNG KHU VỰC ─── */
+.zone-assign-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.zone-assign-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color .2s;
+}
+.zone-assign-card.selecting {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47,111,237,.15);
+}
+.zone-assign-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.zone-color-bar {
+  width: 4px;
+  height: 36px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.zone-assign-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.zone-assign-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.worker-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.worker-slot-filled {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.worker-slot-filled .wdot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.worker-slot-filled .wname {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+.worker-slot-filled .wcode {
+  font-size: 10px;
+  color: var(--text-subtle);
+}
+.worker-slot-filled .wremove {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(240,86,74,.15);
+  border: none;
+  color: var(--red);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.worker-slot-filled .wremove:hover { background: rgba(240,86,74,.35); }
+.worker-slot-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px dashed rgba(255,255,255,.15);
+  border-radius: 7px;
+  font-size: 11px;
+  color: var(--text-subtle);
+  cursor: pointer;
+  transition: all .15s;
+  gap: 6px;
+}
+.worker-slot-empty:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(47,111,237,.06);
+}
+.pool-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.pool-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.pool-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pool-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+  font-size: 11px;
+}
+.pool-chip:hover {
+  border-color: var(--accent);
+  background: rgba(47,111,237,.08);
+}
+.pool-chip.selecting-target {
+  border-color: var(--accent);
+  background: rgba(47,111,237,.12);
+  animation: pulse-border 1s ease-in-out infinite;
+}
+@keyframes pulse-border {
+  0%,100% { box-shadow: 0 0 0 0 rgba(47,111,237,.4); }
+  50% { box-shadow: 0 0 0 4px rgba(47,111,237,.0); }
+}
+.pool-chip .cdot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pool-chip .cname { font-weight: 600; color: var(--text); }
+.pool-chip .ccode { color: var(--text-subtle); }
+.pool-chip-empty {
+  font-size: 11px;
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
 /* ─── SIM STATUS ─── */
 .sim-status {
   display: flex;
@@ -695,10 +853,30 @@ const WORKERS = [
   { name: 'Lê Văn Cường',   code: 'NV-4102', color: '#41bf58', colorName: 'Xanh',  slot: 2 },
 ];
 
+// 3 màu LED cố định mỗi khu vực
+const SLOT_COLORS = [
+  { key: 'yellow', hex: '#FFB01F', label: 'Vàng' },
+  { key: 'red',    hex: '#f0564a', label: 'Đỏ'   },
+  { key: 'green',  hex: '#41bf58', label: 'Xanh'  },
+];
+
+// Pool đầy đủ 9 nhân viên (dùng cho bước Phân công khu vực)
+const WORKERS_POOL = [
+  { name: 'Nguyễn Văn An',    code: 'NV-2207', color: '#FFB01F' },
+  { name: 'Trần Thị Bình',    code: 'NV-3104', color: '#f0564a' },
+  { name: 'Lê Văn Cường',     code: 'NV-4102', color: '#41bf58' },
+  { name: 'Phạm Văn Dũng',    code: 'NV-5063', color: '#3b82f6' },
+  { name: 'Hoàng Thị Em',     code: 'NV-6120', color: '#a855f7' },
+  { name: 'Đặng Văn Phúc',    code: 'NV-7031', color: '#ec4899' },
+  { name: 'Vũ Thị Giang',     code: 'NV-8044', color: '#06b6d4' },
+  { name: 'Ngô Văn Hùng',     code: 'NV-9012', color: '#f97316' },
+  { name: 'Đinh Thị Kim',     code: 'NV-0298', color: '#84cc16' },
+];
+
 const ZONES = [
   { id: 'A', name: 'Khu vực A', color: '#3b82f6', floors: 1, racksPerFloor: 1, binsPerRack: 49 },
   { id: 'B', name: 'Khu vực B', color: '#a855f7', floors: 1, racksPerFloor: 1, binsPerRack: 37 },
-  { id: 'C', name: 'Khu vực C', color: '#ec4899' },
+  { id: 'C', name: 'Khu vực C', color: '#ec4899', floors: 1, racksPerFloor: 1, binsPerRack: 3 },
 ];
 
 // STORES = cửa hàng trong phiên demo (9 cửa hàng)
@@ -819,6 +997,14 @@ let state = {
   testBins: {},      // addr → color đang test ('yellow'|'red'|'green')
   testZoneId: null,  // zone đang hiện panel test
 
+  // Phân công khu vực: { zoneId: { yellow, red, green } } — mỗi slot = workerCode | null
+  zoneAssignments: {
+    A: { yellow: null, red: null, green: null },
+    B: { yellow: null, red: null, green: null },
+    C: { yellow: null, red: null, green: null },
+  },
+  selectingSlot: null, // { zoneId, colorKey } | null
+
   // Report data: distributed[skuIdx][storeIdx]
   distributed: Array.from({length: SKUS.length}, () => new Array(STORES.length).fill(0)),
 };
@@ -834,8 +1020,9 @@ const NAV = {
     { id: 'tiepnhan',    label: 'Hàng tiếp nhận',     step: 1 },
     { id: 'kehoach',     label: 'Kế hoạch phân phối', step: 2 },
     { id: 'dieuchinhh', label: 'Điều chỉnh',          step: 3 },
-    { id: 'vanhanh',    label: 'Vận hành',             step: 4 },
-    { id: 'baocao',     label: 'Báo cáo',              step: 5 },
+    { id: 'phancong',   label: 'Phân công khu vực',   step: 4 },
+    { id: 'vanhanh',    label: 'Vận hành',             step: 5 },
+    { id: 'baocao',     label: 'Báo cáo',              step: 6 },
   ],
   tql: [],
 };
@@ -964,6 +1151,7 @@ function renderMain() {
     case 'tiepnhan':   renderTiepNhan(main); break;
     case 'kehoach':    renderKeHoach(main); break;
     case 'dieuchinhh': renderDieuChinh(main); break;
+    case 'phancong':   renderPhanCong(main); break;
     case 'baocao':     renderBaoCao(main); break;
   }
 }
@@ -1202,19 +1390,22 @@ function renderIT(el) {
 
   html += `</div>
     <div class="card">
-      <div class="card-title">Nhân viên & màu LED</div>
+      <div class="card-title">Slot màu LED — mỗi khu vực</div>
       <table>
-        <thead><tr><th>Tên nhân viên</th><th>Mã NV</th><th>Màu LED</th><th>Slot</th></tr></thead>
+        <thead><tr><th>Slot</th><th>Màu LED</th><th>Nhân viên được gán (tất cả khu vực)</th></tr></thead>
         <tbody>`;
-  WORKERS.forEach(w => {
+  SLOT_COLORS.forEach((sc, slot) => {
+    const ws = getWorkersForSlot(sc.key);
+    const workerInfo = ws.length > 0
+      ? ws.map(w => `${w.name} (${w.zoneId})`).join(' · ')
+      : '<span style="color:var(--text-subtle);font-style:italic">Chưa phân công</span>';
     html += `<tr>
-      <td>${w.name}</td>
-      <td><span class="mono">${w.code}</span></td>
+      <td><span class="badge badge-gray">Slot ${slot}</span></td>
       <td style="display:flex;align-items:center;gap:8px;padding-top:12px">
-        <span style="width:12px;height:12px;border-radius:50%;background:${w.color};box-shadow:0 0 8px ${w.color};display:inline-block;flex-shrink:0"></span>
-        <span style="color:${w.color};font-weight:600">${w.colorName}</span>
+        <span style="width:12px;height:12px;border-radius:50%;background:${sc.hex};box-shadow:0 0 8px ${sc.hex};display:inline-block;flex-shrink:0"></span>
+        <span style="color:${sc.hex};font-weight:600">${sc.label}</span>
       </td>
-      <td><span class="badge badge-gray">Slot ${w.slot}</span></td>
+      <td style="font-size:11px">${workerInfo}</td>
     </tr>`;
   });
   html += `</tbody></table></div>`;
@@ -1542,11 +1733,177 @@ function updatePlanCell(si, ci, val) {
 function chotKeHoach() {
   const hasDeficit = SKUS.some((sku, si) => getEditTotal(si) > sku.qty);
   if (hasDeficit) return;
-  setScreen('vanhanh');
+  setScreen('phancong');
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SCREEN 4: VẬN HÀNH
+   SCREEN 4: PHÂN CÔNG KHU VỰC
+═══════════════════════════════════════════════════════════ */
+function getAssignedCodes() {
+  const codes = [];
+  Object.values(state.zoneAssignments).forEach(zone => {
+    Object.values(zone).forEach(code => { if (code) codes.push(code); });
+  });
+  return codes;
+}
+
+function getPoolWorkers() {
+  const assigned = new Set(getAssignedCodes());
+  return WORKERS_POOL.filter(w => !assigned.has(w.code));
+}
+
+// Lấy danh sách worker được gán cho 1 màu (yellow/red/green) qua tất cả zone
+function getWorkersForSlot(colorKey) {
+  const result = [];
+  ZONES.forEach(z => {
+    const code = state.zoneAssignments[z.id] && state.zoneAssignments[z.id][colorKey];
+    if (code) {
+      const w = WORKERS_POOL.find(x => x.code === code);
+      if (w) result.push({ ...w, zoneId: z.id, zoneName: z.name });
+    }
+  });
+  return result;
+}
+
+function startPickSlot(zoneId, colorKey) {
+  const cur = state.selectingSlot;
+  if (cur && cur.zoneId === zoneId && cur.colorKey === colorKey) {
+    state.selectingSlot = null;
+  } else {
+    state.selectingSlot = { zoneId, colorKey };
+  }
+  const el = document.getElementById('main');
+  if (el) { el.innerHTML = ''; renderPhanCong(el); }
+}
+
+function assignWorkerToSlot(code) {
+  if (!state.selectingSlot) return;
+  const { zoneId, colorKey } = state.selectingSlot;
+  if (!state.zoneAssignments[zoneId]) return;
+  state.zoneAssignments[zoneId][colorKey] = code;
+  state.selectingSlot = null;
+  const el = document.getElementById('main');
+  if (el) { el.innerHTML = ''; renderPhanCong(el); }
+}
+
+function removeWorkerFromSlot(zoneId, colorKey) {
+  if (state.zoneAssignments[zoneId]) {
+    state.zoneAssignments[zoneId][colorKey] = null;
+  }
+  state.selectingSlot = null;
+  const el = document.getElementById('main');
+  if (el) { el.innerHTML = ''; renderPhanCong(el); }
+}
+
+function cancelPickSlot() {
+  state.selectingSlot = null;
+  const el = document.getElementById('main');
+  if (el) { el.innerHTML = ''; renderPhanCong(el); }
+}
+
+function renderPhanCong(el) {
+  const pool = getPoolWorkers();
+  const totalAssigned = getAssignedCodes().length;
+  const canStart = totalAssigned > 0;
+  const sel = state.selectingSlot; // { zoneId, colorKey } | null
+
+  let html = `
+    <div class="page-header">
+      <div class="page-title">Phân công khu vực</div>
+      <div class="page-subtitle">Gán nhân viên vào từng slot màu đèn — 3 màu cố định mỗi khu vực · ${totalAssigned}/9 đã phân công</div>
+    </div>`;
+
+  if (sel) {
+    const sc = SLOT_COLORS.find(c => c.key === sel.colorKey);
+    html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:9px;background:rgba(47,111,237,.08);border:1px solid rgba(47,111,237,.3);font-size:12px">
+      <span style="width:10px;height:10px;border-radius:50%;background:${sc.hex};box-shadow:0 0 8px ${sc.hex};display:inline-block;flex-shrink:0"></span>
+      <span>Chọn nhân viên bên dưới để gán vào đèn <strong style="color:${sc.hex}">${sc.label}</strong> — Khu vực <strong style="color:var(--accent)">${sel.zoneId}</strong></span>
+      <button onclick="cancelPickSlot()" style="margin-left:auto;background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;font-family:var(--mono)">✕ Huỷ</button>
+    </div>`;
+  }
+
+  // Zone cards — 3 fixed color slots each
+  html += `<div class="zone-assign-grid">`;
+  ZONES.forEach(z => {
+    const za = state.zoneAssignments[z.id] || {};
+    const filledCount = SLOT_COLORS.filter(c => za[c.key]).length;
+    const binCount = (z.floors || 1) * (z.racksPerFloor || 1) * (z.binsPerRack || 0);
+    const isSelZone = sel && sel.zoneId === z.id;
+
+    html += `<div class="zone-assign-card${isSelZone ? ' selecting' : ''}">
+      <div class="zone-assign-header">
+        <div class="zone-color-bar" style="background:${z.color}"></div>
+        <div>
+          <div class="zone-assign-title">${z.name}</div>
+          <div class="zone-assign-sub">${binCount} ngăn · ${filledCount}/3 slot đã gán</div>
+        </div>
+      </div>
+      <div class="worker-slots">`;
+
+    SLOT_COLORS.forEach(sc => {
+      const code = za[sc.key];
+      const w = code ? WORKERS_POOL.find(x => x.code === code) : null;
+      const isSelSlot = sel && sel.zoneId === z.id && sel.colorKey === sc.key;
+
+      if (w) {
+        html += `<div class="worker-slot-filled" style="${isSelSlot ? `border-color:${sc.hex}` : ''}">
+          <div class="wdot" style="background:${sc.hex};box-shadow:0 0 5px ${sc.hex}"></div>
+          <div style="flex:1;min-width:0">
+            <div class="wname">${w.name}</div>
+            <div class="wcode">${w.code}</div>
+          </div>
+          <span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:${sc.hex}22;color:${sc.hex};white-space:nowrap">${sc.label}</span>
+          <button class="wremove" onclick="removeWorkerFromSlot('${z.id}','${sc.key}')" title="Gỡ">×</button>
+        </div>`;
+      } else {
+        html += `<div class="worker-slot-empty${isSelSlot ? ' selecting-target' : ''}"
+          onclick="startPickSlot('${z.id}','${sc.key}')"
+          style="${isSelSlot ? `border-color:${sc.hex};color:${sc.hex};background:${sc.hex}11` : ''}">
+          <span style="width:8px;height:8px;border-radius:50%;background:${sc.hex};opacity:${isSelSlot?1:.4};flex-shrink:0;display:inline-block"></span>
+          <span>${sc.label} — Chưa gán</span>
+        </div>`;
+      }
+    });
+
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+
+  // Worker pool
+  html += `<div class="pool-section">
+    <div class="pool-title">Nhân viên chưa phân công (${pool.length})</div>
+    <div class="pool-chips">`;
+
+  if (pool.length === 0) {
+    html += `<span class="pool-chip-empty">Tất cả nhân viên đã được phân công</span>`;
+  } else {
+    pool.forEach(w => {
+      const isTarget = sel !== null;
+      html += `<div class="pool-chip${isTarget ? ' selecting-target' : ''}" onclick="assignWorkerToSlot('${w.code}')">
+        <div class="cdot" style="background:${w.color}"></div>
+        <span class="cname">${w.name}</span>
+        <span class="ccode">${w.code}</span>
+      </div>`;
+    });
+  }
+
+  html += `</div></div>`;
+
+  // Action bar
+  html += `<div style="display:flex;justify-content:flex-end;gap:12px;align-items:center">
+    ${canStart
+      ? `<span style="font-size:11px;color:var(--text-muted)">${totalAssigned} nhân viên sẵn sàng</span>
+         <button class="btn btn-success" onclick="setScreen('vanhanh')">Bắt đầu Vận hành →</button>`
+      : `<span style="font-size:11px;color:var(--text-muted)">Phân công ít nhất 1 nhân viên để tiếp tục</span>
+         <button class="btn" style="background:var(--surface2);color:var(--text-muted);cursor:not-allowed;opacity:.5" disabled>Bắt đầu Vận hành →</button>`
+    }
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 5: VẬN HÀNH
 ═══════════════════════════════════════════════════════════ */
 function renderVanHanh(el) {
   // Full-height container
@@ -1594,11 +1951,19 @@ function renderOpsSidebar() {
   if (!sb) return;
 
   const step = state.opsStep;
+
+  function slotCheckinLabel(colorKey) {
+    const sc = SLOT_COLORS.find(c => c.key === colorKey);
+    const ws = getWorkersForSlot(colorKey);
+    const names = ws.length > 0 ? ws.map(w => w.name.split(' ').pop()).join(', ') : '(chưa phân)';
+    return `${names} — đèn ${sc.label} quét thẻ vào`;
+  }
+
   const stepDefs = [
     'Chuẩn bị ca',
-    'An quét thẻ vào',
-    'Bình quét thẻ vào',
-    'Cường quét thẻ vào',
+    slotCheckinLabel('yellow'),
+    slotCheckinLabel('red'),
+    slotCheckinLabel('green'),
     'Khởi động phiên',
     'Đang vận hành',
   ];
@@ -1622,7 +1987,7 @@ function renderOpsSidebar() {
   // Worker cards section
   html += `<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);padding:6px 0 2px;border-top:1px solid var(--border)">Nhân viên</div>`;
 
-  WORKERS.forEach((w, slot) => {
+  SLOT_COLORS.forEach((sc, slot) => {
     const isActive   = state.workerActive[slot];
     const isDone     = state.workerDone[slot];
     const isScanning = state.workerScanningNext[slot];
@@ -1633,27 +1998,36 @@ function renderOpsSidebar() {
     const totalConfirmed = round * 9 + confirmedCount;
     const progressPct = isActive ? Math.round((totalConfirmed / 27) * 100) : 0;
 
-    let statusLine = 'Chưa vào ca';
-    if (isDone)       statusLine = '✓ Hoàn thành ca';
-    else if (isScanning)  statusLine = 'Quét SKU tiếp theo…';
-    else if (sku)     statusLine = `Round ${round + 1} · Bin ${storeIdx + 1}/9`;
+    const zoneWorkers = getWorkersForSlot(sc.key);
+    const workerLines = zoneWorkers.length > 0
+      ? zoneWorkers.map(w => `<div style="display:flex;align-items:center;gap:5px;font-size:10px;margin-top:1px">
+          <span style="font-size:9px;color:var(--text-subtle)">${w.zoneId}:</span>
+          <span style="color:var(--text);font-weight:600">${w.name.split(' ').slice(-1)[0]}</span>
+          <span style="color:var(--text-subtle)">${w.code}</span>
+        </div>`).join('')
+      : `<div style="font-size:10px;color:var(--text-subtle);font-style:italic">Chưa phân công</div>`;
 
-    const borderColor = (isActive && !isDone) ? w.color : 'var(--border)';
-    const glowColor   = (isActive && !isDone) ? hex2rgba(w.color, 0.3) : 'transparent';
+    let statusLine = zoneWorkers.length === 0 ? 'Chưa phân công' : 'Chưa vào ca';
+    if (isDone)      statusLine = '✓ Hoàn thành ca';
+    else if (isScanning) statusLine = 'Quét SKU tiếp theo…';
+    else if (sku)    statusLine = `Round ${round + 1} · Bin ${storeIdx + 1}/9`;
+
+    const borderColor = (isActive && !isDone) ? sc.hex : 'var(--border)';
+    const glowColor   = (isActive && !isDone) ? hex2rgba(sc.hex, 0.3) : 'transparent';
 
     html += `
       <div class="worker-card" style="border-color:${borderColor};${isActive&&!isDone?`box-shadow:0 0 10px ${glowColor};`:''}">
         <div class="worker-top">
-          <div class="worker-color-dot" style="background:${w.color};box-shadow:0 0 5px ${w.color}99"></div>
-          <div class="worker-name">${w.name.split(' ').slice(-1)[0]}</div>
-          ${isActive ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:${hex2rgba(w.color,.2)};color:${w.color}">${w.colorName}</span>` : ''}
+          <div class="worker-color-dot" style="background:${sc.hex};box-shadow:0 0 5px ${sc.hex}99"></div>
+          <div class="worker-name">Đèn ${sc.label}</div>
+          ${isActive ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:${hex2rgba(sc.hex,.2)};color:${sc.hex}">✓</span>` : ''}
         </div>
-        <div class="worker-code">${w.code}</div>
-        <div class="worker-status">${statusLine}</div>
-        ${sku ? `<div class="worker-sku" style="color:${w.color}">${sku.code}</div>` : ''}
+        ${workerLines}
+        <div class="worker-status" style="margin-top:4px">${statusLine}</div>
+        ${sku ? `<div class="worker-sku" style="color:${sc.hex}">${sku.code}</div>` : ''}
         ${isActive && !isDone ? `
           <div class="worker-progress-bar">
-            <div class="worker-progress-fill" style="width:${progressPct}%;background:${w.color}"></div>
+            <div class="worker-progress-fill" style="width:${progressPct}%;background:${sc.hex}"></div>
           </div>
           <div style="font-size:9px;color:var(--text-subtle)">${totalConfirmed}/27 bins</div>
         ` : ''}
@@ -1679,13 +2053,16 @@ function renderOpsSidebar() {
       </div>
     `;
   } else {
-    const btnLabels = [
-      'NV An quét thẻ →',
-      'NV Bình quét thẻ →',
-      'NV Cường quét thẻ →',
+    const btnLabels = SLOT_COLORS.map(sc => {
+      const ws = getWorkersForSlot(sc.key);
+      const names = ws.length > 0
+        ? ws.map(w => w.name.split(' ').pop()).join(' & ')
+        : `(đèn ${sc.label} chưa phân)`;
+      return `${names} quét thẻ →`;
+    }).concat([
       '▶ Bắt đầu phiên làm việc',
       '▶ Nhân viên bắt đầu phân hàng',
-    ];
+    ]);
     if (step <= 4) {
       html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">${btnLabels[step]}</button>`;
     }
@@ -1725,15 +2102,15 @@ function startSimulation() {
 }
 
 function simTick() {
-  // Find eligible workers: active, not done, not currently scanning
-  const eligible = WORKERS.filter((_, slot) =>
+  // Find eligible slots (0=yellow,1=red,2=green): active, not done, not scanning
+  const eligibleSlots = [0,1,2].filter(slot =>
     state.workerActive[slot] &&
     !state.workerDone[slot] &&
     !state.workerScanningNext[slot]
   );
 
-  if (eligible.length === 0) {
-    const allDone = WORKERS.every((_, s) => state.workerDone[s]);
+  if (eligibleSlots.length === 0) {
+    const allDone = [0,1,2].every(s => state.workerDone[s]);
     if (allDone) {
       clearInterval(state.simTimer);
       state.simRunning = false;
@@ -1744,9 +2121,8 @@ function simTick() {
     return;
   }
 
-  // Pick random eligible worker
-  const w = eligible[Math.floor(Math.random() * eligible.length)];
-  const slot = w.slot;
+  // Pick random eligible slot
+  const slot = eligibleSlots[Math.floor(Math.random() * eligibleSlots.length)];
   const storeIdx = state.workerStoreIdx[slot];
 
   // Mark this bin confirmed
@@ -1799,10 +2175,10 @@ function renderLEDBoard() {
         <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Thời gian thực — ${STORES.length} bin · 3 màu LED</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
-        ${WORKERS.map(w => `
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:${w.color}">
-            <span style="width:7px;height:7px;border-radius:50%;background:${w.color};box-shadow:0 0 5px ${w.color};display:inline-block"></span>
-            ${w.colorName}
+        ${SLOT_COLORS.map(sc => `
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:${sc.hex}">
+            <span style="width:7px;height:7px;border-radius:50%;background:${sc.hex};box-shadow:0 0 5px ${sc.hex};display:inline-block"></span>
+            ${sc.label}
           </span>
         `).join('')}
       </div>
@@ -1831,39 +2207,39 @@ function renderLEDBoard() {
 function buildBinCard(store, zone, sessionStarted) {
   const si = store.storeIdx;
 
-  // Compute per-worker LED state
-  const slots = WORKERS.map((w, slot) => {
-    if (!state.workerActive[slot]) return { w, slot, state: 'inactive' };
-    if (state.workerDone[slot])    return { w, slot, state: 'inactive' };
-    if (!sessionStarted)           return { w, slot, state: 'inactive' };
+  // Compute per-slot LED state (slot 0=yellow, 1=red, 2=green)
+  const slots = SLOT_COLORS.map((sc, slot) => {
+    if (!state.workerActive[slot]) return { sc, slot, state: 'inactive' };
+    if (state.workerDone[slot])    return { sc, slot, state: 'inactive' };
+    if (!sessionStarted)           return { sc, slot, state: 'inactive' };
 
     const skuIdx = getWorkerCurrentSkuIdx(slot);
-    if (skuIdx === null)           return { w, slot, state: 'inactive' };
+    if (skuIdx === null)           return { sc, slot, state: 'inactive' };
 
     const isScanning = state.workerScanningNext[slot];
-    if (isScanning)                return { w, slot, state: 'inactive' };
+    if (isScanning)                return { sc, slot, state: 'inactive' };
 
     const qty = state.editPlan[skuIdx][si];
     const isConfirmed   = state.confirmed[slot][si];
     const isCurrentBin  = state.workerStoreIdx[slot] === si;
 
     return {
-      w, slot, skuIdx, qty,
+      sc, slot, skuIdx, qty,
       isConfirmed,
       isCurrentBin: isCurrentBin && !isConfirmed && state.simRunning,
       state: 'lit',
     };
   });
 
-  // Check if any worker is currently processing THIS bin
+  // Check if any slot is currently processing THIS bin
   const confirmingSlot = slots.find(s => s.state === 'lit' && s.isCurrentBin);
 
   let cardStyle = '';
   let badgeHtml = '';
   if (confirmingSlot) {
-    const cw = confirmingSlot.w;
-    cardStyle = `border-color:${cw.color};box-shadow:0 0 14px ${hex2rgba(cw.color,.35)},0 0 30px ${hex2rgba(cw.color,.12)};`;
-    badgeHtml = `<div class="bin-badge" style="background:${hex2rgba(cw.color,.2)};color:${cw.color};border:1px solid ${hex2rgba(cw.color,.5)}">ĐANG PHÂN</div>`;
+    const cc = confirmingSlot.sc.hex;
+    cardStyle = `border-color:${cc};box-shadow:0 0 14px ${hex2rgba(cc,.35)},0 0 30px ${hex2rgba(cc,.12)};`;
+    badgeHtml = `<div class="bin-badge" style="background:${hex2rgba(cc,.2)};color:${cc};border:1px solid ${hex2rgba(cc,.5)}">ĐANG PHÂN</div>`;
   }
 
   let html = `
@@ -1880,12 +2256,12 @@ function buildBinCard(store, zone, sessionStarted) {
   `;
 
   slots.forEach(slotData => {
-    const { w, state: slotState, skuIdx, qty, isConfirmed, isCurrentBin } = slotData;
+    const { sc, state: slotState, skuIdx, qty, isConfirmed, isCurrentBin } = slotData;
 
     if (slotState === 'inactive') {
       html += `
         <div class="led-row unlit">
-          <div class="led-dot" style="background:${w.color};opacity:.3"></div>
+          <div class="led-dot" style="background:${sc.hex};opacity:.3"></div>
           <div class="led-sku" style="font-size:9px">—</div>
         </div>
       `;
@@ -1897,14 +2273,14 @@ function buildBinCard(store, zone, sessionStarted) {
 
     html += `
       <div class="${rowCls}" style="
-        --led-color:${w.color};
-        --led-glow:${hex2rgba(w.color,.35)};
-        --led-bg:${hex2rgba(w.color,.07)};
-        --led-border:${hex2rgba(w.color,.25)};
-        --led-active-bg:${hex2rgba(w.color,.15)};
-        ${isCurrentBin ? `border-color:${hex2rgba(w.color,.5)};` : ''}
+        --led-color:${sc.hex};
+        --led-glow:${hex2rgba(sc.hex,.35)};
+        --led-bg:${hex2rgba(sc.hex,.07)};
+        --led-border:${hex2rgba(sc.hex,.25)};
+        --led-active-bg:${hex2rgba(sc.hex,.15)};
+        ${isCurrentBin ? `border-color:${hex2rgba(sc.hex,.5)};` : ''}
       ">
-        <div class="led-dot" style="background:${w.color}"></div>
+        <div class="led-dot" style="background:${sc.hex}"></div>
         <div class="led-sku">${sku.code}</div>
         <div class="led-qty">${qty}</div>
         <div class="led-unit">sp</div>
@@ -1918,7 +2294,7 @@ function buildBinCard(store, zone, sessionStarted) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SCREEN 5: BÁO CÁO
+   SCREEN 6: BÁO CÁO
 ═══════════════════════════════════════════════════════════ */
 function renderBaoCao(el) {
   const skuStats = SKUS.map((sku, si) => {
