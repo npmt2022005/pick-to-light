@@ -976,15 +976,26 @@ let state = {
   simDone: false,
 
   workerActive:       [false, false, false],
-  workerRound:        [0, 0, 0],    // which round (SKU batch) each worker is on
-  workerStoreIdx:     [0, 0, 0],    // which store each worker is currently at
+  workerRound:        [0, 0, 0],    // which SKU round each color slot is on
   workerScanningNext: [false, false, false],
   workerDone:         [false, false, false],
-  // confirmed[slot][storeIdx] = true when worker confirmed that bin
+  // confirmed[slot][globalStoreIdx] = true when that bin is done
   confirmed: [
     new Array(9).fill(false),
     new Array(9).fill(false),
     new Array(9).fill(false),
+  ],
+  // Per-slot, per-zone: local bin index within that zone (0,1,2...)
+  workerZoneIdx: [
+    { A: 0, B: 0, C: 0 },
+    { A: 0, B: 0, C: 0 },
+    { A: 0, B: 0, C: 0 },
+  ],
+  // Per-slot, per-zone: true when that zone finished all bins for current SKU round
+  workerZoneDone: [
+    { A: false, B: false, C: false },
+    { A: false, B: false, C: false },
+    { A: false, B: false, C: false },
   ],
 
   // Điều chỉnh: tổng sẽ phân mỗi SKU (manager edit tay)
@@ -1035,6 +1046,11 @@ function hex2rgba(hex, alpha) {
   const g = parseInt(hex.slice(3,5), 16);
   const b = parseInt(hex.slice(5,7), 16);
   return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// Trả về mảng global store indices thuộc zone này (e.g. zone A → [0,1,2])
+function getZoneStoreIndices(zoneId) {
+  return STORES.map((s, i) => s.zone === zoneId ? i : -1).filter(i => i >= 0);
 }
 
 function getPlanTotal(skuIdx) {
@@ -1910,10 +1926,11 @@ function startNewSession() {
   state.simDone            = false;
   state.workerActive       = [false, false, false];
   state.workerRound        = [0, 0, 0];
-  state.workerStoreIdx     = [0, 0, 0];
   state.workerScanningNext = [false, false, false];
   state.workerDone         = [false, false, false];
   state.confirmed          = [new Array(9).fill(false), new Array(9).fill(false), new Array(9).fill(false)];
+  state.workerZoneIdx      = [{ A:0,B:0,C:0 }, { A:0,B:0,C:0 }, { A:0,B:0,C:0 }];
+  state.workerZoneDone     = [{ A:false,B:false,C:false }, { A:false,B:false,C:false }, { A:false,B:false,C:false }];
   state.distributed        = Array.from({length: SKUS.length}, () => new Array(STORES.length).fill(0));
   state.editPlan           = Array.from({length: SKUS.length}, (_, si) => [...PLAN[si]]);
   state.zoneAssignments    = {
@@ -2007,52 +2024,69 @@ function renderOpsSidebar() {
   });
   html += `</div>`;
 
-  // Worker cards section
+  // Per-worker cards (one card per assigned worker, grouped by zone)
   html += `<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);padding:6px 0 2px;border-top:1px solid var(--border)">Nhân viên</div>`;
 
-  SLOT_COLORS.forEach((sc, slot) => {
+  // Build flat list: all assigned workers across all zones
+  const allWorkerCards = [];
+  ZONES.forEach(z => {
+    SLOT_COLORS.forEach((sc, slot) => {
+      const code = state.zoneAssignments[z.id] && state.zoneAssignments[z.id][sc.key];
+      if (!code) return;
+      const w = WORKERS_POOL.find(x => x.code === code);
+      if (w) allWorkerCards.push({ w, sc, slot, zoneId: z.id, zoneName: z.name, zoneColor: z.color });
+    });
+  });
+
+  if (allWorkerCards.length === 0) {
+    html += `<div style="font-size:11px;color:var(--text-subtle);font-style:italic;padding:6px 0">Chưa phân công nhân viên</div>`;
+  }
+
+  allWorkerCards.forEach(({ w, sc, slot, zoneId, zoneName, zoneColor }) => {
     const isActive   = state.workerActive[slot];
     const isDone     = state.workerDone[slot];
     const isScanning = state.workerScanningNext[slot];
-    const sku        = (isActive && !isDone && !isScanning) ? getWorkerCurrentSku(slot) : null;
+    const skuIdx     = getWorkerCurrentSkuIdx(slot);
+    const sku        = (isActive && !isDone && !isScanning && skuIdx !== null) ? SKUS[skuIdx] : null;
     const round      = state.workerRound[slot];
-    const storeIdx   = state.workerStoreIdx[slot];
-    const confirmedCount = state.confirmed[slot].filter(Boolean).length;
-    const totalConfirmed = round * 9 + confirmedCount;
-    const progressPct = isActive ? Math.round((totalConfirmed / 27) * 100) : 0;
+    const zoneIndices = getZoneStoreIndices(zoneId);
+    const zoneSize   = zoneIndices.length;
+    const totalRounds = WORKER_QUEUES[slot].length;
+    const zoneDoneFlag = state.workerZoneDone[slot][zoneId];
+    const localIdx   = state.workerZoneIdx[slot][zoneId];
+    const confirmedInZone = zoneIndices.filter(gi => state.confirmed[slot][gi]).length;
+    const totalDone  = round * zoneSize + confirmedInZone;
+    const totalBins  = totalRounds * zoneSize;
+    const progressPct = isActive ? Math.round((totalDone / totalBins) * 100) : 0;
 
-    const zoneWorkers = getWorkersForSlot(sc.key);
-    const workerLines = zoneWorkers.length > 0
-      ? zoneWorkers.map(w => `<div style="display:flex;align-items:center;gap:5px;font-size:10px;margin-top:1px">
-          <span style="font-size:9px;color:var(--text-subtle)">${w.zoneId}:</span>
-          <span style="color:var(--text);font-weight:600">${w.name.split(' ').slice(-1)[0]}</span>
-          <span style="color:var(--text-subtle)">${w.code}</span>
-        </div>`).join('')
-      : `<div style="font-size:10px;color:var(--text-subtle);font-style:italic">Chưa phân công</div>`;
-
-    let statusLine = zoneWorkers.length === 0 ? 'Chưa phân công' : 'Chưa vào ca';
-    if (isDone)      statusLine = '✓ Hoàn thành ca';
+    let statusLine = 'Chưa vào ca';
+    if (!isActive) statusLine = 'Chưa vào ca';
+    else if (isDone) statusLine = '✓ Hoàn thành ca';
     else if (isScanning) statusLine = 'Quét SKU tiếp theo…';
-    else if (sku)    statusLine = `Round ${round + 1} · Bin ${storeIdx + 1}/9`;
+    else if (zoneDoneFlag) statusLine = `✓ ${zoneName} xong — chờ`;
+    else if (sku) statusLine = `Bin ${localIdx + 1}/${zoneSize}`;
 
     const borderColor = (isActive && !isDone) ? sc.hex : 'var(--border)';
-    const glowColor   = (isActive && !isDone) ? hex2rgba(sc.hex, 0.3) : 'transparent';
+    const glowColor   = (isActive && !isDone) ? hex2rgba(sc.hex, 0.25) : 'transparent';
 
     html += `
-      <div class="worker-card" style="border-color:${borderColor};${isActive&&!isDone?`box-shadow:0 0 10px ${glowColor};`:''}">
+      <div class="worker-card" style="border-color:${borderColor};${isActive&&!isDone?`box-shadow:0 0 8px ${glowColor};`:''}padding:8px">
         <div class="worker-top">
           <div class="worker-color-dot" style="background:${sc.hex};box-shadow:0 0 5px ${sc.hex}99"></div>
-          <div class="worker-name">Đèn ${sc.label}</div>
-          ${isActive ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:${hex2rgba(sc.hex,.2)};color:${sc.hex}">✓</span>` : ''}
+          <div class="worker-name" style="font-size:11px">${w.name.split(' ').slice(-1)[0]}</div>
+          <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${sc.hex}22;color:${sc.hex};font-weight:700">${sc.label}</span>
         </div>
-        ${workerLines}
-        <div class="worker-status" style="margin-top:4px">${statusLine}</div>
-        ${sku ? `<div class="worker-sku" style="color:${sc.hex}">${sku.code}</div>` : ''}
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <span class="worker-code">${w.code}</span>
+          <span style="font-size:9px;padding:1px 6px;border-radius:3px;background:${zoneColor}22;color:${zoneColor};font-weight:600">📍 ${zoneName}</span>
+        </div>
+        ${sku ? `<div class="worker-sku" style="color:${sc.hex};font-size:10px;margin-top:3px">${sku.code}</div>` : ''}
+        <div class="worker-status" style="margin-top:2px">${statusLine}</div>
         ${isActive && !isDone ? `
-          <div class="worker-progress-bar">
+          <div class="worker-progress-bar" style="margin-top:4px">
             <div class="worker-progress-fill" style="width:${progressPct}%;background:${sc.hex}"></div>
           </div>
-          <div style="font-size:9px;color:var(--text-subtle)">${totalConfirmed}/27 bins</div>
+          <div style="font-size:9px;color:var(--text-subtle)">${totalDone}/${totalBins} bins</div>
         ` : ''}
       </div>
     `;
@@ -2126,14 +2160,19 @@ function startSimulation() {
 }
 
 function simTick() {
-  // Find eligible slots (0=yellow,1=red,2=green): active, not done, not scanning
-  const eligibleSlots = [0,1,2].filter(slot =>
-    state.workerActive[slot] &&
-    !state.workerDone[slot] &&
-    !state.workerScanningNext[slot]
-  );
+  // Build eligible (slot, zoneId) pairs: assigned worker exists + active + not done + zone not finished
+  const eligiblePairs = [];
+  [0,1,2].forEach(slot => {
+    if (!state.workerActive[slot] || state.workerDone[slot] || state.workerScanningNext[slot]) return;
+    ZONES.forEach(z => {
+      const code = state.zoneAssignments[z.id] && state.zoneAssignments[z.id][SLOT_COLORS[slot].key];
+      if (!code) return;
+      if (state.workerZoneDone[slot][z.id]) return;
+      eligiblePairs.push({ slot, zoneId: z.id });
+    });
+  });
 
-  if (eligibleSlots.length === 0) {
+  if (eligiblePairs.length === 0) {
     const allDone = [0,1,2].every(s => state.workerDone[s]);
     if (allDone) {
       clearInterval(state.simTimer);
@@ -2145,42 +2184,58 @@ function simTick() {
     return;
   }
 
-  // Pick random eligible slot
-  const slot = eligibleSlots[Math.floor(Math.random() * eligibleSlots.length)];
-  const storeIdx = state.workerStoreIdx[slot];
+  // Pick random eligible (slot, zone) pair
+  const { slot, zoneId } = eligiblePairs[Math.floor(Math.random() * eligiblePairs.length)];
+  const zoneIndices = getZoneStoreIndices(zoneId);
+  const localIdx = state.workerZoneIdx[slot][zoneId];
+  const globalStoreIdx = zoneIndices[localIdx];
 
-  // Mark this bin confirmed
-  state.confirmed[slot][storeIdx] = true;
-
-  // Record distribution
+  // Mark bin confirmed + record distribution
+  state.confirmed[slot][globalStoreIdx] = true;
   const skuIdx = getWorkerCurrentSkuIdx(slot);
   if (skuIdx !== null) {
-    state.distributed[skuIdx][storeIdx] = state.editPlan[skuIdx][storeIdx];
+    state.distributed[skuIdx][globalStoreIdx] = state.editPlan[skuIdx][globalStoreIdx];
   }
 
-  if (storeIdx < 8) {
-    // Advance to next store
-    state.workerStoreIdx[slot] = storeIdx + 1;
+  if (localIdx < zoneIndices.length - 1) {
+    // Advance within zone
+    state.workerZoneIdx[slot][zoneId]++;
     renderOpsSidebar();
     renderLEDBoard();
   } else {
-    // Finished all stores for this SKU round
-    state.workerScanningNext[slot] = true;
-    state.confirmed[slot] = new Array(9).fill(false);
-    state.workerStoreIdx[slot] = 0;
-    renderOpsSidebar();
-    renderLEDBoard();
+    // This zone finished for current SKU round
+    state.workerZoneDone[slot][zoneId] = true;
 
-    // After 1s delay, move to next round
-    setTimeout(() => {
-      state.workerRound[slot]++;
-      state.workerScanningNext[slot] = false;
-      if (state.workerRound[slot] >= WORKER_QUEUES[slot].length) {
-        state.workerDone[slot] = true;
-      }
+    // Check if ALL assigned zones for this slot are done
+    const allZonesDone = ZONES.every(z => {
+      const code = state.zoneAssignments[z.id] && state.zoneAssignments[z.id][SLOT_COLORS[slot].key];
+      return !code || state.workerZoneDone[slot][z.id];
+    });
+
+    if (allZonesDone) {
+      // All zones done — move to next SKU round
+      state.workerScanningNext[slot] = true;
+      ZONES.forEach(z => {
+        state.workerZoneIdx[slot][z.id] = 0;
+        state.workerZoneDone[slot][z.id] = false;
+      });
+      state.confirmed[slot] = new Array(9).fill(false);
       renderOpsSidebar();
       renderLEDBoard();
-    }, 1000);
+
+      setTimeout(() => {
+        state.workerRound[slot]++;
+        state.workerScanningNext[slot] = false;
+        if (state.workerRound[slot] >= WORKER_QUEUES[slot].length) {
+          state.workerDone[slot] = true;
+        }
+        renderOpsSidebar();
+        renderLEDBoard();
+      }, 1000);
+    } else {
+      renderOpsSidebar();
+      renderLEDBoard();
+    }
   }
 }
 
@@ -2231,11 +2286,18 @@ function renderLEDBoard() {
 function buildBinCard(store, zone, sessionStarted) {
   const si = store.storeIdx;
 
-  // Compute per-slot LED state (slot 0=yellow, 1=red, 2=green)
+  // Compute per-slot LED state — only lights up if a worker is assigned to this color IN this zone
+  const storeZoneId = store.zone;
+  const zoneStoreIndices = getZoneStoreIndices(storeZoneId);
+
   const slots = SLOT_COLORS.map((sc, slot) => {
     if (!state.workerActive[slot]) return { sc, slot, state: 'inactive' };
     if (state.workerDone[slot])    return { sc, slot, state: 'inactive' };
     if (!sessionStarted)           return { sc, slot, state: 'inactive' };
+
+    // Only light if a worker is assigned to this color in this bin's zone
+    const code = state.zoneAssignments[storeZoneId] && state.zoneAssignments[storeZoneId][sc.key];
+    if (!code) return { sc, slot, state: 'inactive' };
 
     const skuIdx = getWorkerCurrentSkuIdx(slot);
     if (skuIdx === null)           return { sc, slot, state: 'inactive' };
@@ -2244,13 +2306,17 @@ function buildBinCard(store, zone, sessionStarted) {
     if (isScanning)                return { sc, slot, state: 'inactive' };
 
     const qty = state.editPlan[skuIdx][si];
-    const isConfirmed   = state.confirmed[slot][si];
-    const isCurrentBin  = state.workerStoreIdx[slot] === si;
+    const isConfirmed = state.confirmed[slot][si];
+
+    // Current bin: zone must not be done AND localIdx maps to this store
+    const zoneDone = state.workerZoneDone[slot][storeZoneId];
+    const localIdx = state.workerZoneIdx[slot][storeZoneId];
+    const isCurrentBin = !zoneDone && zoneStoreIndices[localIdx] === si && !isConfirmed && state.simRunning;
 
     return {
       sc, slot, skuIdx, qty,
       isConfirmed,
-      isCurrentBin: isCurrentBin && !isConfirmed && state.simRunning,
+      isCurrentBin,
       state: 'lit',
     };
   });
