@@ -2314,12 +2314,18 @@ function simTick() {
     if (e.key === 'Enter') {
       if (buf.length >= MIN_LEN) handleScan(buf);
       buf = '';
+      return;
+    }
+    if (e.key === 'Backspace') {
+      // Bộ gõ tiếng Việt hợp ký tự bằng cách xóa-gõ lại (W → Backspace + Ư):
+      // phải trừ buffer theo, không thì chuỗi bị lặp ký tự đã xóa
+      buf = buf.slice(0, -1);
     } else if (e.key.length === 1) {
       buf += e.key;
-      // Máy quét không cấu hình suffix Enter: tự chốt chuỗi sau khoảng lặng
-      if (buf.length >= MIN_LEN) {
-        flushTimer = setTimeout(() => { handleScan(buf); buf = ''; }, GAP_MS + 60);
-      }
+    }
+    // Máy quét không cấu hình suffix Enter: tự chốt chuỗi sau khoảng lặng
+    if (buf.length >= MIN_LEN) {
+      flushTimer = setTimeout(() => { handleScan(buf); buf = ''; }, GAP_MS + 60);
     }
   });
 })();
