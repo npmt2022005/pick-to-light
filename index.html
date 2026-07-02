@@ -953,7 +953,8 @@ let state = {
   simRunning: false,
   simTimer: null,
   simDone: false,
-  scanMode: false,      // false = mô phỏng tự chạy, true = chờ sự kiện từ máy quét thật
+  // false = mô phỏng tự chạy, true = chờ sự kiện từ máy quét thật (nhớ lựa chọn qua localStorage)
+  scanMode: (() => { try { return localStorage.getItem('ptl-scanMode') === '1'; } catch (e) { return false; } })(),
 
   workerActive:       [false, false, false],
   workerCurrentSku:   [null, null, null],   // SKU idx đang chia (null = rảnh, chờ nhận thùng)
@@ -2288,6 +2289,26 @@ function simTick() {
 function toggleScanMode() {
   state.scanMode = !state.scanMode;
   state.armedSlot = null;
+  try { localStorage.setItem('ptl-scanMode', state.scanMode ? '1' : '0'); } catch (e) {}
+  if (state.scanMode) {
+    // Vừa chuyển sang máy quét thật giữa phiên: SKU nào mô phỏng đã tự gán
+    // nhưng chưa chia được ngăn nào → trả về pool để quét thẻ + thùng nhận lại
+    let released = false;
+    [0,1,2].forEach(s => {
+      const idx = state.workerCurrentSku[s];
+      if (idx === null) return;
+      if (!state.confirmed[s].some(Boolean)) {
+        state.skuStatus[idx] = 'pool';
+        state.workerCurrentSku[s] = null;
+        released = true;
+      }
+    });
+    if (released) {
+      [0,1,2].forEach(s => {
+        if (state.workerActive[s] && state.workerCurrentSku[s] === null) state.workerDone[s] = false;
+      });
+    }
+  }
   // Về mô phỏng: simTick sẽ tự bốc SKU trong pool cho người đang rảnh
   renderOpsSidebar();
   renderLEDBoard();
