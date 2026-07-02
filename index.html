@@ -2224,15 +2224,10 @@ function simTick() {
   }
 
   // Phiên kết thúc khi mọi SKU đã chia xong
-  if (state.skuStatus.every(st => st === 'done')) {
-    clearInterval(state.simTimer);
-    state.simRunning = false;
-    state.simDone = true;
-    [0,1,2].forEach(s => { if (state.workerActive[s]) state.workerDone[s] = true; });
-    renderOpsSidebar();
-    renderLEDBoard();
-    return;
-  }
+  if (checkSessionEnd()) return;
+
+  // Máy quét thật: từng ngăn do nhân viên bấm đèn xác nhận (confirmBinClick), không tự chạy
+  if (state.scanMode) return;
 
   // Build eligible (slot, zoneId) pairs: assigned worker exists + active + đang giữ SKU + zone not finished
   const eligiblePairs = [];
@@ -2250,6 +2245,23 @@ function simTick() {
 
   // Pick random eligible (slot, zone) pair
   const { slot, zoneId } = eligiblePairs[Math.floor(Math.random() * eligiblePairs.length)];
+  confirmCurrentBin(slot, zoneId);
+}
+
+// Mọi SKU đã 'done' → chốt phiên
+function checkSessionEnd() {
+  if (!state.skuStatus.every(st => st === 'done')) return false;
+  if (state.simTimer) clearInterval(state.simTimer);
+  state.simRunning = false;
+  state.simDone = true;
+  [0,1,2].forEach(s => { if (state.workerActive[s]) state.workerDone[s] = true; });
+  renderOpsSidebar();
+  renderLEDBoard();
+  return true;
+}
+
+// Xác nhận ngăn hiện tại của (slot, zone): mô phỏng gọi tự động, máy quét thật gọi khi bấm đèn
+function confirmCurrentBin(slot, zoneId) {
   const zoneIndices = getZoneStoreIndices(zoneId);
   const localIdx = state.workerZoneIdx[slot][zoneId];
   const globalStoreIdx = zoneIndices[localIdx];
@@ -2264,8 +2276,6 @@ function simTick() {
   if (localIdx < zoneIndices.length - 1) {
     // Advance within zone
     state.workerZoneIdx[slot][zoneId]++;
-    renderOpsSidebar();
-    renderLEDBoard();
   } else {
     // This zone finished for current SKU round
     state.workerZoneDone[slot][zoneId] = true;
@@ -2277,19 +2287,32 @@ function simTick() {
     });
 
     if (allZonesDone) {
-      // Chia xong thùng SKU này → trả về pool trạng thái 'done', nhân viên rảnh chờ nhận thùng mới
+      // Chia xong thùng SKU này → 'done', nhân viên rảnh chờ nhận thùng mới
       const doneSku = state.workerCurrentSku[slot];
       if (doneSku !== null) state.skuStatus[doneSku] = 'done';
       state.workerCurrentSku[slot] = null;
       state.workerRoundsDone[slot]++;
       settleIdleWorkers();
-      renderOpsSidebar();
-      renderLEDBoard();
-    } else {
-      renderOpsSidebar();
-      renderLEDBoard();
+      if (checkSessionEnd()) return;
     }
   }
+  renderOpsSidebar();
+  renderLEDBoard();
+}
+
+// Máy quét thật: nhân viên bấm vào đèn của ngăn = nút xác nhận trên module đèn thật
+function confirmBinClick(slot, storeIdx) {
+  if (!state.scanMode || !state.simRunning) return;
+  if (!state.workerActive[slot] || state.workerCurrentSku[slot] === null) return;
+  const zoneId = STORES[storeIdx].zone;
+  const zoneIndices = getZoneStoreIndices(zoneId);
+  const localIdx = state.workerZoneIdx[slot][zoneId];
+  if (state.workerZoneDone[slot][zoneId] || zoneIndices[localIdx] !== storeIdx || state.confirmed[slot][storeIdx]) {
+    return scanFeedback('warn', 'Chưa đến lượt ngăn này');
+  }
+  const sku = SKUS[state.workerCurrentSku[slot]];
+  confirmCurrentBin(slot, zoneId);
+  scanFeedback('ok', `✓ ${STORES[storeIdx].id} — đã bỏ ${sku.code}`);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -2531,7 +2554,7 @@ function renderLEDBoard() {
     <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--text)">Bảng LED điều phối</div>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Thời gian thực — ${STORES.length} bin · 3 màu LED</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Thời gian thực — ${STORES.length} bin · 3 màu LED${state.scanMode ? ' · bấm đèn để xác nhận đã bỏ hàng' : ''}</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
         ${SLOT_COLORS.map(sc => `
@@ -2637,9 +2660,12 @@ function buildBinCard(store, zone, sessionStarted) {
 
     const sku = SKUS[skuIdx];
     const rowCls = isConfirmed ? 'led-row lit confirmed' : isCurrentBin ? 'led-row lit led-active' : 'led-row lit';
+    // Máy quét thật: đèn ngăn hiện tại là nút bấm xác nhận "đã bỏ hàng"
+    const clickable = state.scanMode && isCurrentBin && !isConfirmed;
 
     html += `
-      <div class="${rowCls}" style="
+      <div class="${rowCls}" ${clickable ? `onclick="confirmBinClick(${slotData.slot}, ${si})" title="Bấm xác nhận đã bỏ hàng vào ngăn"` : ''} style="
+        ${clickable ? 'cursor:pointer;' : ''}
         --led-color:${sc.hex};
         --led-glow:${hex2rgba(sc.hex,.35)};
         --led-bg:${hex2rgba(sc.hex,.07)};
