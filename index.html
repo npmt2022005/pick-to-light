@@ -827,6 +827,40 @@ input[type="number"]:focus {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
+
+/* SCANNER */
+.scan-mode-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0 8px; border-bottom: 1px solid var(--border);
+}
+.scan-mode-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-subtle);
+}
+.scan-mode-btn {
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted);
+  border-radius: 6px; padding: 4px 10px; font-size: 10px; font-weight: 600;
+  font-family: var(--mono); cursor: pointer;
+}
+.scan-mode-btn.on { border-color: var(--accent); color: var(--accent); background: rgba(47,111,237,.12); }
+.scan-wait-hint {
+  width: 100%; text-align: center; padding: 10px; font-size: 11px;
+  color: var(--text-muted); font-family: var(--mono);
+  border: 1px dashed var(--border); border-radius: 8px;
+  animation: scanPulse 1.6s ease infinite;
+}
+@keyframes scanPulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.scan-toast {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+  z-index: 1000; padding: 10px 20px; border-radius: 8px;
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  box-shadow: 0 6px 24px rgba(0,0,0,.45); animation: toastIn .18s ease;
+}
+.scan-toast.ok   { background: #12351b; color: #7be495; border: 1px solid var(--green); }
+.scan-toast.warn { background: #3a2d0d; color: #ffd27a; border: 1px solid var(--yellow); }
+.scan-toast.err  { background: #3b1512; color: #ff9d94; border: 1px solid var(--red); }
+.scan-toast.hide { display: none; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 </style>
 </head>
 <body>
@@ -875,36 +909,18 @@ const WORKERS_POOL = [
 
 const ZONES = [
   { id: 'A', name: 'Khu vực A', color: '#3b82f6', floors: 1, racksPerFloor: 1, binsPerRack: 49 },
-  { id: 'B', name: 'Khu vực B', color: '#a855f7', floors: 1, racksPerFloor: 1, binsPerRack: 37 },
-  { id: 'C', name: 'Khu vực C', color: '#ec4899', floors: 1, racksPerFloor: 1, binsPerRack: 3 },
 ];
 
-// STORES = cửa hàng trong phiên demo (9 cửa hàng)
+// STORES = cửa hàng trong phiên demo (1 cửa hàng, thuộc khu vực A)
 const STORES = [
   { id: 'CH-A01', addr: 'A-01', zone: 'A' },
-  { id: 'CH-A02', addr: 'A-02', zone: 'A' },
-  { id: 'CH-A03', addr: 'A-03', zone: 'A' },
-  { id: 'CH-B01', addr: 'B-01', zone: 'B' },
-  { id: 'CH-B02', addr: 'B-02', zone: 'B' },
-  { id: 'CH-B03', addr: 'B-03', zone: 'B' },
-  { id: 'CH-C01', addr: 'C-01', zone: 'C' },
-  { id: 'CH-C02', addr: 'C-02', zone: 'C' },
-  { id: 'CH-C03', addr: 'C-03', zone: 'C' },
 ];
 
-// STORES_ALL = toàn bộ ngăn vật lý trong kho (49 + 37 + 3 = 89)
+// STORES_ALL = toàn bộ ngăn vật lý trong kho (49 ngăn khu A)
 const STORES_ALL = [
   ...Array.from({length: 49}, (_, i) => {
     const n = String(i + 1).padStart(2, '0');
     return { id: `CH-A${n}`, addr: `A-${n}`, zone: 'A' };
-  }),
-  ...Array.from({length: 37}, (_, i) => {
-    const n = String(i + 1).padStart(2, '0');
-    return { id: `CH-B${n}`, addr: `B-${n}`, zone: 'B' };
-  }),
-  ...Array.from({length: 3}, (_, i) => {
-    const n = String(i + 1).padStart(2, '0');
-    return { id: `CH-C${n}`, addr: `C-${n}`, zone: 'C' };
   }),
 ];
 
@@ -912,57 +928,23 @@ const SKUS = [
   { id: 'SKU01', code: 'ATN01-WHT-L',  name: 'Áo thun basic trắng L',     qty: 160 }, // đủ  =160
   { id: 'SKU02', code: 'ATN01-BLK-XL', name: 'Áo thun basic đen XL',       qty: 110 }, // thiếu -22
   { id: 'SKU03', code: 'ATN01-NVY-M',  name: 'Áo thun basic navy M',        qty: 95  }, // dư  +6
-  { id: 'SKU04', code: 'ATN02-RED-S',  name: 'Áo thun graphic đỏ S',        qty: 69  }, // đủ  =69
-  { id: 'SKU05', code: 'APL01-WHT-L',  name: 'Áo polo piqué trắng L',       qty: 120 }, // thiếu -18
-  { id: 'SKU06', code: 'APL01-NVY-M',  name: 'Áo polo piqué navy M',        qty: 130 }, // dư  +7
-  { id: 'SKU07', code: 'APL02-GRN-XL', name: 'Áo polo piqué xanh XL',       qty: 95  }, // đủ  =95
-  { id: 'SKU08', code: 'AKH01-BLK-M',  name: 'Áo khoác gió đen M',          qty: 72  }, // thiếu -7
-  { id: 'SKU09', code: 'QJN01-IND-30', name: 'Quần jean slim indigo 30',     qty: 58  }, // dư  +5
-  { id: 'SKU10', code: 'QJN01-BLK-32', name: 'Quần jean slim đen 32',        qty: 112 }, // đủ  =112
-  { id: 'SKU11', code: 'QJN02-GRY-34', name: 'Quần jean relaxed xám 34',     qty: 55  }, // thiếu -13
-  { id: 'SKU12', code: 'QSH01-KHK-M',  name: 'Quần short kaki M',            qty: 110 }, // dư  +6
-  { id: 'SKU13', code: 'DDM01-FLO-S',  name: 'Đầm midi floral S',            qty: 54  }, // đủ  =54
-  { id: 'SKU14', code: 'DDM02-BLK-M',  name: 'Đầm mini đen M',               qty: 70  }, // thiếu -14
-  { id: 'SKU15', code: 'VAY01-PLT-S',  name: 'Váy xếp ly S',                 qty: 72  }, // dư  +5
-  { id: 'SKU16', code: 'GCT01-WHT-40', name: 'Giày canvas trắng 40',         qty: 118 }, // đủ  =118
-  { id: 'SKU17', code: 'GCT01-BLK-42', name: 'Giày canvas đen 42',           qty: 80  }, // thiếu -16
-  { id: 'SKU18', code: 'GDA01-BRN-39', name: 'Giày da nâu 39',               qty: 75  }, // dư  +7
-  { id: 'SKU19', code: 'DPS01-BRN-38', name: 'Dép sandal da nâu 38',         qty: 79  }, // đủ  =79
-  { id: 'SKU20', code: 'DPS02-BLK-37', name: 'Dép thể thao đen 37',          qty: 55  }, // thiếu -12
 ];
 
-// PLAN[skuIndex][storeIndex] — 20 SKU × 9 stores
+// PLAN[skuIndex][storeIndex] — 3 SKU × 1 store
 const PLAN = [
-  [20,18,22,25,20,18,15,12,10], // SKU01 total=160 → đủ
-  [15,20,18,22,15,12,10, 8,12], // SKU02 total=132 → thiếu
-  [10,12, 8,15,12,10, 8, 6, 8], // SKU03 total=89  → dư
-  [ 8,10, 6,12,10, 8, 6, 5, 4], // SKU04 total=69  → đủ
-  [18,15,20,18,22,15,12,10, 8], // SKU05 total=138 → thiếu
-  [15,18,12,20,18,10, 8,12,10], // SKU06 total=123 → dư
-  [12,10,14,15,12,10, 8, 6, 8], // SKU07 total=95  → đủ
-  [10,12, 8,12,10, 8, 6, 8, 5], // SKU08 total=79  → thiếu
-  [ 6, 8, 5,10, 8, 5, 4, 4, 3], // SKU09 total=53  → dư
-  [14,12,16,18,14,12,10, 8, 8], // SKU10 total=112 → đủ
-  [ 8,10, 6,12,10, 8, 5, 5, 4], // SKU11 total=68  → thiếu
-  [12,15,10,18,15,12, 8, 8, 6], // SKU12 total=104 → dư
-  [ 6, 8, 4,10, 8, 6, 5, 4, 3], // SKU13 total=54  → đủ
-  [10,12, 8,15,12,10, 6, 6, 5], // SKU14 total=84  → thiếu
-  [ 8,10, 6,12,10, 8, 5, 4, 4], // SKU15 total=67  → dư
-  [15,12,18,20,15,12,10, 8, 8], // SKU16 total=118 → đủ
-  [12,10,14,16,12,10, 8, 6, 8], // SKU17 total=96  → thiếu
-  [ 8,10, 6,12,10, 8, 5, 5, 4], // SKU18 total=68  → dư
-  [10, 8,12,14,10, 8, 6, 6, 5], // SKU19 total=79  → đủ
-  [ 8,10, 6,12,10, 8, 5, 4, 4], // SKU20 total=67  → thiếu
+  [160], // SKU01 total=160 → đủ (tồn 160)
+  [132], // SKU02 total=132 → thiếu -22 (tồn 110)
+  [ 89], // SKU03 total=89  → dư +6 (tồn 95)
 ];
 
-// Worker queues: 20 SKU chia đều cho 3 người (7 / 7 / 6)
+// Worker queues: 3 SKU chia cho 3 người (mỗi người 1 SKU)
 const WORKER_QUEUES = [
-  [0, 3, 6, 9, 12, 15, 18], // An:    SKU01→04→07→10→13→16→19
-  [1, 4, 7,10, 13, 16, 19], // Bình:  SKU02→05→08→11→14→17→20
-  [2, 5, 8,11, 14, 17],     // Cường: SKU03→06→09→12→15→18
+  [0], // An:    SKU01
+  [1], // Bình:  SKU02
+  [2], // Cường: SKU03
 ];
 
-/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════ 
    APP STATE
 ═══════════════════════════════════════════════════════════ */
 let state = {
@@ -974,6 +956,7 @@ let state = {
   simRunning: false,
   simTimer: null,
   simDone: false,
+  scanMode: false,      // false = mô phỏng tự chạy, true = chờ sự kiện từ máy quét thật
 
   workerActive:       [false, false, false],
   workerRound:        [0, 0, 0],    // which SKU round each color slot is on
@@ -981,21 +964,21 @@ let state = {
   workerDone:         [false, false, false],
   // confirmed[slot][globalStoreIdx] = true when that bin is done
   confirmed: [
-    new Array(9).fill(false),
-    new Array(9).fill(false),
-    new Array(9).fill(false),
+    new Array(STORES.length).fill(false),
+    new Array(STORES.length).fill(false),
+    new Array(STORES.length).fill(false),
   ],
   // Per-slot, per-zone: local bin index within that zone (0,1,2...)
   workerZoneIdx: [
-    { A: 0, B: 0, C: 0 },
-    { A: 0, B: 0, C: 0 },
-    { A: 0, B: 0, C: 0 },
+    { A: 0 },
+    { A: 0 },
+    { A: 0 },
   ],
   // Per-slot, per-zone: true when that zone finished all bins for current SKU round
   workerZoneDone: [
-    { A: false, B: false, C: false },
-    { A: false, B: false, C: false },
-    { A: false, B: false, C: false },
+    { A: false },
+    { A: false },
+    { A: false },
   ],
 
   // Điều chỉnh: tổng sẽ phân mỗi SKU (manager edit tay)
@@ -1011,8 +994,6 @@ let state = {
   // Phân công khu vực: { zoneId: { yellow, red, green } } — mỗi slot = workerCode | null
   zoneAssignments: {
     A: { yellow: null, red: null, green: null },
-    B: { yellow: null, red: null, green: null },
-    C: { yellow: null, red: null, green: null },
   },
   selectingSlot: null, // { zoneId, colorKey } | null
 
@@ -1928,15 +1909,13 @@ function startNewSession() {
   state.workerRound        = [0, 0, 0];
   state.workerScanningNext = [false, false, false];
   state.workerDone         = [false, false, false];
-  state.confirmed          = [new Array(9).fill(false), new Array(9).fill(false), new Array(9).fill(false)];
-  state.workerZoneIdx      = [{ A:0,B:0,C:0 }, { A:0,B:0,C:0 }, { A:0,B:0,C:0 }];
-  state.workerZoneDone     = [{ A:false,B:false,C:false }, { A:false,B:false,C:false }, { A:false,B:false,C:false }];
+  state.confirmed          = [new Array(STORES.length).fill(false), new Array(STORES.length).fill(false), new Array(STORES.length).fill(false)];
+  state.workerZoneIdx      = [{ A:0 }, { A:0 }, { A:0 }];
+  state.workerZoneDone     = [{ A:false }, { A:false }, { A:false }];
   state.distributed        = Array.from({length: SKUS.length}, () => new Array(STORES.length).fill(0));
   state.editPlan           = Array.from({length: SKUS.length}, (_, si) => [...PLAN[si]]);
   state.zoneAssignments    = {
     A: { yellow: null, red: null, green: null },
-    B: { yellow: null, red: null, green: null },
-    C: { yellow: null, red: null, green: null },
   };
   state.selectingSlot = null;
   setScreen('phancong');
@@ -2010,6 +1989,15 @@ function renderOpsSidebar() {
 
   let html = `<div class="ops-section-label">Trạng thái phiên</div>`;
 
+  // Nguồn sự kiện: mô phỏng tự chạy hay máy quét thật
+  html += `
+    <div class="scan-mode-row">
+      <span class="scan-mode-label">Nguồn sự kiện</span>
+      <button class="scan-mode-btn ${state.scanMode ? 'on' : ''}" onclick="toggleScanMode()">
+        ${state.scanMode ? '⌁ Máy quét thật' : '▷ Mô phỏng'}
+      </button>
+    </div>`;
+
   // Step track
   html += `<div class="step-track">`;
   stepDefs.forEach((s, i) => {
@@ -2062,7 +2050,9 @@ function renderOpsSidebar() {
     let statusLine = 'Chưa vào ca';
     if (!isActive) statusLine = 'Chưa vào ca';
     else if (isDone) statusLine = '✓ Hoàn thành ca';
-    else if (isScanning) statusLine = 'Quét SKU tiếp theo…';
+    else if (isScanning) statusLine = state.scanMode
+      ? `⌁ Chờ quét ${skuIdx !== null ? SKUS[skuIdx].code : 'thùng SKU'}`
+      : 'Quét SKU tiếp theo…';
     else if (zoneDoneFlag) statusLine = `✓ ${zoneName} xong — chờ`;
     else if (sku) statusLine = `Bin ${localIdx + 1}/${zoneSize}`;
 
@@ -2111,18 +2101,22 @@ function renderOpsSidebar() {
       </div>
     `;
   } else {
-    const btnLabels = SLOT_COLORS.map(sc => {
-      const ws = getWorkersForSlot(sc.key);
-      const names = ws.length > 0
-        ? ws.map(w => w.name.split(' ').pop()).join(' & ')
-        : `(đèn ${sc.label} chưa phân)`;
-      return `${names} quét thẻ →`;
-    }).concat([
-      '▶ Bắt đầu phiên làm việc',
-      '▶ Nhân viên bắt đầu phân hàng',
-    ]);
-    if (step <= 4) {
-      html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">${btnLabels[step]}</button>`;
+    if (step <= 2) {
+      if (state.scanMode) {
+        html += `<div class="scan-wait-hint">⌁ Chờ quét thẻ nhân viên…</div>`;
+      } else {
+        const nextSlot = state.workerActive.indexOf(false);
+        const sc = SLOT_COLORS[nextSlot === -1 ? 0 : nextSlot];
+        const ws = getWorkersForSlot(sc.key);
+        const names = ws.length > 0
+          ? ws.map(w => w.name.split(' ').pop()).join(' & ')
+          : `(đèn ${sc.label} chưa phân)`;
+        html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">${names} quét thẻ →</button>`;
+      }
+    } else if (step === 3) {
+      html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">▶ Bắt đầu phiên làm việc</button>`;
+    } else if (step === 4) {
+      html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">▶ Nhân viên bắt đầu phân hàng${state.scanMode ? ' (chờ quét thùng)' : ''}</button>`;
     }
   }
 
@@ -2133,21 +2127,24 @@ function renderOpsSidebar() {
 /* ─── OPS ADVANCE STEPS ─── */
 function opsAdvance() {
   const step = state.opsStep;
-  if (step === 0) {
-    state.workerActive[0] = true;
-    state.opsStep = 1;
-  } else if (step === 1) {
-    state.workerActive[1] = true;
-    state.opsStep = 2;
-  } else if (step === 2) {
-    state.workerActive[2] = true;
-    state.opsStep = 3;
+  if (step <= 2) {
+    // Check-in thủ công: kích hoạt slot đầu tiên chưa vào ca
+    // (quét thẻ có thể check-in không theo thứ tự nên opsStep = số người đã vào ca)
+    const idx = state.workerActive.indexOf(false);
+    if (idx !== -1) state.workerActive[idx] = true;
+    state.opsStep = Math.min(3, state.workerActive.filter(Boolean).length);
   } else if (step === 3) {
     // All workers checked in — show SKUs activated
     state.opsStep = 4;
   } else if (step === 4) {
     state.opsStep = 5;
     state.simRunning = true;
+    if (state.scanMode) {
+      // Máy quét thật: mỗi nhân viên phải quét thùng SKU đầu tiên thì đèn mới sáng
+      [0,1,2].forEach(s => {
+        if (state.workerActive[s] && !state.workerDone[s]) state.workerScanningNext[s] = true;
+      });
+    }
     startSimulation();
   }
   renderOpsSidebar();
@@ -2214,29 +2211,178 @@ function simTick() {
 
     if (allZonesDone) {
       // All zones done — move to next SKU round
-      state.workerScanningNext[slot] = true;
       ZONES.forEach(z => {
         state.workerZoneIdx[slot][z.id] = 0;
         state.workerZoneDone[slot][z.id] = false;
       });
-      state.confirmed[slot] = new Array(9).fill(false);
+      state.confirmed[slot] = new Array(STORES.length).fill(false);
+      state.workerRound[slot]++;
+      if (state.workerRound[slot] >= WORKER_QUEUES[slot].length) {
+        state.workerDone[slot] = true;
+      } else {
+        // Còn SKU tiếp theo: máy quét thật → chờ quét thùng; mô phỏng → tự chạy sau 1s
+        state.workerScanningNext[slot] = true;
+        if (!state.scanMode) {
+          setTimeout(() => {
+            state.workerScanningNext[slot] = false;
+            renderOpsSidebar();
+            renderLEDBoard();
+          }, 1000);
+        }
+      }
       renderOpsSidebar();
       renderLEDBoard();
-
-      setTimeout(() => {
-        state.workerRound[slot]++;
-        state.workerScanningNext[slot] = false;
-        if (state.workerRound[slot] >= WORKER_QUEUES[slot].length) {
-          state.workerDone[slot] = true;
-        }
-        renderOpsSidebar();
-        renderLEDBoard();
-      }, 1000);
     } else {
       renderOpsSidebar();
       renderLEDBoard();
     }
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCANNER — máy quét mã vạch/QR (chế độ USB HID keyboard wedge)
+   Máy quét "gõ" chuỗi ký tự rất nhanh rồi kết thúc bằng Enter.
+   Test tay không cần máy quét: gõ handleScan('NV-2207') trong Console.
+═══════════════════════════════════════════════════════════ */
+(function initScanListener() {
+  const GAP_MS = 50;   // người gõ chậm hơn mức này → không phải máy quét
+  const MIN_LEN = 4;
+  let buf = '', lastKey = 0;
+  window.addEventListener('keydown', e => {
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    const now = Date.now();
+    if (now - lastKey > GAP_MS) buf = '';
+    lastKey = now;
+    if (e.key === 'Enter') {
+      if (buf.length >= MIN_LEN) handleScan(buf);
+      buf = '';
+    } else if (e.key.length === 1) {
+      buf += e.key;
+    }
+  });
+})();
+
+function toggleScanMode() {
+  state.scanMode = !state.scanMode;
+  if (!state.scanMode) {
+    // Về mô phỏng: giải phóng các slot đang đứng chờ quét thùng SKU
+    [0,1,2].forEach(s => { state.workerScanningNext[s] = false; });
+  }
+  renderOpsSidebar();
+  renderLEDBoard();
+}
+
+// Router: nhận chuỗi máy quét trả về, phân loại theo pattern mã
+function handleScan(raw) {
+  const code = raw.trim().toUpperCase();
+
+  const worker = WORKERS_POOL.find(w => w.code.toUpperCase() === code);
+  if (worker) return handleBadgeScan(worker);
+
+  const skuIdx = SKUS.findIndex(s => s.code.toUpperCase() === code);
+  if (skuIdx !== -1) return handleSkuScan(skuIdx);
+
+  scanFeedback('err', `Mã không hợp lệ: ${code}`);
+}
+
+// Quét thẻ nhân viên → check-in vào ca
+function handleBadgeScan(worker) {
+  if (state.screen !== 'vanhanh') {
+    return scanFeedback('warn', `${worker.name}: mở màn hình Vận hành để check-in`);
+  }
+  if (state.simDone) return scanFeedback('warn', 'Phiên đã kết thúc');
+
+  const slot = findSlotForWorkerCode(worker.code);
+  if (slot === -1) return scanFeedback('err', `${worker.name} chưa được phân công khu vực`);
+  if (state.workerActive[slot]) return scanFeedback('warn', `${worker.name} đã vào ca rồi`);
+
+  state.workerActive[slot] = true;
+  if (state.opsStep >= 5) {
+    // Vào ca muộn khi phiên đang chạy → vẫn phải quét thùng SKU đầu tiên
+    if (state.scanMode && !state.workerDone[slot]) state.workerScanningNext[slot] = true;
+  } else if (state.opsStep <= 3) {
+    state.opsStep = Math.min(3, state.workerActive.filter(Boolean).length);
+  }
+  scanFeedback('ok', `✓ ${worker.name} vào ca — đèn ${SLOT_COLORS[slot].label}`);
+  renderOpsSidebar();
+  renderLEDBoard();
+}
+
+// Tìm slot màu LED mà nhân viên (theo mã thẻ) được phân công
+function findSlotForWorkerCode(code) {
+  for (const z of [...ZONES, ...state.extraZones]) {
+    const za = state.zoneAssignments[z.id];
+    if (!za) continue;
+    for (let slot = 0; slot < SLOT_COLORS.length; slot++) {
+      if ((za[SLOT_COLORS[slot].key] || '') === code) return slot;
+    }
+  }
+  return -1;
+}
+
+// Quét tem thùng SKU → mở vòng phân hàng cho nhân viên phụ trách
+function handleSkuScan(skuIdx) {
+  const sku = SKUS[skuIdx];
+  if (state.screen !== 'vanhanh' || state.opsStep < 5) {
+    return scanFeedback('warn', `${sku.code}: phiên chưa vận hành, chưa cần quét thùng`);
+  }
+
+  for (let slot = 0; slot < SLOT_COLORS.length; slot++) {
+    if (!state.workerActive[slot] || state.workerDone[slot]) continue;
+    if (getWorkerCurrentSkuIdx(slot) !== skuIdx) continue;
+    if (!state.workerScanningNext[slot]) {
+      return scanFeedback('warn', `${sku.code} đang được phân hàng rồi`);
+    }
+    state.workerScanningNext[slot] = false;
+    const ws = getWorkersForSlot(SLOT_COLORS[slot].key);
+    const names = ws.length ? ws.map(w => w.name.split(' ').pop()).join(' & ') : `đèn ${SLOT_COLORS[slot].label}`;
+    scanFeedback('ok', `✓ ${sku.code} — ${names} bắt đầu phân hàng`);
+    renderOpsSidebar();
+    renderLEDBoard();
+    return;
+  }
+
+  // Không slot nào đang chờ SKU này → chẩn đoán lý do để báo lỗi rõ ràng
+  for (let slot = 0; slot < SLOT_COLORS.length; slot++) {
+    const pos = WORKER_QUEUES[slot].indexOf(skuIdx);
+    if (pos === -1) continue;
+    if (pos < state.workerRound[slot]) return scanFeedback('warn', `${sku.code} đã phân xong`);
+    if (!state.workerActive[slot])    return scanFeedback('err', `Nhân viên phụ trách ${sku.code} chưa vào ca`);
+    return scanFeedback('err', `Sai thùng — chưa đến lượt ${sku.code}`);
+  }
+  scanFeedback('err', `${sku.code} không thuộc phiên này`);
+}
+
+/* ─── Scan feedback: toast + beep ─── */
+let scanToastTimer = null;
+function scanFeedback(type, msg) {
+  scanBeep(type);
+  let el = document.getElementById('scan-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'scan-toast';
+    document.body.appendChild(el);
+  }
+  el.className = `scan-toast ${type}`;
+  el.textContent = msg;
+  clearTimeout(scanToastTimer);
+  scanToastTimer = setTimeout(() => { el.className = 'scan-toast hide'; }, 2500);
+}
+
+let scanAudioCtx = null;
+function scanBeep(type) {
+  try {
+    scanAudioCtx = scanAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = scanAudioCtx.createOscillator();
+    const gain = scanAudioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(scanAudioCtx.destination);
+    osc.frequency.value = type === 'ok' ? 1200 : type === 'warn' ? 600 : 220;
+    gain.gain.value = 0.08;
+    osc.start();
+    osc.stop(scanAudioCtx.currentTime + (type === 'ok' ? 0.09 : 0.25));
+  } catch (e) { /* không có audio cũng không sao */ }
 }
 
 /* ─── LED BOARD ─── */
