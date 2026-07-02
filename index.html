@@ -2115,12 +2115,19 @@ function renderOpsSidebar() {
       <button class="btn btn-primary" style="width:100%;font-size:11px" onclick="startNewSession()">↩ Phiên phân hàng tiếp theo</button>
     `;
   } else if (state.simRunning) {
+    const anyIdle = [0,1,2].some(s => state.workerActive[s] && !state.workerDone[s] && state.workerCurrentSku[s] === null);
+    const armed = state.armedSlot !== null;
     html += `
       <div class="sim-status">
         <div class="sim-dot"></div>
         <span>Đang vận hành…</span>
       </div>
     `;
+    if (state.scanMode && armed) {
+      html += `<div class="scan-wait-hint">⌁ Bước 2/2: quét tem thùng SKU để nhận việc</div>`;
+    } else if (state.scanMode && anyIdle) {
+      html += `<div class="scan-wait-hint">⌁ Bước 1/2: quét thẻ nhân viên đang rảnh</div>`;
+    }
   } else {
     if (step <= 2) {
       if (state.scanMode) {
