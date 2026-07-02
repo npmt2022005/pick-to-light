@@ -2054,6 +2054,18 @@ function renderOpsSidebar() {
       Đèn thật: ${HW.ctrlOk ? 'đã kết nối controller' : HW.bridgeOk ? 'bridge OK — bấm nhập IP đèn' : 'chưa chạy demo-bridge.exe'}
     </div>`;
 
+  // Form nhập IP controller (mở khi bấm dòng trạng thái)
+  if (HW.showCfg) {
+    const inputStyle = 'background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:5px 8px;border-radius:6px;width:100%;box-sizing:border-box';
+    html += `
+      <div style="display:flex;flex-direction:column;gap:5px;padding:2px 0 8px;border-bottom:1px solid var(--border)">
+        <input id="hw-ip"   placeholder="IP controller"  value="${HW.cfg.ip || '192.168.1.254'}" style="${inputStyle}">
+        <input id="hw-port" placeholder="Port"           value="${HW.cfg.port || 5003}"          style="${inputStyle}">
+        <input id="hw-key"  placeholder="License key (bỏ trống nếu không có)" value="${HW.cfg.licenseKey || ''}" style="${inputStyle}">
+        <button class="btn btn-primary" style="width:100%;font-size:11px;padding:7px" onclick="hwConnectFromForm()">⌁ Kết nối đèn</button>
+      </div>`;
+  }
+
   // Step track
   html += `<div class="step-track">`;
   stepDefs.forEach((s, i) => {
@@ -2947,14 +2959,23 @@ function hwLightCurrentBin(slot) {
 
 function hwClearAll() { hwSend({ type: 'clear' }); }
 
-// Bấm vào dòng trạng thái "Đèn thật" trong sidebar để cấu hình IP controller
+// Bấm vào dòng trạng thái "Đèn thật" → mở/đóng form nhập IP ngay trong sidebar
+// (Electron không hỗ trợ window.prompt nên phải dùng form inline)
 function hwConfigPrompt() {
-  const ip = prompt('IP controller đèn Lightstep:', HW.cfg.ip || '192.168.1.10');
-  if (!ip) return;
-  const port = parseInt(prompt('Port controller:', HW.cfg.port || 5003), 10) || 5003;
-  const licenseKey = prompt('License key SDK (bỏ trống nếu không có):', HW.cfg.licenseKey || '') || '';
+  HW.showCfg = !HW.showCfg;
+  renderOpsSidebar();
+}
+
+function hwConnectFromForm() {
+  const ip         = ((document.getElementById('hw-ip')   || {}).value || '').trim();
+  const port       = parseInt((document.getElementById('hw-port') || {}).value, 10) || 5003;
+  const licenseKey = ((document.getElementById('hw-key')  || {}).value || '').trim();
+  if (!ip) return scanFeedback('warn', 'Nhập IP controller đèn');
   HW.cfg = { ...HW.cfg, ip, port, licenseKey };
   try { localStorage.setItem('ptl-hw', JSON.stringify(HW.cfg)); } catch (e) {}
+  HW.showCfg = false;
+  renderOpsSidebar();
+  scanFeedback('warn', `Đang kết nối controller ${ip}…`);
   hwSend({ type: 'connect', ip, port, licenseKey });
 }
 
