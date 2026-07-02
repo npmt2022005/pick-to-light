@@ -2010,13 +2010,14 @@ function renderOpsSidebar() {
 
   let html = `<div class="ops-section-label">Trạng thái phiên</div>`;
 
-  // Nguồn sự kiện: mô phỏng tự chạy hay máy quét thật
+  // Nguồn sự kiện: 2 nút chọn rõ ràng (nút sáng = chế độ đang chạy)
   html += `
     <div class="scan-mode-row">
       <span class="scan-mode-label">Nguồn sự kiện</span>
-      <button class="scan-mode-btn ${state.scanMode ? 'on' : ''}" onclick="toggleScanMode()">
-        ${state.scanMode ? '⌁ Máy quét thật' : '▷ Mô phỏng'}
-      </button>
+      <div style="display:flex;gap:4px">
+        <button class="scan-mode-btn ${!state.scanMode ? 'on' : ''}" onclick="setScanMode(false)">▷ Mô phỏng</button>
+        <button class="scan-mode-btn ${state.scanMode ? 'on' : ''}" onclick="setScanMode(true)">⌁ Máy quét</button>
+      </div>
     </div>`;
 
   // Step track
@@ -2292,6 +2293,11 @@ function simTick() {
     }
   });
 })();
+
+function setScanMode(on) {
+  if (state.scanMode === on) return; // bấm lại nút đang sáng → không làm gì
+  toggleScanMode();
+}
 
 function toggleScanMode() {
   state.scanMode = !state.scanMode;
