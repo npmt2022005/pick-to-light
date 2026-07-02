@@ -912,8 +912,9 @@ const ZONES = [
 ];
 
 // STORES = cửa hàng trong phiên demo (1 cửa hàng, thuộc khu vực A)
+// lightAddr = địa chỉ module đèn Lightstep thật (4 số) gắn với ngăn này
 const STORES = [
-  { id: 'CH-A01', addr: 'A-01', zone: 'A' },
+  { id: 'CH-A01', addr: 'A-01', zone: 'A', lightAddr: '0002' },
 ];
 
 // STORES_ALL = toàn bộ ngăn vật lý trong kho (49 ngăn khu A)
@@ -1057,6 +1058,7 @@ function claimSku(slot, skuIdx) {
   });
   state.confirmed[slot] = new Array(STORES.length).fill(false);
   settleIdleWorkers(); // thùng cuối vừa được nhận → người còn rảnh coi như xong ca
+  hwLightCurrentBin(slot); // thắp đèn thật ngăn đầu tiên của thùng này
 }
 
 // "Giơ tay" có hẹn giờ: quét thẻ xong phải quét thùng trong ARM_TIMEOUT_MS,
@@ -1962,6 +1964,7 @@ function startNewSession() {
     A: { yellow: null, red: null, green: null },
   };
   state.selectingSlot = null;
+  hwClearAll(); // phiên mới → tắt toàn bộ đèn thật còn sót
   setScreen('phancong');
 }
 
@@ -2041,6 +2044,14 @@ function renderOpsSidebar() {
         <button class="scan-mode-btn ${!state.scanMode ? 'on' : ''}" onclick="setScanMode(false)">▷ Mô phỏng</button>
         <button class="scan-mode-btn ${state.scanMode ? 'on' : ''}" onclick="setScanMode(true)">⌁ Máy quét</button>
       </div>
+    </div>`;
+
+  // Trạng thái đèn Lightstep thật (bấm để cấu hình IP controller)
+  html += `
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);padding:2px 0 6px;border-bottom:1px solid var(--border);cursor:pointer"
+         onclick="hwConfigPrompt()" title="Bấm để nhập IP controller đèn">
+      <span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${HW.ctrlOk ? 'var(--green)' : HW.bridgeOk ? 'var(--yellow)' : 'var(--text-subtle)'}"></span>
+      Đèn thật: ${HW.ctrlOk ? 'đã kết nối controller' : HW.bridgeOk ? 'bridge OK — bấm nhập IP đèn' : 'chưa chạy demo-bridge.exe'}
     </div>`;
 
   // Step track
@@ -2255,6 +2266,7 @@ function checkSessionEnd() {
   state.simRunning = false;
   state.simDone = true;
   [0,1,2].forEach(s => { if (state.workerActive[s]) state.workerDone[s] = true; });
+  hwClearAll(); // tắt toàn bộ đèn thật khi phiên kết thúc
   renderOpsSidebar();
   renderLEDBoard();
   return true;
@@ -2276,6 +2288,7 @@ function confirmCurrentBin(slot, zoneId) {
   if (localIdx < zoneIndices.length - 1) {
     // Advance within zone
     state.workerZoneIdx[slot][zoneId]++;
+    hwLightCurrentBin(slot); // thắp đèn thật ngăn kế tiếp
   } else {
     // This zone finished for current SKU round
     state.workerZoneDone[slot][zoneId] = true;
@@ -2850,10 +2863,107 @@ function toggleAcc(idx) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   HARDWARE — đèn Lightstep thật qua demo-bridge.exe
+   App ↔ ws://localhost:4000 ↔ demo-bridge.exe ↔ TCP ↔ controller đèn.
+   Thắp đèn khi nhận thùng / sang ngăn kế; NÚT BẤM trên module đèn
+   gửi ngược về → xác nhận ngăn (thay cú click trên màn hình).
+═══════════════════════════════════════════════════════════ */
+const HW = {
+  ws: null,
+  bridgeOk: false, // nối được demo-bridge.exe
+  ctrlOk: false,   // bridge nối được controller đèn
+  cfg: (() => { try { return JSON.parse(localStorage.getItem('ptl-hw') || '{}'); } catch (e) { return {}; } })(),
+};
+
+function hwInit() {
+  try { HW.ws = new WebSocket(`ws://localhost:${HW.cfg.bridgePort || 4000}/`); }
+  catch (e) { return hwRetry(); }
+  HW.ws.onopen = () => {
+    HW.bridgeOk = true;
+    renderOpsSidebar();
+    // Có sẵn IP đã lưu → tự nối controller luôn
+    if (HW.cfg.ip) hwSend({ type: 'connect', ip: HW.cfg.ip, port: HW.cfg.port || 5003, licenseKey: HW.cfg.licenseKey || '' });
+  };
+  HW.ws.onmessage = (e) => { try { hwEvent(JSON.parse(e.data)); } catch (err) {} };
+  HW.ws.onclose = () => {
+    const wasOk = HW.bridgeOk;
+    HW.bridgeOk = false; HW.ctrlOk = false;
+    if (wasOk) renderOpsSidebar();
+    hwRetry();
+  };
+  HW.ws.onerror = () => {}; // onclose sẽ lo reconnect
+}
+function hwRetry() { setTimeout(hwInit, 5000); }
+
+function hwSend(obj) {
+  if (HW.ws && HW.ws.readyState === 1) HW.ws.send(JSON.stringify(obj));
+}
+
+function hwEvent(evt) {
+  if (evt.type === 'connected') {
+    HW.ctrlOk = true;
+    scanFeedback('ok', `✓ Đèn thật đã kết nối (${evt.ip})`);
+    renderOpsSidebar();
+  } else if (evt.type === 'closed') {
+    HW.ctrlOk = false;
+    renderOpsSidebar();
+  } else if (evt.type === 'error') {
+    scanFeedback('err', `Đèn thật: ${evt.message}`);
+  } else if (evt.type === 'received') {
+    // Nút bấm trên module đèn → xác nhận ngăn tương ứng
+    (evt.addresses || []).forEach(a => hwButtonPressed(String(a.address)));
+  }
+}
+
+// Nút bấm vật lý tại địa chỉ đèn → tìm ngăn + nhân viên đang chia và xác nhận
+function hwButtonPressed(address) {
+  const si = STORES.findIndex(s => s.lightAddr === address);
+  if (si === -1) return;
+  const zoneId = STORES[si].zone;
+  const zi = getZoneStoreIndices(zoneId);
+  for (let slot = 0; slot < SLOT_COLORS.length; slot++) {
+    if (!state.workerActive[slot] || state.workerCurrentSku[slot] === null) continue;
+    if (state.workerZoneDone[slot][zoneId]) continue;
+    if (zi[state.workerZoneIdx[slot][zoneId]] !== si || state.confirmed[slot][si]) continue;
+    confirmBinClick(slot, si);
+    return;
+  }
+}
+
+// Thắp đèn thật cho ngăn hiện tại của slot (kèm số lượng cần bỏ)
+function hwLightCurrentBin(slot) {
+  const skuIdx = state.workerCurrentSku[slot];
+  if (skuIdx === null) return;
+  [...ZONES, ...state.extraZones].forEach(z => {
+    if (state.workerZoneDone[slot][z.id]) return;
+    const zi = getZoneStoreIndices(z.id);
+    const si = zi[state.workerZoneIdx[slot][z.id]];
+    if (si === undefined) return;
+    const addr = STORES[si] && STORES[si].lightAddr;
+    if (!addr) return;
+    hwSend({ type: 'light', items: [{ address: addr, qty: state.editPlan[skuIdx][si] }] });
+  });
+}
+
+function hwClearAll() { hwSend({ type: 'clear' }); }
+
+// Bấm vào dòng trạng thái "Đèn thật" trong sidebar để cấu hình IP controller
+function hwConfigPrompt() {
+  const ip = prompt('IP controller đèn Lightstep:', HW.cfg.ip || '192.168.1.10');
+  if (!ip) return;
+  const port = parseInt(prompt('Port controller:', HW.cfg.port || 5003), 10) || 5003;
+  const licenseKey = prompt('License key SDK (bỏ trống nếu không có):', HW.cfg.licenseKey || '') || '';
+  HW.cfg = { ...HW.cfg, ip, port, licenseKey };
+  try { localStorage.setItem('ptl-hw', JSON.stringify(HW.cfg)); } catch (e) {}
+  hwSend({ type: 'connect', ip, port, licenseKey });
+}
+
+/* ═══════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════ */
 function init() {
   renderAll();
+  hwInit();
 }
 
 init();
