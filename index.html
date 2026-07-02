@@ -2329,7 +2329,14 @@ function toggleScanMode() {
 
 // Router: nhận chuỗi máy quét trả về, phân loại theo pattern mã
 function handleScan(raw) {
-  const code = raw.trim().toUpperCase();
+  // Bộ gõ tiếng Việt (Telex) có thể biến đổi phím máy quét gõ vào
+  // (W→Ư, DD→Đ, AA→Â…) — đảo ngược các biến đổi này trước khi so mã
+  const code = raw.trim().toUpperCase()
+    .replace(/Ư/g, 'W')
+    .replace(/Đ/g, 'DD')
+    .replace(/Â/g, 'AA')
+    .replace(/Ê/g, 'EE')
+    .replace(/Ô/g, 'OO');
 
   const worker = WORKERS_POOL.find(w => w.code.toUpperCase() === code);
   if (worker) return handleBadgeScan(worker);
