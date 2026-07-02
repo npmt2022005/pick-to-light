@@ -2102,11 +2102,15 @@ function renderOpsSidebar() {
     else if (zoneDoneFlag) statusLine = `✓ ${zoneName} xong — chờ`;
     else if (sku) statusLine = `Bin ${localIdx + 1}/${zoneSize}`;
 
-    const borderColor = (isActive && !isDone) ? sc.hex : 'var(--border)';
-    const glowColor   = (isActive && !isDone) ? hex2rgba(sc.hex, 0.25) : 'transparent';
+    // "Đèn" của ô nhân viên: sáng mạnh khi giơ tay, sáng thường khi đang chia,
+    // tắt khi rảnh (vd vừa hủy giơ tay hoặc bị tự nhả) — chỉ còn viền màu nhạt
+    const isWorking   = !!sku;
+    const isLit       = isArmed || isWorking;
+    const borderColor = (isActive && !isDone) ? (isLit ? sc.hex : hex2rgba(sc.hex, 0.4)) : 'var(--border)';
+    const glowStyle   = isLit ? `box-shadow:0 0 ${isArmed ? 14 : 8}px ${hex2rgba(sc.hex, isArmed ? 0.45 : 0.25)};` : '';
 
     html += `
-      <div class="worker-card" style="border-color:${borderColor};${isActive&&!isDone?`box-shadow:0 0 8px ${glowColor};`:''}padding:8px">
+      <div class="worker-card" style="border-color:${borderColor};${glowStyle}padding:8px">
         <div class="worker-top">
           <div class="worker-color-dot" style="background:${sc.hex};box-shadow:0 0 5px ${sc.hex}99"></div>
           <div class="worker-name" style="font-size:11px">${w.name.split(' ').slice(-1)[0]}</div>
