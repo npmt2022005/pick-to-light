@@ -1059,6 +1059,29 @@ function claimSku(slot, skuIdx) {
   settleIdleWorkers(); // thùng cuối vừa được nhận → người còn rảnh coi như xong ca
 }
 
+// "Giơ tay" có hẹn giờ: quét thẻ xong phải quét thùng trong ARM_TIMEOUT_MS,
+// quá hạn tự nhả để không kẹt hàng đợi
+const ARM_TIMEOUT_MS = 20000;
+let armedTimer = null;
+
+function armSlot(slot) {
+  state.armedSlot = slot;
+  clearTimeout(armedTimer);
+  armedTimer = setTimeout(() => {
+    if (state.armedSlot !== slot) return;
+    state.armedSlot = null;
+    const ws = getWorkersForSlot(SLOT_COLORS[slot].key);
+    const name = ws.length ? ws[0].name : `đèn ${SLOT_COLORS[slot].label}`;
+    scanFeedback('warn', `⌁ Quá ${ARM_TIMEOUT_MS / 1000}s không quét thùng — ${name} cần quét lại thẻ`);
+    renderOpsSidebar();
+  }, ARM_TIMEOUT_MS);
+}
+
+function disarmSlot() {
+  clearTimeout(armedTimer);
+  state.armedSlot = null;
+}
+
 // Pool hết SKU → nhân viên nào đang rảnh coi như xong ca
 function settleIdleWorkers() {
   if (state.skuStatus.some(st => st === 'pool')) return;
@@ -1929,7 +1952,7 @@ function startNewSession() {
   state.workerRoundsDone   = [0, 0, 0];
   state.workerDone         = [false, false, false];
   state.skuStatus          = SKUS.map(() => 'pool');
-  state.armedSlot          = null;
+  disarmSlot(); // armedSlot = null + hủy hẹn giờ tự nhả
   state.confirmed          = [new Array(STORES.length).fill(false), new Array(STORES.length).fill(false), new Array(STORES.length).fill(false)];
   state.workerZoneIdx      = [{ A:0 }, { A:0 }, { A:0 }];
   state.workerZoneDone     = [{ A:false }, { A:false }, { A:false }];
@@ -2304,7 +2327,7 @@ function setScanMode(on) {
 
 function toggleScanMode() {
   state.scanMode = !state.scanMode;
-  state.armedSlot = null;
+  disarmSlot();
   try { localStorage.setItem('ptl-scanMode', state.scanMode ? '1' : '0'); } catch (e) {}
   if (state.scanMode) {
     // Vừa chuyển sang máy quét thật giữa phiên: SKU nào mô phỏng đã tự gán
@@ -2362,6 +2385,20 @@ function handleBadgeScan(worker) {
   const slot = findSlotForWorkerCode(worker.code);
   if (slot === -1) return scanFeedback('err', `${worker.name} chưa được phân công khu vực`);
 
+  // Khóa cặp thẻ → thùng: đang có người giơ tay chờ quét thùng
+  if (state.armedSlot !== null) {
+    if (state.armedSlot === slot) {
+      // Quét lại chính thẻ mình → hủy giơ tay
+      disarmSlot();
+      scanFeedback('warn', `Đã hủy — ${worker.name} không nhận thùng`);
+      renderOpsSidebar();
+      return;
+    }
+    const armedWs = getWorkersForSlot(SLOT_COLORS[state.armedSlot].key);
+    const armedName = armedWs.length ? armedWs[0].name : 'người trước';
+    return scanFeedback('err', `Đang chờ ${armedName} quét thùng — quét lại thẻ ${armedName} để hủy`);
+  }
+
   if (state.workerActive[slot]) {
     // Đã vào ca — lần quét thẻ này là để nhận thùng
     if (state.workerDone[slot]) return scanFeedback('warn', `${worker.name} đã xong ca`);
@@ -2369,7 +2406,7 @@ function handleBadgeScan(worker) {
       return scanFeedback('warn', `${worker.name} đang chia ${SKUS[state.workerCurrentSku[slot]].code}, chưa nhận thùng mới được`);
     }
     if (!state.skuStatus.some(st => st === 'pool')) return scanFeedback('warn', 'Hết thùng SKU để nhận');
-    state.armedSlot = slot;
+    armSlot(slot);
     scanFeedback('ok', `⌁ ${worker.name}: quét tem thùng SKU để nhận việc`);
     renderOpsSidebar();
     return;
@@ -2381,7 +2418,7 @@ function handleBadgeScan(worker) {
     state.opsStep = Math.min(3, state.workerActive.filter(Boolean).length);
   }
   if (state.scanMode) {
-    state.armedSlot = slot;
+    armSlot(slot);
     scanFeedback('ok', `✓ ${worker.name} vào ca — quét tem thùng SKU để nhận việc`);
   } else {
     scanFeedback('ok', `✓ ${worker.name} vào ca — đèn ${SLOT_COLORS[slot].label}`);
@@ -2426,7 +2463,7 @@ function handleSkuScan(skuIdx) {
   }
 
   const slot = state.armedSlot;
-  state.armedSlot = null;
+  disarmSlot();
   // Quét thùng đầu tiên khi phiên chưa chạy → tự khởi động phiên
   if (!state.simRunning && !state.simDone) {
     state.opsStep = 5;
