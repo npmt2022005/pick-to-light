@@ -888,10 +888,12 @@ const WORKERS = [
 ];
 
 // 3 màu LED cố định mỗi khu vực
+// lightAddr = địa chỉ module đèn Lightstep thật — mỗi module là đèn MỘT MÀU cố định,
+// nên map theo màu nhân viên: Vàng→0004, Đỏ→0002, Xanh→0003
 const SLOT_COLORS = [
-  { key: 'yellow', hex: '#FFB01F', label: 'Vàng' },
-  { key: 'red',    hex: '#f0564a', label: 'Đỏ'   },
-  { key: 'green',  hex: '#41bf58', label: 'Xanh'  },
+  { key: 'yellow', hex: '#FFB01F', label: 'Vàng', lightAddr: '0004' },
+  { key: 'red',    hex: '#f0564a', label: 'Đỏ',   lightAddr: '0002' },
+  { key: 'green',  hex: '#41bf58', label: 'Xanh', lightAddr: '0003' },
 ];
 
 // Pool đầy đủ 9 nhân viên (dùng cho bước Phân công khu vực)
@@ -912,9 +914,8 @@ const ZONES = [
 ];
 
 // STORES = cửa hàng trong phiên demo (1 cửa hàng, thuộc khu vực A)
-// lightAddr = địa chỉ module đèn Lightstep thật (4 số) gắn với ngăn này
 const STORES = [
-  { id: 'CH-A01', addr: 'A-01', zone: 'A', lightAddr: '0002' },
+  { id: 'CH-A01', addr: 'A-01', zone: 'A' },
 ];
 
 // STORES_ALL = toàn bộ ngăn vật lý trong kho (49 ngăn khu A)
@@ -2927,32 +2928,33 @@ function hwEvent(evt) {
   }
 }
 
-// Nút bấm vật lý tại địa chỉ đèn → tìm ngăn + nhân viên đang chia và xác nhận
+// Nút bấm vật lý trên module đèn → module thuộc màu nào thì xác nhận
+// ngăn hiện tại của nhân viên màu đó
 function hwButtonPressed(address) {
-  const si = STORES.findIndex(s => s.lightAddr === address);
-  if (si === -1) return;
-  const zoneId = STORES[si].zone;
-  const zi = getZoneStoreIndices(zoneId);
-  for (let slot = 0; slot < SLOT_COLORS.length; slot++) {
-    if (!state.workerActive[slot] || state.workerCurrentSku[slot] === null) continue;
-    if (state.workerZoneDone[slot][zoneId]) continue;
-    if (zi[state.workerZoneIdx[slot][zoneId]] !== si || state.confirmed[slot][si]) continue;
+  const slot = SLOT_COLORS.findIndex(sc => sc.lightAddr === address);
+  if (slot === -1) return;
+  if (!state.workerActive[slot] || state.workerCurrentSku[slot] === null) return;
+  for (const z of [...ZONES, ...state.extraZones]) {
+    if (state.workerZoneDone[slot][z.id]) continue;
+    const zi = getZoneStoreIndices(z.id);
+    const si = zi[state.workerZoneIdx[slot][z.id]];
+    if (si === undefined || state.confirmed[slot][si]) continue;
     confirmBinClick(slot, si);
     return;
   }
 }
 
-// Thắp đèn thật cho ngăn hiện tại của slot (kèm số lượng cần bỏ)
+// Thắp module đèn màu của nhân viên (kèm số lượng cần bỏ vào ngăn hiện tại)
 function hwLightCurrentBin(slot) {
   const skuIdx = state.workerCurrentSku[slot];
   if (skuIdx === null) return;
+  const addr = SLOT_COLORS[slot].lightAddr;
+  if (!addr) return;
   [...ZONES, ...state.extraZones].forEach(z => {
     if (state.workerZoneDone[slot][z.id]) return;
     const zi = getZoneStoreIndices(z.id);
     const si = zi[state.workerZoneIdx[slot][z.id]];
     if (si === undefined) return;
-    const addr = STORES[si] && STORES[si].lightAddr;
-    if (!addr) return;
     hwSend({ type: 'light', items: [{ address: addr, qty: state.editPlan[skuIdx][si] }] });
   });
 }
