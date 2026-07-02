@@ -2071,9 +2071,10 @@ function renderOpsSidebar() {
     if (!isActive) statusLine = 'Chưa vào ca';
     else if (isDone) statusLine = '✓ Hoàn thành ca';
     else if (isIdle) {
-      if (state.opsStep < 5) statusLine = 'Đã vào ca — chờ khởi động phiên';
-      else if (isArmed)      statusLine = '⌁ Quét tem thùng SKU để nhận việc…';
-      else statusLine = state.scanMode ? '⌁ Rảnh — quét thẻ rồi quét thùng' : 'Chờ nhận SKU…';
+      if (isArmed)              statusLine = '⌁ Quét tem thùng SKU để nhận việc…';
+      else if (state.scanMode)  statusLine = '⌁ Rảnh — quét thẻ rồi quét thùng';
+      else if (state.opsStep < 5) statusLine = 'Đã vào ca — chờ khởi động phiên';
+      else statusLine = 'Chờ nhận SKU…';
     }
     else if (zoneDoneFlag) statusLine = `✓ ${zoneName} xong — chờ`;
     else if (sku) statusLine = `Bin ${localIdx + 1}/${zoneSize}`;
@@ -2144,8 +2145,10 @@ function renderOpsSidebar() {
       }
     } else if (step === 3) {
       html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">▶ Bắt đầu phiên làm việc</button>`;
+      if (state.scanMode) html += `<div class="scan-wait-hint">⌁ Hoặc quét tem thùng SKU — phiên tự khởi động</div>`;
     } else if (step === 4) {
       html += `<button class="btn btn-primary" style="width:100%;font-size:11px;padding:10px" onclick="opsAdvance()">▶ Nhân viên bắt đầu phân hàng${state.scanMode ? ' (quét thẻ → quét thùng)' : ''}</button>`;
+      if (state.scanMode) html += `<div class="scan-wait-hint">⌁ Hoặc quét tem thùng SKU — phiên tự khởi động</div>`;
     }
   }
 
@@ -2361,7 +2364,6 @@ function handleBadgeScan(worker) {
 
   if (state.workerActive[slot]) {
     // Đã vào ca — lần quét thẻ này là để nhận thùng
-    if (state.opsStep < 5) return scanFeedback('warn', `${worker.name} đã vào ca rồi`);
     if (state.workerDone[slot]) return scanFeedback('warn', `${worker.name} đã xong ca`);
     if (state.workerCurrentSku[slot] !== null) {
       return scanFeedback('warn', `${worker.name} đang chia ${SKUS[state.workerCurrentSku[slot]].code}, chưa nhận thùng mới được`);
@@ -2373,14 +2375,17 @@ function handleBadgeScan(worker) {
     return;
   }
 
+  // Check-in vào ca — ở chế độ máy quét thì "giơ tay" luôn: quét thùng ngay sau là nhận việc
   state.workerActive[slot] = true;
-  if (state.opsStep >= 5) {
-    // Vào ca muộn khi phiên đang chạy → arm luôn, quét thùng là nhận việc ngay
-    if (state.scanMode) state.armedSlot = slot;
-  } else if (state.opsStep <= 3) {
+  if (state.opsStep <= 3) {
     state.opsStep = Math.min(3, state.workerActive.filter(Boolean).length);
   }
-  scanFeedback('ok', `✓ ${worker.name} vào ca — đèn ${SLOT_COLORS[slot].label}`);
+  if (state.scanMode) {
+    state.armedSlot = slot;
+    scanFeedback('ok', `✓ ${worker.name} vào ca — quét tem thùng SKU để nhận việc`);
+  } else {
+    scanFeedback('ok', `✓ ${worker.name} vào ca — đèn ${SLOT_COLORS[slot].label}`);
+  }
   renderOpsSidebar();
   renderLEDBoard();
 }
@@ -2397,10 +2402,14 @@ function findSlotForWorkerCode(code) {
   return -1;
 }
 
-// Quét tem thùng SKU → gán thùng cho nhân viên vừa quét thẻ (armed) và mở vòng phân hàng
+// Quét tem thùng SKU → gán thùng cho nhân viên vừa quét thẻ (armed) và mở vòng phân hàng.
+// Thùng đầu tiên được quét sẽ tự khởi động phiên — không cần bấm nút.
 function handleSkuScan(skuIdx) {
   const sku = SKUS[skuIdx];
-  if (state.screen !== 'vanhanh' || state.opsStep < 5) {
+  if (state.screen !== 'vanhanh') {
+    return scanFeedback('warn', `${sku.code}: mở màn hình Vận hành trước`);
+  }
+  if (!state.scanMode && state.opsStep < 5) {
     return scanFeedback('warn', `${sku.code}: phiên chưa vận hành, chưa cần quét thùng`);
   }
   if (state.skuStatus[skuIdx] === 'done') {
@@ -2418,6 +2427,12 @@ function handleSkuScan(skuIdx) {
 
   const slot = state.armedSlot;
   state.armedSlot = null;
+  // Quét thùng đầu tiên khi phiên chưa chạy → tự khởi động phiên
+  if (!state.simRunning && !state.simDone) {
+    state.opsStep = 5;
+    state.simRunning = true;
+    startSimulation();
+  }
   claimSku(slot, skuIdx);
   const ws = getWorkersForSlot(SLOT_COLORS[slot].key);
   const names = ws.length ? ws.map(w => w.name.split(' ').pop()).join(' & ') : `đèn ${SLOT_COLORS[slot].label}`;
