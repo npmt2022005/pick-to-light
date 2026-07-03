@@ -110,6 +110,16 @@ export function assignWorkerToSlot(code) {
   notify();
 }
 
+// Gán trực tiếp từ dropdown ma trận — không qua bước chọn slot
+export function setSlotWorker(zoneId, colorKey, code) {
+  if (!state.zoneAssignments[zoneId]) {
+    state.zoneAssignments[zoneId] = { yellow: null, red: null, green: null };
+  }
+  state.zoneAssignments[zoneId][colorKey] = code;
+  state.selectingSlot = null;
+  notify();
+}
+
 export function removeWorkerFromSlot(zoneId, colorKey) {
   if (state.zoneAssignments[zoneId]) {
     state.zoneAssignments[zoneId][colorKey] = null;
