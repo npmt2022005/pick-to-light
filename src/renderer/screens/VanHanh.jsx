@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import {
-  Button, CompoundButton, Input, Switch, Field, ProgressBar,
+  Button, CompoundButton, Input, Switch, Field, ProgressBar, Avatar,
   Dialog, DialogSurface, DialogBody, DialogTitle, DialogContent, DialogActions,
 } from '@fluentui/react-components';
 import {
   PlayRegular, PlugConnectedRegular, DocumentBulletListRegular, ArrowCounterclockwiseRegular,
+  PersonRegular,
 } from '@fluentui/react-icons';
 import {
   SLOT_COLORS, WORKERS_POOL, ZONES, STORES, SKUS,
@@ -12,39 +13,128 @@ import {
 } from '../core/data.js';
 import { state, setScreen } from '../core/store.js';
 import {
-  getWorkerCurrentSkuIdx, getWorkersForSlot,
+  getWorkerCurrentSkuIdx, getWorkersForSlot, getAssignedCodes,
   opsAdvance, setScanMode, startNewSession, confirmBinClick,
 } from '../core/session.js';
 import { HW, hwToggleCfg, hwConnect } from '../core/hardware.js';
 
 export default function VanHanh() {
+  // Tách pha: chuẩn bị ca (check-in) và vận hành (theo dõi) là hai màn khác nhau
+  const started = state.simRunning || state.simDone;
   return (
     <div id="ops-outer">
-      <OpsSidebar />
-      <LedBoard />
+      <OpsCommandBar />
+      {started ? (
+        <div id="ops-main">
+          <OpsSidebar />
+          <div id="ops-right">
+            <LedBoard />
+            <EventLog />
+          </div>
+        </div>
+      ) : (
+        <PrepPhase />
+      )}
     </div>
   );
 }
 
-/* ─── OPS SIDEBAR ─── */
+/* ─── PHA CHUẨN BỊ CA — check-in nhân viên trước khi phiên chạy ─── */
+function PrepPhase() {
+  const activeCount = state.workerActive.filter(Boolean).length;
+  return (
+    <div id="prep-phase">
+      <div className="prep-center">
+        <div>
+          <div className="prep-title">Chuẩn bị ca</div>
+          <div className="prep-sub">
+            {state.scanMode
+              ? '⌁ Nhân viên quét thẻ của mình để vào ca — thứ tự tùy ý'
+              : `Check-in lần lượt theo màu đèn · ${activeCount}/3 đã vào ca`}
+          </div>
+        </div>
+        <div className="prep-cards">
+          {SLOT_COLORS.map((sc, slot) => <PrepCard key={sc.key} sc={sc} slot={slot} />)}
+        </div>
+        <div className="prep-actions">
+          <OpsActions step={state.opsStep} />
+        </div>
+      </div>
+      <EventLog />
+    </div>
+  );
+}
+
+function PrepCard({ sc, slot }) {
+  const ws = getWorkersForSlot(sc.key);
+  const w = ws[0];
+  const active = state.workerActive[slot];
+  const nextSlot = state.workerActive.indexOf(false);
+  const isNext = !!w && !active && (state.scanMode || nextSlot === slot);
+
+  const cardStyle = active
+    ? { borderColor: 'var(--green)' }
+    : isNext
+      ? { borderColor: sc.hex, boxShadow: `0 0 0 3px ${hex2rgba(sc.hex, 0.15)}` }
+      : undefined;
+
+  return (
+    <div className={`prep-card${!w ? ' prep-empty' : ''}`} style={cardStyle}>
+      <div className="prep-color-bar" style={{ background: sc.hex }} />
+      <div className="prep-led" style={{ color: sc.hex }}>
+        <span className="prep-led-dot" style={{ background: sc.hex, boxShadow: `0 0 6px ${sc.hex}` }} />
+        Đèn {sc.label}
+      </div>
+      {w ? (
+        <>
+          <Avatar name={w.name} color="colorful" size={56} />
+          <div className="prep-name">{w.name}</div>
+          <div className="prep-code">{w.code}</div>
+          <div className={`prep-status${active ? ' ok' : isNext ? ' next' : ''}`} style={isNext ? { color: sc.hex } : undefined}>
+            {active ? '✓ Đã vào ca'
+              : state.scanMode ? '⌁ Chờ quét thẻ…'
+              : isNext ? 'Đến lượt check-in'
+              : 'Chờ đến lượt'}
+          </div>
+        </>
+      ) : (
+        <>
+          <Avatar icon={<PersonRegular />} size={56} />
+          <div className="prep-name" style={{ color: 'var(--text-subtle)' }}>Chưa phân công</div>
+          <Button size="small" onClick={() => setScreen('phancong')}>Phân công ngay</Button>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ─── COMMAND BAR — điều khiển phiên, tách khỏi sidebar theo dõi ─── */
+function OpsCommandBar() {
+  return (
+    <div className="ops-cmdbar">
+      <span className="ops-cmd-label">Nguồn sự kiện</span>
+      <Switch
+        checked={state.scanMode}
+        onChange={(_, d) => setScanMode(d.checked)}
+        label={state.scanMode ? '⌁ Máy quét thật' : '▷ Mô phỏng'}
+      />
+      <span className="cmd-sep" />
+      <button className="hw-status-btn" onClick={hwToggleCfg} title="Bấm để nhập IP controller đèn">
+        <span className="hw-dot" style={{ background: HW.ctrlOk ? 'var(--green)' : HW.bridgeOk ? 'var(--yellow)' : 'var(--text-subtle)' }} />
+        Đèn thật: {HW.ctrlOk ? 'đã kết nối controller' : HW.bridgeOk ? 'bridge OK — bấm nhập IP đèn' : 'chưa chạy demo-bridge.exe'}
+      </button>
+      {HW.showCfg && <HwConfigForm />}
+      <span className="spacer" />
+      <span className="ops-cmd-hint">
+        {state.simDone ? '✓ Phiên đã hoàn thành' : state.simRunning ? 'Phiên đang chạy' : 'Chuẩn bị ca — check-in nhân viên'}
+      </span>
+    </div>
+  );
+}
+
+/* ─── OPS SIDEBAR (pha vận hành) ─── */
 function OpsSidebar() {
   const step = state.opsStep;
-
-  const slotCheckinLabel = (colorKey) => {
-    const sc = SLOT_COLORS.find((c) => c.key === colorKey);
-    const ws = getWorkersForSlot(colorKey);
-    const names = ws.length > 0 ? ws.map((w) => w.name.split(' ').pop()).join(', ') : '(chưa phân)';
-    return `${names} — đèn ${sc.label} quét thẻ vào`;
-  };
-
-  const stepDefs = [
-    'Chuẩn bị ca',
-    slotCheckinLabel('yellow'),
-    slotCheckinLabel('red'),
-    slotCheckinLabel('green'),
-    'Khởi động phiên',
-    'Đang vận hành',
-  ];
 
   // Danh sách nhân viên được phân công (theo zone × màu)
   const allWorkerCards = [];
@@ -71,31 +161,6 @@ function OpsSidebar() {
         <ProgressBar value={doneSkus / SKUS.length} thickness="large" color={doneSkus === SKUS.length ? 'success' : 'brand'} />
       </div>
 
-      <div className="scan-mode-row">
-        <span className="scan-mode-label">Nguồn sự kiện</span>
-        <Switch
-          checked={state.scanMode}
-          onChange={(_, d) => setScanMode(d.checked)}
-          label={state.scanMode ? '⌁ Máy quét thật' : '▷ Mô phỏng'}
-        />
-      </div>
-
-      <div className="hw-status-row" onClick={hwToggleCfg} title="Bấm để nhập IP controller đèn">
-        <span className="hw-dot" style={{ background: HW.ctrlOk ? 'var(--green)' : HW.bridgeOk ? 'var(--yellow)' : 'var(--text-subtle)' }} />
-        Đèn thật: {HW.ctrlOk ? 'đã kết nối controller' : HW.bridgeOk ? 'bridge OK — bấm nhập IP đèn' : 'chưa chạy demo-bridge.exe'}
-      </div>
-
-      {HW.showCfg && <HwConfigForm />}
-
-      <div className="step-track">
-        {stepDefs.map((s, i) => (
-          <div key={i} className={`step-row${i < step ? ' s-done' : ''}${i === step ? ' s-active' : ''}`}>
-            <div className="step-dot" />
-            <div className="step-text">{s}</div>
-          </div>
-        ))}
-      </div>
-
       <div className="workers-label">Nhân viên</div>
       {allWorkerCards.length === 0 && (
         <div style={{ fontSize: 12, color: 'var(--text-subtle)', fontStyle: 'italic', padding: '6px 0' }}>
@@ -105,6 +170,28 @@ function OpsSidebar() {
       {allWorkerCards.map((card) => <WorkerCard key={`${card.zoneId}-${card.sc.key}`} {...card} />)}
 
       <OpsActions step={step} />
+    </div>
+  );
+}
+
+/* ─── NHẬT KÝ SỰ KIỆN — panel ngang dưới bảng LED, kiểu danh sách sự kiện HMI ─── */
+function EventLog() {
+  return (
+    <div className="event-log">
+      <div className="event-log-title">Nhật ký sự kiện{state.eventLog.length > 0 ? ` (${state.eventLog.length})` : ''}</div>
+      <div className="event-log-list">
+        {state.eventLog.length === 0 ? (
+          <div className="ev-empty">Chưa có sự kiện</div>
+        ) : (
+          state.eventLog.map((e, i) => (
+            <div key={state.eventLog.length - i} className="ev-row">
+              <span className={`ev-dot ev-${e.type}`} />
+              <span className="ev-time">{e.t}</span>
+              <span className="ev-msg">{e.msg}</span>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
@@ -178,7 +265,7 @@ function WorkerCard({ w, sc, slot, zoneId, zoneName, zoneColor }) {
     <div className="worker-card" style={{ borderColor, boxShadow }}>
       <div className="worker-top">
         <div className="worker-color-dot" style={{ background: sc.hex, boxShadow: `0 0 5px ${sc.hex}99` }} />
-        <div className="worker-name">{w.name.split(' ').slice(-1)[0]}</div>
+        <div className="worker-name">{w.name}</div>
         <span style={{ fontSize: 10, padding: '1px 5px', borderRadius: 3, background: `${sc.hex}22`, color: sc.hex, fontWeight: 700 }}>{sc.label}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
@@ -221,6 +308,13 @@ function OpsActions({ step }) {
   }
 
   if (step <= 2) {
+    if (getAssignedCodes().length === 0) {
+      return (
+        <div className="ops-actions">
+          <div className="scan-wait-hint">Chưa có nhân viên nào được phân công khu vực</div>
+        </div>
+      );
+    }
     if (state.scanMode) {
       return <div className="ops-actions"><div className="scan-wait-hint">⌁ Chờ quét thẻ nhân viên…</div></div>;
     }
@@ -296,7 +390,7 @@ function LedBoard() {
               <div className="zone-dot" style={{ background: zone.color, boxShadow: `0 0 5px ${zone.color}88` }} />
               <span style={{ color: zone.color }}>{zone.name}</span>
             </div>
-            <div className="zone-bins">
+            <div className={`zone-bins${zoneStores.length <= 3 ? ' zone-bins-large' : ''}`}>
               {zoneStores.map((store) => (
                 <BinCard key={store.id} store={store} zone={zone} sessionStarted={sessionStarted} />
               ))}
@@ -342,19 +436,18 @@ function BinCard({ store, zone, sessionStarted }) {
   return (
     <div className="bin-card" style={cardStyle}>
       <div className="bin-header">
-        <div>
-          <div className="bin-name">{store.id}</div>
-          <div className="bin-subname">{store.id}</div>
+        <div className="bin-name">{store.id}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {confirmingSlot && (
+            <div className="bin-badge" style={{
+              background: hex2rgba(confirmingSlot.sc.hex, 0.2),
+              color: confirmingSlot.sc.hex,
+              border: `1px solid ${hex2rgba(confirmingSlot.sc.hex, 0.5)}`,
+            }}>ĐANG PHÂN</div>
+          )}
+          <div className="bin-addr" style={{ color: zone.color }}>{store.addr}</div>
         </div>
-        <div className="bin-addr" style={{ color: zone.color }}>{store.addr}</div>
       </div>
-      {confirmingSlot && (
-        <div className="bin-badge" style={{
-          background: hex2rgba(confirmingSlot.sc.hex, 0.2),
-          color: confirmingSlot.sc.hex,
-          border: `1px solid ${hex2rgba(confirmingSlot.sc.hex, 0.5)}`,
-        }}>ĐANG PHÂN</div>
-      )}
       <div className="led-slots">
         {slots.map((slotData) => {
           const { sc, slot, state: slotState, skuIdx, qty, isConfirmed, isCurrentBin } = slotData;

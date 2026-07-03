@@ -1,6 +1,8 @@
-/* Scan feedback: toast + beep.
+/* Scan feedback: toast + beep + ghi nhật ký sự kiện.
    Toast hiển thị qua Fluent Toaster (đăng ký từ React qua setToastHandler);
    fallback DOM tự chế chỉ dùng khi React chưa mount. */
+import { logEvent } from './store.js';
+
 let toastHandler = null;
 
 export function setToastHandler(fn) {
@@ -11,6 +13,7 @@ let scanToastTimer = null;
 
 export function scanFeedback(type, msg) {
   scanBeep(type);
+  logEvent(type, msg);
   if (toastHandler) return toastHandler(type, msg);
 
   // Fallback khi chưa có Toaster

@@ -4,7 +4,7 @@ import {
   SLOT_COLORS, WORKERS_POOL, ZONES, STORES, SKUS, PLAN, ZONE_COLORS,
   getZoneStoreIndices,
 } from './data.js';
-import { state, notify, setScreen } from './store.js';
+import { state, notify, setScreen, logEvent } from './store.js';
 import { scanFeedback } from './toast.js';
 import { hwLightCurrentBin, hwClearAll } from './hardware.js';
 
@@ -25,6 +25,11 @@ export function getWorkerCurrentSku(slot) {
 export function claimSku(slot, skuIdx) {
   state.workerCurrentSku[slot] = skuIdx;
   state.skuStatus[skuIdx] = 'active';
+  if (!state.scanMode) {
+    const ws = getWorkersForSlot(SLOT_COLORS[slot].key);
+    const name = ws.length ? ws[0].name : `Đèn ${SLOT_COLORS[slot].label}`;
+    logEvent('info', `▷ ${name} nhận thùng ${SKUS[skuIdx].code}`);
+  }
   [...ZONES, ...state.extraZones].forEach((z) => {
     state.workerZoneIdx[slot][z.id] = 0;
     state.workerZoneDone[slot][z.id] = false;
@@ -180,6 +185,7 @@ export function startNewSession() {
     A: { yellow: null, red: null, green: null },
   };
   state.selectingSlot = null;
+  state.eventLog = [];
   // Phiên mới nhảy thẳng tới Phân công (kế hoạch reset về gốc, coi như đã chốt)
   state.planLocked = true;
   hwClearAll();
@@ -190,13 +196,19 @@ export function opsAdvance() {
   const step = state.opsStep;
   if (step <= 2) {
     const idx = state.workerActive.indexOf(false);
-    if (idx !== -1) state.workerActive[idx] = true;
+    if (idx !== -1) {
+      state.workerActive[idx] = true;
+      const ws = getWorkersForSlot(SLOT_COLORS[idx].key);
+      const name = ws.length ? ws[0].name : `Đèn ${SLOT_COLORS[idx].label}`;
+      logEvent('info', `✓ ${name} vào ca — đèn ${SLOT_COLORS[idx].label}`);
+    }
     state.opsStep = Math.min(3, state.workerActive.filter(Boolean).length);
   } else if (step === 3) {
     state.opsStep = 4;
   } else if (step === 4) {
     state.opsStep = 5;
     state.simRunning = true;
+    logEvent('info', '▷ Phiên phân hàng bắt đầu');
     startSimulation();
   }
   notify();
@@ -247,6 +259,7 @@ export function checkSessionEnd() {
   state.simRunning = false;
   state.simDone = true;
   [0, 1, 2].forEach((s) => { if (state.workerActive[s]) state.workerDone[s] = true; });
+  logEvent('ok', '★ Phiên hoàn thành — tất cả thùng đã phân xong');
   hwClearAll();
   notify();
   return true;
@@ -262,6 +275,8 @@ export function confirmCurrentBin(slot, zoneId) {
   const skuIdx = getWorkerCurrentSkuIdx(slot);
   if (skuIdx !== null) {
     state.distributed[skuIdx][globalStoreIdx] = state.editPlan[skuIdx][globalStoreIdx];
+    // Chế độ quét thật đã log qua scanFeedback trong confirmBinClick
+    if (!state.scanMode) logEvent('ok', `✓ ${STORES[globalStoreIdx].id} — đã bỏ ${SKUS[skuIdx].code}`);
   }
 
   if (localIdx < zoneIndices.length - 1) {
@@ -277,7 +292,10 @@ export function confirmCurrentBin(slot, zoneId) {
 
     if (allZonesDone) {
       const doneSku = state.workerCurrentSku[slot];
-      if (doneSku !== null) state.skuStatus[doneSku] = 'done';
+      if (doneSku !== null) {
+        state.skuStatus[doneSku] = 'done';
+        logEvent('ok', `✓ Thùng ${SKUS[doneSku].code} phân xong`);
+      }
       state.workerCurrentSku[slot] = null;
       state.workerRoundsDone[slot]++;
       settleIdleWorkers();

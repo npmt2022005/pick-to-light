@@ -44,7 +44,20 @@ export const state = {
 
   // Báo cáo
   distributed: Array.from({ length: SKUS.length }, () => new Array(STORES.length).fill(0)),
+
+  // Nhật ký sự kiện phiên vận hành (mới nhất đứng đầu)
+  eventLog: [],
 };
+
+export function logEvent(type, msg) {
+  state.eventLog.unshift({
+    t: new Date().toLocaleTimeString('vi-VN', { hour12: false }),
+    type,
+    msg,
+  });
+  if (state.eventLog.length > 60) state.eventLog.length = 60;
+  notify();
+}
 
 /* Cơ chế thông báo cho React (useSyncExternalStore) */
 let version = 0;
