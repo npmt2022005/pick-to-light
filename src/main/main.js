@@ -37,13 +37,13 @@ function createWindow() {
     // Header của app vẽ đè lên vùng title bar — nút phóng to/thu nhỏ là nút native
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      color: '#202020',
-      symbolColor: '#e6e6e6',
-      height: 48,
+      color: '#f3f3f3',
+      symbolColor: '#1b1b1b',
+      height: 40,
     },
     // Mica (backgroundMaterial) của Electron chưa ổn định — DWM có máy không áp,
     // cửa sổ thành trong suốt thô nhìn xuyên ra sau. Dùng nền đặc cho chắc chắn.
-    backgroundColor: '#202020',
+    backgroundColor: '#f3f3f3',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

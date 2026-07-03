@@ -273,8 +273,8 @@ function LedBoard() {
     <div id="led-board">
       <div className="led-board-head">
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>Bảng LED điều phối</div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+          <div className="lb-title">Bảng LED điều phối</div>
+          <div className="lb-sub">
             Thời gian thực — {STORES.length} bin · 3 màu LED{state.scanMode ? ' · bấm đèn để xác nhận đã bỏ hàng' : ''}
           </div>
         </div>
