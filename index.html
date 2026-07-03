@@ -930,13 +930,19 @@ const SKUS = [
   { id: 'SKU01', code: 'ATN01-WHT-L',  name: 'Áo thun basic trắng L',     qty: 160 }, // đủ  =160
   { id: 'SKU02', code: 'ATN01-BLK-XL', name: 'Áo thun basic đen XL',       qty: 110 }, // thiếu -22
   { id: 'SKU03', code: 'ATN01-NVY-M',  name: 'Áo thun basic navy M',        qty: 95  }, // dư  +6
+  { id: 'SKU04', code: 'ATN02-RED-S',  name: 'Áo thun graphic đỏ S',        qty: 69  }, // đủ  =69
+  { id: 'SKU05', code: 'APL01-WHT-L',  name: 'Áo polo piqué trắng L',       qty: 120 }, // thiếu -18
+  { id: 'SKU06', code: 'APL01-NVY-M',  name: 'Áo polo piqué navy M',        qty: 130 }, // dư  +7
 ];
 
-// PLAN[skuIndex][storeIndex] — 3 SKU × 1 store
+// PLAN[skuIndex][storeIndex] — 6 SKU × 1 store
 const PLAN = [
   [160], // SKU01 total=160 → đủ (tồn 160)
   [132], // SKU02 total=132 → thiếu -22 (tồn 110)
   [ 89], // SKU03 total=89  → dư +6 (tồn 95)
+  [ 69], // SKU04 total=69  → đủ (tồn 69)
+  [138], // SKU05 total=138 → thiếu -18 (tồn 120)
+  [123], // SKU06 total=123 → dư +7 (tồn 130)
 ];
 
 // Không gán cứng SKU cho nhân viên nữa — nhân viên tự nhận thùng:
