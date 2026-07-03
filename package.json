@@ -1,0 +1,51 @@
+{
+  "name": "put-to-light",
+  "version": "1.0.0",
+  "description": "Put-to-Light Warehouse Demo",
+  "author": "Rockship <rockship17.co@gmail.com>",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "npm run build:ui && electron .",
+    "dev": "vite",
+    "build:ui": "vite build",
+    "pack": "npm run build:ui && electron-builder --win --dir",
+    "dist": "npm run build:ui && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.rockship.puttolight",
+    "productName": "PutToLight",
+    "files": [
+      "src/main/**",
+      "dist-renderer/**"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    }
+  },
+  "dependencies": {
+    "electron-log": "^5.2.0"
+  },
+  "devDependencies": {
+    "@fluentui/react-components": "^9.74.3",
+    "@fluentui/react-icons": "^2.0.331",
+    "@vitejs/plugin-react": "^6.0.3",
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "vite": "^8.1.3"
+  }
+}

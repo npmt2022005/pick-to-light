@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src ws://localhost:* ws://127.0.0.1:*">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Put·to·Light — Warehouse Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="app">
+  <header id="header">
+    <div class="logo">Put·<span>to</span>·Light</div>
+    <div class="role-tabs">
+      <button class="role-tab" data-role="it" onclick="setRole('it')">IT</button>
+      <button class="role-tab" data-role="qlyvh" onclick="setRole('qlyvh')">Quản lý VH</button>
+      <button class="role-tab" data-role="tql" onclick="setRole('tql')">Tổng Quản Lý</button>
+    </div>
+  </header>
+  <nav id="sidenav"></nav>
+  <main id="main"></main>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

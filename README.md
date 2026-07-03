@@ -73,4 +73,46 @@ Chạy thẳng trên trình duyệt — không cần cài đặt hay server.
 
 ## Tech
 
-Single-file HTML — CSS + JS inline, không có dependency ngoài ngoài Google Fonts.
+**React + Fluent UI React** (component chính chủ Microsoft, theme Windows 11 dark) chạy trong Electron; build bằng Vite. Logic nghiệp vụ (phiên làm việc, scanner, WebSocket đèn) là JS thuần trong `src/renderer/core/` — không phụ thuộc React, tách bạch khỏi giao diện.
+
+Ảnh màn hình: [docs/screenshots/](docs/screenshots/).
+
+## Bố cục dự án
+
+```
+pick-to-light/
+├── src/
+│   ├── main/main.js        # Electron main: cửa sổ, single-instance, electron-log
+│   ├── renderer/           # giao diện React + Fluent UI (build bằng Vite)
+│   │   ├── index.html      # entry Vite + CSP
+│   │   ├── main.jsx        # mount React, khởi động scanner + hardware
+│   │   ├── App.jsx         # shell: header TabList, sidenav, điều phối màn hình
+│   │   ├── custom.css      # style cho phần đặc thù: bảng LED, step track, sơ đồ kho
+│   │   ├── core/           # LOGIC (JS thuần): data, store, session, scanner, hardware
+│   │   └── screens/        # 7 màn hình: TiepNhan, KeHoach, DieuChinh, PhanCong,
+│   │                       #             VanHanh (bảng LED), BaoCao, SoDoKho
+│   └── legacy/             # bản vanilla cũ (chạy thẳng trên trình duyệt, cho GitHub Pages)
+├── build/icon.ico          # icon app cho Windows
+├── index.html              # stub redirect cho GitHub Pages → src/legacy/
+├── tools/barcodes.html     # trang in mã vạch thẻ nhân viên + tem thùng SKU
+├── hardware/
+│   ├── DemoBridge/         # bridge C# (.NET 4.8): WebSocket localhost ↔ controller đèn
+│   └── LsSample1a/         # sample WinForms của Aioi Systems (tham khảo SDK)
+└── docs/                   # PRD, user flow, changelog, screenshots
+```
+
+## Dev & phát hành
+
+| Lệnh | Tác dụng |
+|---|---|
+| `npm start` | Build UI (Vite) rồi mở app Electron |
+| `npm run dev` | Vite dev server (xem UI trong trình duyệt, hot-reload) |
+| `npm run pack` | Build thư mục app chưa đóng gói (kiểm tra nhanh) vào `dist/win-unpacked` |
+| `npm run dist` | Đóng gói **installer NSIS** (`PutToLight-Setup-x.y.z.exe`) + bản **portable** |
+
+Log runtime ghi tại `%APPDATA%/put-to-light/logs/main.log` (electron-log).
+
+Test scanner không cần máy quét: mở DevTools, gõ `window.__scan('NV-2207')` (thẻ nhân viên) hoặc `window.__scan('ATN01-WHT-L')` (tem thùng).
+
+Chưa thiết lập (cần khi phát hành rộng): ký số exe (code signing — tránh cảnh báo SmartScreen), auto-update (electron-updater + GitHub Releases).
+

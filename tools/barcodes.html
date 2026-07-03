@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tem barcode demo — Put-to-Light</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 24px; color: #111; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .hint { font-size: 12px; color: #666; margin-bottom: 20px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin: 24px 0 12px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 14px; }
+  .label {
+    border: 1px dashed #999; border-radius: 6px; padding: 10px 14px 6px;
+    text-align: center; page-break-inside: avoid;
+  }
+  .label .who { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .label .sub { font-size: 10px; color: #666; margin-bottom: 4px; }
+  .testbox {
+    border: 2px solid #2f6fed; border-radius: 8px; padding: 14px 16px;
+    margin-bottom: 8px; background: #f0f5ff;
+  }
+  .testbox .tb-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+  .testbox input {
+    width: 100%; box-sizing: border-box; font-family: Consolas, monospace;
+    font-size: 16px; padding: 8px 10px; border: 1px solid #999; border-radius: 6px;
+  }
+  .testbox .tb-result { font-size: 13px; margin-top: 8px; min-height: 18px; font-family: Consolas, monospace; }
+  @media print {
+    .hint, .testbox { display: none; }
+    .label { border-color: #ddd; }
+  }
+</style>
+</head>
+<body>
+<h1>Tem barcode demo — Put-to-Light</h1>
+<p class="hint">In trang này (Ctrl+P), cắt rời từng tem. Chuẩn mã Code 128 — mọi máy quét 1D/2D đều đọc được. Cần mạng lần đầu mở trang (tải thư viện JsBarcode từ CDN).</p>
+
+<div class="testbox">
+  <div class="tb-title">🔧 Test máy quét — click vào ô dưới rồi quét bất kỳ tem nào trên trang này</div>
+  <input id="scan-test" placeholder="Click vào đây rồi bóp cò máy quét…" autocomplete="off">
+  <div class="tb-result" id="scan-result">Chưa nhận được gì.</div>
+</div>
+
+<h2>Thẻ nhân viên</h2>
+<div class="grid" id="badges"></div>
+
+<h2>Tem thùng SKU</h2>
+<div class="grid" id="skus"></div>
+
+<script>
+const WORKERS = [
+  { name: 'Nguyễn Văn An',  code: 'NV-2207' },
+  { name: 'Trần Thị Bình',  code: 'NV-3104' },
+  { name: 'Lê Văn Cường',   code: 'NV-4102' },
+  { name: 'Phạm Văn Dũng',  code: 'NV-5063' },
+  { name: 'Hoàng Thị Em',   code: 'NV-6120' },
+  { name: 'Đặng Văn Phúc',  code: 'NV-7031' },
+  { name: 'Vũ Thị Giang',   code: 'NV-8044' },
+  { name: 'Ngô Văn Hùng',   code: 'NV-9012' },
+  { name: 'Đinh Thị Kim',   code: 'NV-0298' },
+];
+const SKUS = [
+  { name: 'Áo thun basic trắng L', code: 'ATN01-WHT-L' },
+  { name: 'Áo thun basic đen XL',  code: 'ATN01-BLK-XL' },
+  { name: 'Áo thun basic navy M',  code: 'ATN01-NVY-M' },
+  { name: 'Áo thun graphic đỏ S',  code: 'ATN02-RED-S' },
+  { name: 'Áo polo piqué trắng L', code: 'APL01-WHT-L' },
+  { name: 'Áo polo piqué navy M',  code: 'APL01-NVY-M' },
+];
+
+function makeLabels(items, containerId, subLabel) {
+  const box = document.getElementById(containerId);
+  items.forEach(it => {
+    const div = document.createElement('div');
+    div.className = 'label';
+    div.innerHTML = `<div class="who">${it.name}</div><div class="sub">${subLabel}</div><svg></svg>`;
+    box.appendChild(div);
+    JsBarcode(div.querySelector('svg'), it.code, {
+      format: 'CODE128', width: 2, height: 56, fontSize: 13,
+      font: 'Consolas', textMargin: 2, margin: 4,
+    });
+  });
+}
+makeLabels(WORKERS, 'badges', 'Thẻ nhân viên');
+makeLabels(SKUS, 'skus', 'Tem thùng SKU');
+
+/* ─── Ô test máy quét: hiện chuỗi nhận được, có/không Enter suffix, timing ─── */
+const inp = document.getElementById('scan-test');
+const res = document.getElementById('scan-result');
+let keyTimes = [], flushT = null;
+
+function reportScan(hasEnter) {
+  const val = inp.value;
+  if (!val) return;
+  const gaps = keyTimes.slice(1).map((t, i) => t - keyTimes[i]);
+  const maxGap = gaps.length ? Math.round(Math.max(...gaps)) : 0;
+  if (hasEnter) {
+    res.style.color = '#1a7f37';
+    res.innerHTML = `✓ Nhận: <b>${val}</b> (${val.length} ký tự) · CÓ Enter suffix · phím cách nhau tối đa ${maxGap}ms — hoàn hảo, app sẽ nhận được.`;
+  } else {
+    res.style.color = '#9a6700';
+    res.innerHTML = `⚠ Nhận: <b>${val}</b> (${val.length} ký tự) · KHÔNG có Enter suffix · phím cách nhau tối đa ${maxGap}ms — app vẫn nhận được (tự chốt sau khoảng lặng), nhưng nên bật suffix Enter trên máy quét.`;
+  }
+  inp.value = '';
+  keyTimes = [];
+}
+
+inp.addEventListener('keydown', e => {
+  clearTimeout(flushT);
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    reportScan(true);
+  } else if (e.key.length === 1) {
+    keyTimes.push(performance.now());
+    flushT = setTimeout(() => reportScan(false), 300);
+  }
+});
+</script>
+</body>
+</html>
